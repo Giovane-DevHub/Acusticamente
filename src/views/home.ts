@@ -1,0 +1,172 @@
+import { storageService } from '../services/storageService';
+import { authService } from '../services/authService';
+import { ICONS, showToast } from '../utils/ui';
+
+export function renderHome(onNavigate: (screen: string) => void): HTMLElement {
+  const container = document.createElement('div');
+  const user = authService.getCurrentUser();
+  const students = storageService.getStudents();
+  const plans = storageService.getPlans();
+  const appointments = storageService.getAppointments();
+
+  const todayStr = storageService.getTodayDateString();
+  const todayAppointments = appointments.filter(a => a.data === todayStr);
+
+  const activeStudentsCount = students.filter(s => s.status === 'ativo').length;
+  const nextApp = todayAppointments.find(a => a.status === 'agendado');
+
+  container.innerHTML = `
+    <!-- Cabeçalho de Boas-vindas -->
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-family: var(--font-heading); font-size: 1.28rem; font-weight: 700; color: var(--text-white);">
+          Olá, ${user?.nome || 'Administrador'}
+        </h2>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 3px;">
+          Aqui está o resumo das suas atividades e aulas de hoje.
+        </p>
+      </div>
+
+      <button class="btn btn-primary" id="home-btn-new-appointment">
+        ${ICONS.plus} Novo Agendamento
+      </button>
+    </div>
+
+    <!-- Cards de Métricas -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon-box">
+          ${ICONS.agenda}
+        </div>
+        <div class="metric-data">
+          <span class="metric-value">${todayAppointments.length}</span>
+          <span class="metric-label">Aulas hoje</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-box">
+          ${ICONS.alunos}
+        </div>
+        <div class="metric-data">
+          <span class="metric-value">${activeStudentsCount}</span>
+          <span class="metric-label">Alunos ativos</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-box">
+          ${ICONS.home}
+        </div>
+        <div class="metric-data">
+          <span class="metric-value">${nextApp ? nextApp.horaInicio : '--:--'}</span>
+          <span class="metric-label">${nextApp ? 'Próxima aula' : 'Nenhuma pendente'}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-box">
+          ${ICONS.planos}
+        </div>
+        <div class="metric-data">
+          <span class="metric-value">${plans.length}</span>
+          <span class="metric-label">Planos de ensino</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de Aulas de Hoje -->
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h3 class="panel-card-title">Aulas de Hoje (${todayAppointments.length})</h3>
+        <button class="btn btn-secondary" id="home-btn-view-all-agenda" style="padding: 6px 14px; font-size: 0.82rem;">
+          Ver Agenda Completa
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Horário</th>
+              <th>Aluno</th>
+              <th>Plano de Ensino</th>
+              <th>Status</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="today-classes-tbody">
+            ${
+              todayAppointments.length === 0
+                ? `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Nenhuma aula agendada para hoje.</td></tr>`
+                : todayAppointments
+                    .map(app => {
+                      const student = students.find(s => s.id === app.alunoId);
+                      const plan = plans.find(p => p.id === app.planoId);
+                      const isConcluido = app.status === 'concluido';
+
+                      return `
+                        <tr data-app-id="${app.id}">
+                          <td>
+                            <strong style="color: var(--text-white);">${app.horaInicio}</strong>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);"> às ${app.horaFim}</span>
+                          </td>
+                          <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                              <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; color: var(--color-coral);">
+                                ${(student?.nome || 'A')[0]}
+                              </div>
+                              <span style="font-weight: 500;">${student?.nome || 'Aluno não vinculado'}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <span style="color: var(--text-secondary);">${plan?.nome || 'Plano Personalizado'}</span>
+                          </td>
+                          <td>
+                            <span class="badge ${isConcluido ? 'badge-success' : 'badge-warning'}">
+                              ${isConcluido ? '✓ Concluído' : '⏳ Agendado'}
+                            </span>
+                          </td>
+                          <td style="text-align: right;">
+                            ${
+                              !isConcluido
+                                ? `<button class="btn btn-secondary btn-complete-class" data-id="${app.id}" style="padding: 5px 12px; font-size: 0.78rem; color: var(--status-success);">
+                                     Concluir
+                                   </button>`
+                                : `<span style="font-size: 0.8rem; color: var(--text-muted);">Finalizada</span>`
+                            }
+                          </td>
+                        </tr>
+                      `;
+                    })
+                    .join('')
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Eventos
+  container.querySelector('#home-btn-new-appointment')?.addEventListener('click', () => {
+    onNavigate('agenda');
+  });
+
+  container.querySelector('#home-btn-view-all-agenda')?.addEventListener('click', () => {
+    onNavigate('agenda');
+  });
+
+  container.querySelectorAll('.btn-complete-class').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = (e.currentTarget as HTMLElement).dataset.id;
+      if (id) {
+        storageService.updateAppointment(id, { status: 'concluido' }, user?.nome || 'Administrador');
+        showToast('Aula concluída com sucesso!', 'success');
+        // Recarrega tela
+        onNavigate('home');
+      }
+    });
+  });
+
+  return container;
+}
