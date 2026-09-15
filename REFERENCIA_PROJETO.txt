@@ -1,0 +1,39 @@
+================================================================================
+                        ACUSTICAMENTE - DOCUMENTO DE REFERÊNCIA
+================================================================================
+
+1. IDENTIFICAÇÃO DO PROJETO
+--------------------------------------------------------------------------------
+Nome do Projeto: Acusticamente
+Segmento: Sistema de Gestão Educacional
+Linguagem de Programação: TypeScript
+Ambiente de Execução: Node.js
+Estilização: CSS
+Banco de Dados Oficial: MongoDB
+
+
+2. PALETA DE CORES OFICIAL
+--------------------------------------------------------------------------------
+- Fundo (Preto Azulado Escuro): 
+    HEX: #17181f
+    RGB: rgb(23, 24, 31)
+
+- Destaque / Ação (Vermelho Coral Vibrante): 
+    HEX: #ea4335
+    RGB: rgb(234, 67, 53)
+
+- Textos & Destaque (Branco Gelo Puro): 
+    HEX: #ffffff
+    RGB: rgb(255, 255, 255)
+
+Cores Complementares da Interface:
+- Superfícies dos Cards e Menus: #1f212b
+- Superfícies Elevadas e Modais: #262936
+- Bordas e Divisores Sutis: #2e3242
+- Textos Secundários / Mudos: #9aa0b4
+- Badges de Sucesso: #22c55e (Fundo translúcido: rgba(34, 197, 94, 0.15))
+- Badges de Alerta / Pendente: #f59e0b (Fundo translúcido: rgba(245, 158, 11, 0.15))
+
+3. Caminhos úteis
+--------------------------------------------------------------------------------
+src/views/ <- caminho dos fontes das telas
