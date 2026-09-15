@@ -5,14 +5,45 @@
 1. IDENTIFICAÇÃO DO PROJETO
 --------------------------------------------------------------------------------
 Nome do Projeto: Acusticamente
-Segmento: Sistema de Gestão Educacional
-Linguagem de Programação: TypeScript
-Ambiente de Execução: Node.js
-Estilização: CSS
-Banco de Dados Oficial: MongoDB
+Segmento: Gestão de Escola de Música
+Versão da Aplicação: 1.0.0
+Desenvolvedor: DevHub
 
 
-2. PALETA DE CORES OFICIAL
+2. ESPECIFICAÇÕES TÉCNICAS E VERSÕES
+--------------------------------------------------------------------------------
+- Linguagem de Programação:
+    * TypeScript: v5.4.5 (Target ES2020)
+    * JavaScript: ECMAScript 2020+ (ESNext)
+
+- Ambiente de Execução (Runtime):
+    * Node.js: v24.19.0 LTS (compatível com Node v18+, v20+ e v24+)
+    * Gerenciador de Pacotes: npm v10.x+
+
+- Servidor e Build Tool:
+    * Vite: v5.2.11 (Porta padrão: 3000, host: true)
+
+- Banco de Dados Oficial:
+    * MongoDB: v7.0 / v6.0+ (Community Server ou MongoDB Atlas)
+    * URI Padrão Local: mongodb://localhost:27017
+    * Database Padrão: acusticamente_db
+    * Driver / ORM Recomendado: mongodb ^6.x / mongoose ^8.x
+    * Coleções Mapeadas:
+        - usuarios (Credenciais, perfis e permissões)
+        - alunos (Dados cadastrais e matrículas)
+        - planos_ensino (Cursos musicais e módulos dinâmicos)
+        - agenda (Aulas e compromissos com horários)
+        - auditorias (Trilha imutável de compliance e ações)
+
+
+3. CREDENCIAIS INICIAIS DO SISTEMA
+--------------------------------------------------------------------------------
+- Usuário Administrador Padrão:
+    * Login: 1
+    * Senha: 1
+
+
+4. PALETA DE CORES OFICIAL
 --------------------------------------------------------------------------------
 - Fundo (Preto Azulado Escuro): 
     HEX: #17181f
@@ -31,9 +62,30 @@ Cores Complementares da Interface:
 - Superfícies Elevadas e Modais: #262936
 - Bordas e Divisores Sutis: #2e3242
 - Textos Secundários / Mudos: #9aa0b4
-- Badges de Sucesso: #22c55e (Fundo translúcido: rgba(34, 197, 94, 0.15))
-- Badges de Alerta / Pendente: #f59e0b (Fundo translúcido: rgba(245, 158, 11, 0.15))
+- Badges de Sucesso: #22c55e (Fundo: rgba(34, 197, 94, 0.15))
+- Badges de Alerta / Pendente: #f59e0b (Fundo: rgba(245, 158, 11, 0.15))
 
-3. Caminhos úteis
+
+5. ESTRUTURA E CAMINHOS ÚTEIS
 --------------------------------------------------------------------------------
-src/views/ <- caminho dos fontes das telas
+- Telas da Aplicação:
+    * src/views/home.ts          -> Dashboard inicial e aulas de hoje
+    * src/views/agenda.ts        -> Calendário mensal estilo Google e agendamentos
+    * src/views/alunos.ts        -> Cadastro e gestão de alunos
+    * src/views/planos.ts        -> Planos de ensino e módulos musicais
+    * src/views/user.ts          -> Gestão de usuários do sistema
+    * src/views/auditoria.ts     -> Histórico auditado de todas as operações
+    * src/views/configuracoes.ts -> Parâmetros da escola, MongoDB e Sobre o Sistema
+    * src/views/login.ts         -> Autenticação de usuários
+
+- Serviços e Tipos:
+    * src/types/index.ts             -> Interfaces e modelos de dados
+    * src/services/storageService.ts -> Camada de dados e persistência
+    * src/services/authService.ts    -> Sessão e controle de login
+    * src/services/auditService.ts   -> Registro de logs de auditoria
+    * src/services/mongoService.ts   -> Definições de Schemas do MongoDB
+
+- Configurações do Ambiente:
+    * vite.config.ts  -> Configuração de porta, rede local e servidor
+    * tsconfig.json   -> Regras de compilação do TypeScript
+    * package.json    -> Dependências e scripts do projeto
