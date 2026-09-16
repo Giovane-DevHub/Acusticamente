@@ -117,9 +117,15 @@ class StorageService {
     }
 
     // 3. Alunos
+    // 3. Alunos
     const savedStudents = localStorage.getItem(STUDENTS_KEY);
     if (savedStudents) {
-      this.students = JSON.parse(savedStudents);
+      this.students = JSON.parse(savedStudents).map((s: any) => ({
+        ...s,
+        saldoReposicoes: typeof s.saldoReposicoes === 'number' ? s.saldoReposicoes : 0,
+        instrumentoPrincipal: s.instrumentoPrincipal || 'Violão',
+        nivelMusical: s.nivelMusical || 'iniciante'
+      }));
     } else {
       this.students = [
         {
@@ -127,8 +133,15 @@ class StorageService {
           nome: 'Lucas Silveira',
           email: 'lucas@email.com',
           telefone: '(11) 98231-1122',
+          dataNascimento: '2014-05-14',
+          instrumentoPrincipal: 'Bateria',
+          nivelMusical: 'iniciante',
+          responsavelNome: 'Cláudia Silveira',
+          responsavelTelefone: '(11) 98111-2233',
+          responsavelParentesco: 'Mãe',
           planoId: 'plano_1',
           moduloAtual: 'Módulo 2: Discriminação de Timbres',
+          saldoReposicoes: 1,
           status: 'ativo',
           observacoes: 'Apresenta grande facilidade com ritmo.',
           criadoEm: new Date().toISOString()
@@ -138,8 +151,15 @@ class StorageService {
           nome: 'Mariana Duarte',
           email: 'mariana.duarte@email.com',
           telefone: '(11) 97123-4567',
+          dataNascimento: '2008-09-21',
+          instrumentoPrincipal: 'Violão',
+          nivelMusical: 'basico',
+          responsavelNome: 'Roberto Duarte',
+          responsavelTelefone: '(11) 97111-0000',
+          responsavelParentesco: 'Pai',
           planoId: 'plano_2',
           moduloAtual: 'Módulo 1: Primeiros Acordes e Levadas',
+          saldoReposicoes: 0,
           status: 'ativo',
           observacoes: 'Iniciando estudos no violão popular.',
           criadoEm: new Date().toISOString()
@@ -149,8 +169,12 @@ class StorageService {
           nome: 'Gabriel Santos',
           email: 'gabriel.s@email.com',
           telefone: '(11) 99345-6789',
+          dataNascimento: '1998-03-10',
+          instrumentoPrincipal: 'Piano & Teclado',
+          nivelMusical: 'intermediario',
           planoId: 'plano_3',
           moduloAtual: 'Módulo 1: Digitação e Postura',
+          saldoReposicoes: 0,
           status: 'ativo',
           observacoes: 'Excelente dedicação nas aulas de piano.',
           criadoEm: new Date().toISOString()
@@ -160,8 +184,15 @@ class StorageService {
           nome: 'Beatriz Costa',
           email: 'beatriz.costa@email.com',
           telefone: '(11) 96543-2109',
+          dataNascimento: '2015-11-05',
+          instrumentoPrincipal: 'Técnica Vocal / Canto',
+          nivelMusical: 'iniciante',
+          responsavelNome: 'Ana Costa',
+          responsavelTelefone: '(11) 96500-1122',
+          responsavelParentesco: 'Mãe',
           planoId: 'plano_1',
           moduloAtual: 'Módulo 3: Harmonia Básica e Canto',
+          saldoReposicoes: 2,
           status: 'ativo',
           observacoes: 'Foco no canto coral.',
           criadoEm: new Date().toISOString()
@@ -530,6 +561,111 @@ class StorageService {
       usuarioNome: currentUserName,
       detalhes: `Compromisso "${app.titulo}" removido da agenda.`
     });
+  }
+
+  // Presença e Conclusão de Aula
+  public marcarPresenca(appointmentId: string, currentUserName: string): Appointment {
+    const app = this.updateAppointment(appointmentId, { status: 'concluido' }, currentUserName);
+    const student = this.students.find(s => s.id === app.alunoId);
+    auditService.log({
+      tela: 'Agenda',
+      acao: 'Presença Confirmada',
+      usuarioNome: currentUserName,
+      detalhes: `Presença confirmada para o aluno "${student?.nome || 'N/A'}" na aula "${app.titulo}".`
+    });
+    return app;
+  }
+
+  // Registro de Falta com geração automática de saldo para Falta Justificada
+  public registrarFalta(
+    appointmentId: string,
+    justificada: boolean,
+    justificativa: string | undefined,
+    currentUserName: string
+  ): { appointment: Appointment; saldoReposicoes: number } {
+    const status = justificada ? 'falta_justificada' : 'falta_injustificada';
+    const app = this.updateAppointment(
+      appointmentId,
+      { status, justificativaFalta: justificativa?.trim() || undefined },
+      currentUserName
+    );
+
+    const student = this.students.find(s => s.id === app.alunoId);
+    let novoSaldo = student?.saldoReposicoes || 0;
+
+    if (justificada && student) {
+      novoSaldo = (student.saldoReposicoes || 0) + 1;
+      student.saldoReposicoes = novoSaldo;
+      this.saveStudents();
+
+      auditService.log({
+        tela: 'Agenda',
+        acao: 'Falta Justificada Registrada',
+        usuarioNome: currentUserName,
+        detalhes: `Falta justificada para o aluno "${student.nome}" na aula "${app.titulo}". Crédito de reposição gerado (+1). Saldo atual: ${novoSaldo}. Motivo: ${justificativa || 'Não especificado'}`
+      });
+    } else if (!justificada && student) {
+      auditService.log({
+        tela: 'Agenda',
+        acao: 'Falta Injustificada Registrada',
+        usuarioNome: currentUserName,
+        detalhes: `Falta sem aviso/injustificada para o aluno "${student.nome}" na aula "${app.titulo}". Nenhum crédito de reposição gerado.`
+      });
+    }
+
+    return { appointment: app, saldoReposicoes: novoSaldo };
+  }
+
+  // Agendamento de Reposição (vinculada ou avulsa, deduzindo crédito se houver)
+  public agendarReposicao(
+    data: Omit<Appointment, 'id' | 'criadoEm' | 'tipoAula'>,
+    aulaOriginalId: string | undefined,
+    currentUserName: string
+  ): Appointment {
+    const newApp = this.addAppointment(
+      {
+        ...data,
+        tipoAula: 'reposicao',
+        aulaOriginalId,
+        status: 'agendado'
+      },
+      currentUserName
+    );
+
+    // Se houver aula original, vincula a referência da reposição
+    if (aulaOriginalId) {
+      const origIndex = this.appointments.findIndex(a => a.id === aulaOriginalId);
+      if (origIndex !== -1) {
+        this.appointments[origIndex].aulaReposicaoId = newApp.id;
+        this.saveAppointments();
+      }
+    }
+
+    // Abate 1 crédito de reposição do aluno (se tiver créditos)
+    const student = this.students.find(s => s.id === newApp.alunoId);
+    if (student && typeof student.saldoReposicoes === 'number' && student.saldoReposicoes > 0) {
+      student.saldoReposicoes -= 1;
+      this.saveStudents();
+      auditService.log({
+        tela: 'Agenda',
+        acao: 'Aula de Reposição Agendada',
+        usuarioNome: currentUserName,
+        detalhes: `Reposição agendada para "${student.nome}". 1 crédito abatido. Saldo restante: ${student.saldoReposicoes}.`
+      });
+    }
+
+    return newApp;
+  }
+
+  // Histórico de Aulas de um Aluno
+  public getStudentAppointments(studentId: string): Appointment[] {
+    return this.appointments
+      .filter(a => a.alunoId === studentId)
+      .sort((a, b) => {
+        const dateA = `${a.data}T${a.horaInicio}`;
+        const dateB = `${b.data}T${b.horaInicio}`;
+        return dateB.localeCompare(dateA);
+      });
   }
 
   // ===================== CONFIGURAÇÕES =====================

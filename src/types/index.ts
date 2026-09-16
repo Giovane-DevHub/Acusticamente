@@ -59,13 +59,22 @@ export interface User {
   atualizadoEm?: string;
 }
 
+export type MusicalLevel = 'iniciante' | 'basico' | 'intermediario' | 'avancado';
+
 export interface Student {
   id: string;
   nome: string;
   email: string;
   telefone: string;
+  dataNascimento?: string;
+  instrumentoPrincipal?: string;
+  nivelMusical?: MusicalLevel;
+  responsavelNome?: string;
+  responsavelTelefone?: string;
+  responsavelParentesco?: string;
   planoId: string;
   moduloAtual?: string;
+  saldoReposicoes?: number;
   status: 'ativo' | 'inativo';
   observacoes?: string;
   criadoEm: string;
@@ -86,6 +95,15 @@ export interface TeachingPlan {
   criadoEm: string;
 }
 
+export type AppointmentStatus =
+  | 'agendado'
+  | 'concluido'
+  | 'falta_justificada'
+  | 'falta_injustificada'
+  | 'cancelado';
+
+export type AppointmentType = 'regular' | 'reposicao';
+
 export interface Appointment {
   id: string;
   titulo: string;
@@ -95,7 +113,11 @@ export interface Appointment {
   data: string; // YYYY-MM-DD
   horaInicio: string; // HH:mm
   horaFim: string; // HH:mm
-  status: 'agendado' | 'concluido' | 'cancelado';
+  status: AppointmentStatus;
+  tipoAula?: AppointmentType;
+  justificativaFalta?: string;
+  aulaOriginalId?: string;
+  aulaReposicaoId?: string;
   observacoes?: string;
   criadoEm: string;
 }
