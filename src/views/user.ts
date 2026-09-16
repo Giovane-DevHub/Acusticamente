@@ -54,6 +54,15 @@ export const PERMISSION_GROUPS: {
       ]
     },
     {
+      key: 'relatorios',
+      title: 'Relatórios',
+      icon: '📊',
+      items: [
+        { key: 'acesso', label: 'Acesso ao módulo de relatórios' },
+        { key: 'gerar', label: 'Gerar e emitir relatórios em PDF' }
+      ]
+    },
+    {
       key: 'home',
       title: 'Início',
       icon: '🏠',
@@ -541,6 +550,10 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
               cadastrar: (document.getElementById('perm-financeiro-cadastrar') as HTMLInputElement)?.checked ?? false,
               alterar: (document.getElementById('perm-financeiro-alterar') as HTMLInputElement)?.checked ?? false,
               excluir: (document.getElementById('perm-financeiro-excluir') as HTMLInputElement)?.checked ?? false
+            },
+            relatorios: {
+              acesso: (document.getElementById('perm-relatorios-acesso') as HTMLInputElement)?.checked ?? false,
+              gerar: (document.getElementById('perm-relatorios-gerar') as HTMLInputElement)?.checked ?? false
             },
             home: {
               acesso: (document.getElementById('perm-home-acesso') as HTMLInputElement)?.checked ?? false

@@ -2,7 +2,7 @@
 
 export type UserRole = 'admin' | 'professor' | 'atendente';
 
-export type AppFormScreen = 'home' | 'agenda' | 'alunos' | 'planos' | 'auditoria' | 'configuracoes' | 'financeiro';
+export type AppFormScreen = 'home' | 'agenda' | 'alunos' | 'planos' | 'auditoria' | 'configuracoes' | 'financeiro' | 'relatorios';
 
 export interface AlunosPermissions {
   acesso: boolean;
@@ -45,6 +45,11 @@ export interface FinanceiroPermissions {
   excluir: boolean;
 }
 
+export interface RelatoriosPermissions {
+  acesso: boolean;
+  gerar: boolean;
+}
+
 export interface UserPermissions {
   alunos: AlunosPermissions;
   agenda: AgendaPermissions;
@@ -53,6 +58,7 @@ export interface UserPermissions {
   auditoria: AuditoriaPermissions;
   configuracoes: ConfiguracoesPermissions;
   financeiro: FinanceiroPermissions;
+  relatorios: RelatoriosPermissions;
 }
 
 export interface User {
@@ -169,6 +175,7 @@ export type AppScreen =
   | 'user'
   | 'planos'
   | 'financeiro'
+  | 'relatorios'
   | 'auditoria'
   | 'configuracoes';
 

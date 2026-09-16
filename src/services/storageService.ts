@@ -55,7 +55,11 @@ class StorageService {
               : u.papel === 'atendente'
               ? { acesso: true, cadastrar: true, alterar: true, excluir: false }
               : { acesso: false, cadastrar: false, alterar: false, excluir: false }
-          )
+          ),
+          relatorios: u.permissoes?.relatorios || {
+            acesso: true,
+            gerar: true
+          }
         }
       }));
     } else {
@@ -72,6 +76,7 @@ class StorageService {
             agenda: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             planos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: true },
+            relatorios: { acesso: true, gerar: true },
             home: { acesso: true },
             auditoria: { acesso: true },
             configuracoes: { acesso: true, alterar: true }
@@ -90,6 +95,7 @@ class StorageService {
             agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
             planos: { acesso: true, cadastrar: false, alterar: false, excluir: false },
             financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
+            relatorios: { acesso: true, gerar: true },
             home: { acesso: true },
             auditoria: { acesso: false },
             configuracoes: { acesso: false, alterar: false }

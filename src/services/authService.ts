@@ -9,6 +9,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     planos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     home: { acesso: true },
     financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: true },
+    relatorios: { acesso: true, gerar: true },
     auditoria: { acesso: true },
     configuracoes: { acesso: true, alterar: true }
   },
@@ -18,6 +19,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     planos: { acesso: true, cadastrar: false, alterar: false, excluir: false },
     home: { acesso: true },
     financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
+    relatorios: { acesso: true, gerar: true },
     auditoria: { acesso: false },
     configuracoes: { acesso: false, alterar: false }
   },
@@ -27,6 +29,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     planos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
     home: { acesso: true },
     financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: false },
+    relatorios: { acesso: true, gerar: true },
     auditoria: { acesso: false },
     configuracoes: { acesso: false, alterar: false }
   }
@@ -40,6 +43,7 @@ export function getUserPermissions(user?: User | null): UserPermissions {
       planos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       home: { acesso: false },
       financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
+      relatorios: { acesso: false, gerar: false },
       auditoria: { acesso: false },
       configuracoes: { acesso: false, alterar: false }
     };
@@ -86,6 +90,10 @@ export function getUserPermissions(user?: User | null): UserPermissions {
       alterar: isOldBool(raw.financeiro) ? raw.financeiro : (raw.financeiro?.alterar ?? defaults.financeiro?.alterar ?? false),
       excluir: isOldBool(raw.financeiro) ? false : (raw.financeiro?.excluir ?? defaults.financeiro?.excluir ?? false)
     },
+    relatorios: {
+      acesso: isOldBool(raw.relatorios) ? raw.relatorios : (raw.relatorios?.acesso ?? defaults.relatorios?.acesso ?? true),
+      gerar: isOldBool(raw.relatorios) ? raw.relatorios : (raw.relatorios?.gerar ?? defaults.relatorios?.gerar ?? true)
+    },
     auditoria: {
       acesso: isOldBool(raw.auditoria) ? raw.auditoria : (raw.auditoria?.acesso ?? defaults.auditoria.acesso)
     },
@@ -101,7 +109,7 @@ export function hasPermission(user: User | null | undefined, screen: AppScreen):
   if (screen === 'login') return true;
   // Apenas administradores têm acesso à aba/tela de usuários
   if (screen === 'user') return user.papel === 'admin';
-  if (user.papel === 'admin') return true;
+  if (user.papel === 'admin' || user.isSistema) return true;
 
   const perms = getUserPermissions(user);
   const screenPerm = perms[screen as keyof UserPermissions];
