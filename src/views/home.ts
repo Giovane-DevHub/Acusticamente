@@ -119,39 +119,37 @@ export function renderHome(onNavigate: (screen: string) => void): HTMLElement {
 
                       return `
                         <tr data-app-id="${app.id}">
-                          <td>
-                            <strong style="color: var(--text-white);">${app.horaInicio}</strong>
-                            <span style="font-size: 0.78rem; color: var(--text-muted);"> às ${app.horaFim}</span>
+                          <td style="white-space: nowrap;">
+                            <strong style="color: var(--text-white); font-size: 0.84rem;">${app.horaInicio} - ${app.horaFim}</strong>
                             ${
                               app.tipoAula === 'reposicao'
-                                ? `<div style="font-size: 0.68rem; color: #4ade80; font-weight: 600;">🔄 Reposição</div>`
+                                ? `<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.68rem; margin-left: 4px;">🔄 Reposição</span>`
                                 : ''
                             }
                           </td>
                           <td>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                              <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; color: var(--color-coral);">
+                            <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                              <div style="width: 24px; height: 24px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--color-coral); flex-shrink: 0;">
                                 ${(student?.nome || 'A')[0]}
                               </div>
-                              <div>
-                                <span style="font-weight: 500;">${student?.nome || 'Aluno não vinculado'}</span>
-                                ${student?.instrumentoPrincipal ? `<div style="font-size: 0.72rem; color: var(--text-muted);">${student.instrumentoPrincipal}</div>` : ''}
-                              </div>
+                              <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem;">
+                                ${student?.nome || 'Aluno não vinculado'}
+                              </span>
                             </div>
                           </td>
-                          <td>
-                            <span style="color: var(--text-secondary);">${plan?.nome || 'Plano Personalizado'}</span>
+                          <td style="white-space: nowrap;">
+                            <span style="color: var(--text-secondary); font-size: 0.82rem;">${plan?.nome || 'Plano Personalizado'}</span>
                           </td>
-                          <td>
+                          <td style="white-space: nowrap;">
                             ${statusBadge}
                           </td>
-                          <td style="text-align: right;">
+                          <td style="text-align: right; white-space: nowrap;">
                             ${
                               isPendente
-                                ? `<button class="btn btn-secondary btn-complete-class" data-id="${app.id}" style="padding: 5px 12px; font-size: 0.78rem; color: var(--status-success);">
+                                ? `<button class="btn btn-secondary btn-complete-class" data-id="${app.id}" style="padding: 4px 10px; font-size: 0.76rem; color: var(--status-success);">
                                      ✓ Concluir
                                    </button>`
-                                : `<span style="font-size: 0.8rem; color: var(--text-muted);">${isConcluido ? 'Finalizada' : 'Registrada'}</span>`
+                                : `<span style="font-size: 0.76rem; color: var(--text-muted);">${isConcluido ? 'Finalizada' : 'Registrada'}</span>`
                             }
                           </td>
                         </tr>

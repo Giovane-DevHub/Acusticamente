@@ -175,8 +175,20 @@ export type AppScreen =
 export interface SystemSettings {
   nomeEscola: string;
   nomeClinica?: string;
+  razaoSocial?: string;
+  nomeFantasia?: string;
+  cnpj?: string;
+  inscricaoEstadual?: string;
   telefoneContato: string;
   emailContato: string;
+  website?: string;
+  cep?: string;
+  logradouro?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
   mongoUri: string;
   mongoDatabase: string;
   mongoStatus: 'conectado' | 'desconectado' | 'simulado';

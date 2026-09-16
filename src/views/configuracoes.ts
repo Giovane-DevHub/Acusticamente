@@ -1,6 +1,6 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
-import { MONGO_SCHEMAS, MongoConnectionService } from '../services/mongoService';
+import { MongoConnectionService } from '../services/mongoService';
 import { showToast } from '../utils/ui';
 
 export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLElement {
@@ -16,166 +16,421 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
         Configurações do Sistema
       </h2>
       <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-        Gerencie parâmetros institucionais e a integração oficial com o MongoDB.
+        Gerencie os dados cadastrais da instituição e os parâmetros do banco de dados.
       </p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex-wrap: wrap;">
-      <!-- Coluna 1: Dados Gerais da Instituição -->
-      <div class="panel-card" style="margin-bottom: 0;">
-        <div class="panel-card-header">
-          <h3 class="panel-card-title">Dados da Instituição</h3>
-        </div>
+    <!-- Seletor de Abas com Contraste Nítido -->
+    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+      <button 
+        type="button" 
+        class="btn-cfg-tab active" 
+        id="btn-tab-instituicao" 
+        data-tab="instituicao" 
+        style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--color-coral); color: #ffffff; border: 1px solid var(--color-coral); cursor: pointer; transition: all 0.15s ease;"
+      >
+        <span>🏢</span> Dados da Instituição
+      </button>
 
-        <div style="padding: 24px;">
-          <form id="form-settings-institucional">
+      <button 
+        type="button" 
+        class="btn-cfg-tab" 
+        id="btn-tab-mongo" 
+        data-tab="mongo" 
+        style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.15s ease;"
+      >
+        <span>🍃</span> Banco de Dados (MongoDB)
+        <span class="badge badge-success" style="font-size: 0.68rem; padding: 2px 7px;">● Operacional</span>
+      </button>
+    </div>
+
+    <!-- Painel de Conteúdo das Abas -->
+    <div class="panel-card" style="margin-bottom: 16px;">
+      <!-- CONTEÚDO DA ABA 1: DADOS DA INSTITUIÇÃO -->
+      <div id="tab-content-instituicao" style="padding: 20px 24px;">
+        <form id="form-settings-institucional">
+          <!-- Identificação & Contato -->
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap;">
+              <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 240px;">
+                <label class="form-label" for="cfg-fantasia" style="font-size: 0.75rem;">Nome Fantasia</label>
+                <input 
+                  type="text" 
+                  id="cfg-fantasia" 
+                  class="form-input" 
+                  value="${settings.nomeFantasia || settings.nomeEscola || 'Acusticamente Escola de Música'}" 
+                  required 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 240px;">
+                <label class="form-label" for="cfg-razao" style="font-size: 0.75rem;">Razão Social</label>
+                <input 
+                  type="text" 
+                  id="cfg-razao" 
+                  class="form-input" 
+                  value="${settings.razaoSocial || 'Acusticamente Ensino Musical Ltda'}" 
+                />
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;">
+              <div class="form-group" style="margin-bottom: 0; width: 175px;">
+                <label class="form-label" for="cfg-cnpj" style="font-size: 0.75rem;">CNPJ</label>
+                <input 
+                  type="text" 
+                  id="cfg-cnpj" 
+                  class="form-input" 
+                  placeholder="00.000.000/0001-00" 
+                  maxlength="18"
+                  value="${settings.cnpj || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; width: 145px;">
+                <label class="form-label" for="cfg-ie" style="font-size: 0.75rem;">Inscrição Estadual</label>
+                <input 
+                  type="text" 
+                  id="cfg-ie" 
+                  class="form-input" 
+                  placeholder="Isento ou nº"
+                  value="${settings.inscricaoEstadual || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; width: 150px;">
+                <label class="form-label" for="cfg-tel" style="font-size: 0.75rem;">Telefone / WhatsApp</label>
+                <input 
+                  type="text" 
+                  id="cfg-tel" 
+                  class="form-input" 
+                  placeholder="(11) 98765-4321"
+                  value="${settings.telefoneContato}" 
+                  required 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; flex: 1.2; min-width: 180px;">
+                <label class="form-label" for="cfg-email" style="font-size: 0.75rem;">E-mail de Contato</label>
+                <input 
+                  type="email" 
+                  id="cfg-email" 
+                  class="form-input" 
+                  value="${settings.emailContato}" 
+                  required 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 160px;">
+                <label class="form-label" for="cfg-site" style="font-size: 0.75rem;">Website</label>
+                <input 
+                  type="text" 
+                  id="cfg-site" 
+                  class="form-input" 
+                  placeholder="www.escola.com.br" 
+                  value="${settings.website || ''}" 
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div style="margin-bottom: 18px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+            <div style="display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-end; flex-wrap: wrap;">
+              <div class="form-group" style="margin-bottom: 0; width: 115px;">
+                <label class="form-label" for="cfg-cep" style="font-size: 0.75rem;">CEP</label>
+                <input 
+                  type="text" 
+                  id="cfg-cep" 
+                  class="form-input" 
+                  placeholder="00000-000" 
+                  maxlength="9"
+                  value="${settings.cep || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 200px;">
+                <label class="form-label" for="cfg-logradouro" style="font-size: 0.75rem;">Logradouro / Rua</label>
+                <input 
+                  type="text" 
+                  id="cfg-logradouro" 
+                  class="form-input" 
+                  placeholder="Rua, Av, Alameda..."
+                  value="${settings.logradouro || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; width: 85px;">
+                <label class="form-label" for="cfg-numero" style="font-size: 0.75rem;">Número</label>
+                <input 
+                  type="text" 
+                  id="cfg-numero" 
+                  class="form-input" 
+                  placeholder="123"
+                  value="${settings.numero || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; width: 160px;">
+                <label class="form-label" for="cfg-complemento" style="font-size: 0.75rem;">Complemento</label>
+                <input 
+                  type="text" 
+                  id="cfg-complemento" 
+                  class="form-input" 
+                  placeholder="Sala, Bloco, Apto..."
+                  value="${settings.complemento || ''}" 
+                />
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;">
+              <div class="form-group" style="margin-bottom: 0; width: 220px;">
+                <label class="form-label" for="cfg-bairro" style="font-size: 0.75rem;">Bairro</label>
+                <input 
+                  type="text" 
+                  id="cfg-bairro" 
+                  class="form-input" 
+                  value="${settings.bairro || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 180px;">
+                <label class="form-label" for="cfg-cidade" style="font-size: 0.75rem;">Cidade</label>
+                <input 
+                  type="text" 
+                  id="cfg-cidade" 
+                  class="form-input" 
+                  value="${settings.cidade || ''}" 
+                />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; width: 55px;">
+                <label class="form-label" for="cfg-uf" style="font-size: 0.75rem; text-align: center;">UF</label>
+                <input 
+                  type="text" 
+                  id="cfg-uf" 
+                  class="form-input" 
+                  maxlength="2" 
+                  style="text-transform: uppercase; text-align: center; padding-left: 0; padding-right: 0;" 
+                  placeholder="SP" 
+                  value="${settings.estado || ''}" 
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Ação Salvar -->
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px; display: flex; justify-content: flex-start;">
+            ${
+              canAlter
+                ? `
+                  <button type="submit" class="btn btn-primary" id="btn-save-settings" style="padding: 8px 22px; font-weight: 600; font-size: 0.85rem;">
+                    Salvar Dados da Instituição
+                  </button>
+                `
+                : `<span style="font-size: 0.8rem; color: var(--text-muted);">🔒 Modo somente leitura (Sem permissão para alterar)</span>`
+            }
+          </div>
+        </form>
+      </div>
+
+      <!-- CONTEÚDO DA ABA 2: BANCO DE DADOS (MONGODB) -->
+      <div id="tab-content-mongo" style="padding: 24px; display: none;">
+        <div style="max-width: 580px;">
+          <h4 style="font-size: 0.84rem; font-weight: 700; color: var(--text-white); margin: 0 0 14px 0;">
+            Parâmetros de Conexão com o Banco de Dados
+          </h4>
+
+          <form id="form-settings-mongo">
             <div class="form-group">
-              <label class="form-label" for="cfg-nome">Nome da Escola de Música</label>
-              <input type="text" id="cfg-nome" class="form-input" value="${settings.nomeEscola || settings.nomeClinica || 'Acusticamente - Escola de Música'}" required />
+              <label class="form-label" for="cfg-mongo-uri">URI de Conexão MongoDB</label>
+              <input 
+                type="text" 
+                id="cfg-mongo-uri" 
+                class="form-input" 
+                value="${settings.mongoUri}" 
+                placeholder="mongodb://localhost:27017" 
+                required 
+              />
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="cfg-tel">Telefone / WhatsApp Principal</label>
-              <input type="text" id="cfg-tel" class="form-input" value="${settings.telefoneContato}" required />
+              <label class="form-label" for="cfg-mongo-db">Nome do Banco (Database)</label>
+              <input 
+                type="text" 
+                id="cfg-mongo-db" 
+                class="form-input" 
+                value="${settings.mongoDatabase}" 
+                placeholder="acusticamente_db" 
+                required 
+              />
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="cfg-email">E-mail de Contato</label>
-              <input type="email" id="cfg-email" class="form-input" value="${settings.emailContato}" required />
-            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" id="btn-test-mongo">
+                Testar Conexão MongoDB
+              </button>
 
-            <div style="margin-top: 24px;">
               ${
                 canAlter
                   ? `
-                    <button type="submit" class="btn btn-primary" id="btn-save-settings">
-                      Salvar Configurações
+                    <button type="submit" class="btn btn-primary" id="btn-save-mongo">
+                      Salvar Conexão do Banco
                     </button>
                   `
-                  : `<span style="font-size: 0.8rem; color: var(--text-muted);">🔒 Modo somente leitura (Sem permissão para alterar)</span>`
+                  : ''
               }
             </div>
+
+            <div id="mongo-test-result" style="margin-top: 16px; font-size: 0.82rem;"></div>
           </form>
-        </div>
-      </div>
-
-      <!-- Coluna 2: Configuração e Diagnóstico do MongoDB -->
-      <div class="panel-card" style="margin-bottom: 0;">
-        <div class="panel-card-header">
-          <h3 class="panel-card-title">Banco de Dados (MongoDB)</h3>
-          <span class="badge badge-success" id="mongo-status-badge">● Operacional</span>
-        </div>
-
-        <div style="padding: 24px;">
-          <div class="form-group">
-            <label class="form-label" for="cfg-mongo-uri">URI de Conexão MongoDB</label>
-            <input type="text" id="cfg-mongo-uri" class="form-input" value="${settings.mongoUri}" placeholder="mongodb://localhost:27017" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="cfg-mongo-db">Nome do Banco (Database)</label>
-            <input type="text" id="cfg-mongo-db" class="form-input" value="${settings.mongoDatabase}" placeholder="acusticamente_db" />
-          </div>
-
-          <div style="display: flex; gap: 10px; margin-top: 18px;">
-            <button type="button" class="btn btn-secondary" id="btn-test-mongo">
-              Testar Conexão MongoDB
-            </button>
-          </div>
-
-          <div id="mongo-test-result" style="margin-top: 16px; font-size: 0.82rem; color: var(--text-secondary);"></div>
-
-          <!-- Relação de Coleções MongoDB Registradas -->
-          <div style="margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
-            <div style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 0.05em;">
-              Coleções MongoDB Mapeadas
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              ${Object.values(MONGO_SCHEMAS)
-      .map(
-        s => `
-                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
-                      <div>
-                        <strong style="color: var(--text-white); font-size: 0.85rem;">${s.collectionName}</strong>
-                        <div style="font-size: 0.72rem; color: var(--text-muted);">${s.description}</div>
-                      </div>
-                      <span style="font-size: 0.7rem; color: var(--color-coral); font-family: monospace;">Schema Pronto</span>
-                    </div>
-                  `
-      )
-      .join('')}
-            </div>
-          </div>
         </div>
       </div>
     </div>
 
-    <!-- Informações do Sistema, Versão & DevHub -->
-    <div class="panel-card" style="margin-top: 24px; margin-bottom: 0;">
-      <div class="panel-card-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <h3 class="panel-card-title">Sobre o Sistema</h3>
-          <span class="badge badge-primary" style="font-family: monospace; font-size: 0.72rem; padding: 2px 8px;">v1.0.0</span>
-        </div>
-        <span style="font-size: 0.75rem; color: var(--text-muted);">
-          Desenvolvido por <strong style="color: var(--color-coral); font-weight: 600;">DevHub</strong>
+    <!-- Linha Fina com Informações do Sistema -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.78rem; color: var(--text-secondary);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 6px;">
+          <span>🎵</span> Acusticamente
         </span>
+        <span class="badge badge-primary" style="font-family: monospace; font-size: 0.7rem; padding: 2px 7px;">v1.0.0</span>
+        <span style="color: var(--border-subtle);">|</span>
+        <span>Gestão Educacional &amp; Escolar</span>
       </div>
 
-      <div style="padding: 20px 24px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px;">
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Plataforma</div>
-            <div style="font-size: 0.92rem; font-weight: 600; color: var(--text-white); margin-top: 4px;">Acusticamente</div>
-            <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Gestão Educacional</div>
-          </div>
-
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Versão da Aplicação</div>
-            <div style="font-size: 0.92rem; font-weight: 600; color: var(--color-coral); margin-top: 4px; font-family: monospace;">1.0.0 (Release Oficial)</div>
-            <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Build estável em TypeScript</div>
-          </div>
-
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Desenvolvido por</div>
-            <div style="font-size: 0.92rem; font-weight: 600; color: var(--text-white); margin-top: 4px;">DevHub</div>
-            <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Soluções e Engenharia de Software</div>
-          </div>
-
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Banco de Dados & Engine</div>
-            <div style="font-size: 0.92rem; font-weight: 600; color: var(--text-white); margin-top: 4px;">MongoDB + TypeScript</div>
-            <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Trilha de auditoria em tempo real</div>
-          </div>
-        </div>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span>Engine: <code style="color: #ff9187; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">MongoDB + TypeScript</code></span>
+        <span style="color: var(--border-subtle);">|</span>
+        <span>Desenvolvido por <strong style="color: var(--color-coral); font-weight: 600;">DevHub</strong></span>
       </div>
     </div>
   `;
 
-  // Salvar configurações gerais
-  const form = container.querySelector('#form-settings-institucional') as HTMLFormElement;
-  form?.addEventListener('submit', (e) => {
+  // Alternância das Abas com Contraste Nítido
+  const tabInstituicaoBtn = container.querySelector('#btn-tab-instituicao') as HTMLButtonElement;
+  const tabMongoBtn = container.querySelector('#btn-tab-mongo') as HTMLButtonElement;
+  const contentInstituicao = container.querySelector('#tab-content-instituicao') as HTMLElement;
+  const contentMongo = container.querySelector('#tab-content-mongo') as HTMLElement;
+
+  function setTabStyles(activeBtn: HTMLButtonElement, inactiveBtn: HTMLButtonElement): void {
+    activeBtn.style.background = 'var(--color-coral)';
+    activeBtn.style.color = '#ffffff';
+    activeBtn.style.borderColor = 'var(--color-coral)';
+    activeBtn.style.fontWeight = '700';
+
+    inactiveBtn.style.background = 'var(--bg-surface)';
+    inactiveBtn.style.color = 'var(--text-secondary)';
+    inactiveBtn.style.borderColor = 'var(--border-subtle)';
+    inactiveBtn.style.fontWeight = '600';
+  }
+
+  function switchTab(activeTab: 'instituicao' | 'mongo'): void {
+    if (activeTab === 'instituicao') {
+      contentInstituicao.style.display = 'block';
+      contentMongo.style.display = 'none';
+      setTabStyles(tabInstituicaoBtn, tabMongoBtn);
+    } else {
+      contentInstituicao.style.display = 'none';
+      contentMongo.style.display = 'block';
+      setTabStyles(tabMongoBtn, tabInstituicaoBtn);
+    }
+  }
+
+  tabInstituicaoBtn?.addEventListener('click', () => switchTab('instituicao'));
+  tabMongoBtn?.addEventListener('click', () => switchTab('mongo'));
+
+  // Máscaras visuais automáticas para campos de tamanho fixo (CNPJ, CEP e UF)
+  const inputCnpj = container.querySelector('#cfg-cnpj') as HTMLInputElement;
+  inputCnpj?.addEventListener('input', (e) => {
+    let v = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 14);
+    if (v.length > 12) {
+      v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/, '$1.$2.$3/$4-$5');
+    } else if (v.length > 8) {
+      v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/, '$1.$2.$3/$4');
+    } else if (v.length > 5) {
+      v = v.replace(/^(\d{2})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+    } else if (v.length > 2) {
+      v = v.replace(/^(\d{2})(\d{1,3})$/, '$1.$2');
+    }
+    (e.target as HTMLInputElement).value = v;
+  });
+
+  const inputCep = container.querySelector('#cfg-cep') as HTMLInputElement;
+  inputCep?.addEventListener('input', (e) => {
+    let v = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 8);
+    if (v.length > 5) {
+      v = v.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
+    }
+    (e.target as HTMLInputElement).value = v;
+  });
+
+  const inputUf = container.querySelector('#cfg-uf') as HTMLInputElement;
+  inputUf?.addEventListener('input', (e) => {
+    (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.toUpperCase().slice(0, 2);
+  });
+
+  // Salvar configurações de Dados da Instituição
+  const formInstitucional = container.querySelector('#form-settings-institucional') as HTMLFormElement;
+  formInstitucional?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const nome = (container.querySelector('#cfg-nome') as HTMLInputElement).value;
+    const nomeFantasia = (container.querySelector('#cfg-fantasia') as HTMLInputElement).value;
+    const razaoSocial = (container.querySelector('#cfg-razao') as HTMLInputElement).value;
+    const cnpj = (container.querySelector('#cfg-cnpj') as HTMLInputElement).value;
+    const ie = (container.querySelector('#cfg-ie') as HTMLInputElement).value;
     const tel = (container.querySelector('#cfg-tel') as HTMLInputElement).value;
     const email = (container.querySelector('#cfg-email') as HTMLInputElement).value;
+    const site = (container.querySelector('#cfg-site') as HTMLInputElement).value;
+
+    const cep = (container.querySelector('#cfg-cep') as HTMLInputElement).value;
+    const logradouro = (container.querySelector('#cfg-logradouro') as HTMLInputElement).value;
+    const numero = (container.querySelector('#cfg-numero') as HTMLInputElement).value;
+    const complemento = (container.querySelector('#cfg-complemento') as HTMLInputElement).value;
+    const bairro = (container.querySelector('#cfg-bairro') as HTMLInputElement).value;
+    const cidade = (container.querySelector('#cfg-cidade') as HTMLInputElement).value;
+    const uf = (container.querySelector('#cfg-uf') as HTMLInputElement).value.toUpperCase();
+
+    storageService.updateSettings(
+      {
+        nomeEscola: nomeFantasia,
+        nomeClinica: nomeFantasia,
+        nomeFantasia,
+        razaoSocial,
+        cnpj,
+        inscricaoEstadual: ie,
+        telefoneContato: tel,
+        emailContato: email,
+        website: site,
+        cep,
+        logradouro,
+        numero,
+        complemento,
+        bairro,
+        cidade,
+        estado: uf
+      },
+      user?.nome || 'Administrador'
+    );
+
+    showToast('Dados da instituição salvos com sucesso!', 'success');
+  });
+
+  // Salvar configurações do Banco MongoDB
+  const formMongo = container.querySelector('#form-settings-mongo') as HTMLFormElement;
+  formMongo?.addEventListener('submit', (e) => {
+    e.preventDefault();
     const mongoUri = (container.querySelector('#cfg-mongo-uri') as HTMLInputElement).value;
     const mongoDb = (container.querySelector('#cfg-mongo-db') as HTMLInputElement).value;
 
     storageService.updateSettings(
       {
-        nomeEscola: nome,
-        nomeClinica: nome,
-        telefoneContato: tel,
-        emailContato: email,
         mongoUri,
         mongoDatabase: mongoDb
       },
       user?.nome || 'Administrador'
     );
 
-    showToast('Configurações salvas e auditadas!', 'success');
+    showToast('Configurações do MongoDB salvas com sucesso!', 'success');
   });
 
   // Testar conexão MongoDB

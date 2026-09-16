@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Appointment, AppointmentStatus, AppointmentType } from '../types';
-import { ICONS, openModal, closeModal, showToast } from '../utils/ui';
+import { ICONS, openModal, closeModal, showToast, confirmAction } from '../utils/ui';
 
 interface AppointmentPrefill {
   studentId?: string;
@@ -455,12 +455,18 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
         btn.addEventListener('click', (e) => {
           const id = (e.currentTarget as HTMLElement).dataset.id;
           if (!id) return;
-          if (confirm('Registrar falta sem aviso prévio / injustificada? Não será gerado crédito de reposição.')) {
-            storageService.registrarFalta(id, false, undefined, user?.nome || 'Administrador');
-            showToast('Falta injustificada registrada.', 'info');
-            buildCalendarView();
-            openDayDetailsModal(dateStr);
-          }
+          confirmAction({
+            title: 'Falta Injustificada',
+            message: 'Deseja registrar falta sem aviso prévio / injustificada? <strong>Não será gerado crédito de reposição</strong> para o aluno.',
+            confirmText: 'Registrar Falta',
+            confirmBtnClass: 'btn-danger',
+            onConfirm: () => {
+              storageService.registrarFalta(id, false, undefined, user?.nome || 'Administrador');
+              showToast('Falta injustificada registrada.', 'info');
+              buildCalendarView();
+              openDayDetailsModal(dateStr);
+            }
+          });
         });
       });
 
@@ -499,11 +505,17 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
         btn.addEventListener('click', (e) => {
           const id = (e.currentTarget as HTMLElement).dataset.id;
           const app = storageService.getAppointments().find(a => a.id === id);
-          if (app && confirm(`Deseja realmente excluir o compromisso "${app.titulo}"?`)) {
-            storageService.deleteAppointment(app.id, user?.nome || 'Administrador');
-            showToast('Compromisso removido.', 'info');
-            buildCalendarView();
-            openDayDetailsModal(dateStr);
+          if (app) {
+            confirmAction({
+              title: 'Excluir Compromisso',
+              message: `Deseja realmente excluir o compromisso "<strong>${app.titulo}</strong>"?`,
+              onConfirm: () => {
+                storageService.deleteAppointment(app.id, user?.nome || 'Administrador');
+                showToast('Compromisso removido.', 'info');
+                buildCalendarView();
+                openDayDetailsModal(dateStr);
+              }
+            });
           }
         });
       });
@@ -723,12 +735,16 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
     if (isEditing && existingApp) {
       setTimeout(() => {
         document.getElementById('btn-delete-app')?.addEventListener('click', () => {
-          if (confirm(`Deseja realmente excluir o compromisso "${existingApp.titulo}"?`)) {
-            storageService.deleteAppointment(existingApp.id, user?.nome || 'Administrador');
-            showToast('Compromisso removido.', 'info');
-            closeModal();
-            buildCalendarView();
-          }
+          confirmAction({
+            title: 'Excluir Compromisso',
+            message: `Deseja realmente excluir o compromisso "<strong>${existingApp.titulo}</strong>"?`,
+            onConfirm: () => {
+              storageService.deleteAppointment(existingApp.id, user?.nome || 'Administrador');
+              showToast('Compromisso removido.', 'info');
+              closeModal();
+              buildCalendarView();
+            }
+          });
         });
       }, 50);
     }

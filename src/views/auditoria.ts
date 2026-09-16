@@ -6,7 +6,6 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
   
   // Por padrão, seleciona a data de hoje
   let filterDate: Date | null = new Date();
-  let selectedTela = 'todos';
   let searchTerm = '';
 
   const pad = (n: number) => n.toString().padStart(2, '0');
@@ -56,19 +55,16 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
         (log.dataHoraFormatada && log.dataHoraFormatada.startsWith(selectedDateStr)) ||
         (log.dataHora && log.dataHora.startsWith(toInputDateValue(filterDate)));
 
-      // Filtro de tela
-      const matchTela =
-        selectedTela === 'todos' || log.tela.toLowerCase().includes(selectedTela.toLowerCase());
-
-      // Filtro de texto
+      // Filtro de texto (tela, usuário, ação ou detalhe)
       const matchSearch =
         searchTerm === '' ||
+        log.tela.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.usuarioNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.usuarioLogin.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.acao.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.detalhes.toLowerCase().includes(searchTerm.toLowerCase());
 
-      return matchDate && matchTela && matchSearch;
+      return matchDate && matchSearch;
     });
 
     container.innerHTML = `
@@ -83,10 +79,8 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
           </p>
         </div>
 
-        <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; gap: 10px; align-items: center;">
-          <span>Hoje: <strong style="color: var(--color-coral);">${todayCount}</strong></span>
-          <span style="color: var(--border-subtle);">|</span>
-          <span>Total Geral: <strong style="color: var(--text-white);">${allLogs.length}</strong></span>
+        <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px;">
+          <span>Registros de Hoje: <strong style="color: var(--color-coral);">${todayCount}</strong></span>
         </div>
       </div>
 
@@ -126,13 +120,13 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
       </div>
 
       <!-- Filtros e Barra de Busca -->
-      <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-        <div style="position: relative; flex: 1; min-width: 260px; max-width: 380px;">
+      <div style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
+        <div style="position: relative; flex: 1; max-width: 440px;">
           <input 
             type="text" 
             id="audit-search-input" 
             class="form-input" 
-            placeholder="Pesquisar por ação, usuário ou detalhe..." 
+            placeholder="Pesquisar por tela, ação, usuário ou detalhe..." 
             value="${searchTerm}"
             style="padding-left: 36px;"
           />
@@ -140,20 +134,11 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
             ${ICONS.search}
           </div>
         </div>
-
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-          ${['todos', 'login', 'agenda', 'alunos', 'usuários', 'plano', 'configurações']
-            .map(t => {
-              const isActive = selectedTela.toLowerCase() === t;
-              const label = t === 'todos' ? 'Todas as Telas' : t.charAt(0).toUpperCase() + t.slice(1);
-              return `
-                <button type="button" class="btn ${isActive ? 'btn-primary' : 'btn-secondary'} btn-filter-tela" data-tela="${t}" style="padding: 6px 14px; font-size: 0.8rem;">
-                  ${label}
-                </button>
-              `;
-            })
-            .join('')}
-        </div>
+        ${
+          searchTerm
+            ? `<button type="button" class="btn btn-secondary btn-sm" id="btn-clear-audit-search">Limpar</button>`
+            : ''
+        }
       </div>
 
       <!-- Tabela de Auditoria -->
@@ -203,34 +188,32 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
                       .map(log => {
                         return `
                           <tr>
-                            <td>
-                              <div style="font-family: monospace; font-size: 0.84rem; color: var(--text-white);">
+                            <td style="white-space: nowrap;">
+                              <span style="font-family: monospace; font-size: 0.82rem; color: var(--text-white);">
                                 ${log.dataHoraFormatada}
-                              </div>
+                              </span>
                             </td>
                             <td>
-                              <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #2b2e3e; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: var(--color-coral);">
+                              <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #2b2e3e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--color-coral); flex-shrink: 0;">
                                   ${log.usuarioNome[0] || 'U'}
                                 </div>
-                                <div>
-                                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-white);">${log.usuarioNome}</div>
-                                  <div style="font-size: 0.72rem; color: var(--text-muted);">login: ${log.usuarioLogin}</div>
-                                </div>
+                                <span style="font-weight: 600; font-size: 0.84rem; color: var(--text-white);">${log.usuarioNome}</span>
+                                <span style="font-size: 0.74rem; color: var(--text-muted);">(${log.usuarioLogin})</span>
                               </div>
                             </td>
                             <td>
-                              <span style="font-size: 0.82rem; color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px;">
+                              <span class="badge" style="background: rgba(255,255,255,0.06); font-size: 0.74rem; white-space: nowrap;">
                                 ${log.tela}
                               </span>
                             </td>
                             <td>
-                              <strong style="font-size: 0.85rem; color: #ff9187;">
+                              <strong style="font-size: 0.82rem; color: #ff9187; white-space: nowrap;">
                                 ${log.acao}
                               </strong>
                             </td>
                             <td>
-                              <span style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+                              <span style="font-size: 0.82rem; color: var(--text-secondary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 480px;" title="${log.detalhes}">
                                 ${log.detalhes}
                               </span>
                             </td>
@@ -300,12 +283,9 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
       }
     });
 
-    // Conectar filtros de tela
-    container.querySelectorAll('.btn-filter-tela').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        selectedTela = (e.currentTarget as HTMLElement).dataset.tela || 'todos';
-        renderTable();
-      });
+    container.querySelector('#btn-clear-audit-search')?.addEventListener('click', () => {
+      searchTerm = '';
+      renderTable();
     });
   }
 

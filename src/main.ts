@@ -1,6 +1,6 @@
 import { authService, hasPermission } from './services/authService';
 import { getAcusticamenteLogo } from './assets/logo';
-import { ICONS, showToast } from './utils/ui';
+import { ICONS, showToast, confirmAction } from './utils/ui';
 import { AppScreen, User } from './types';
 
 // Telas da aplicação com nomes fáceis
@@ -251,9 +251,15 @@ class AppRouter {
 
     // Conectar logout
     layout.querySelector('#btn-app-logout')?.addEventListener('click', () => {
-      if (confirm('Deseja realmente sair do sistema Acusticamente?')) {
-        authService.logout();
-      }
+      confirmAction({
+        title: 'Sair do Sistema',
+        message: 'Deseja realmente encerrar sua sessão no sistema Acusticamente?',
+        confirmText: 'Sair',
+        confirmBtnClass: 'btn-danger',
+        onConfirm: () => {
+          authService.logout();
+        }
+      });
     });
 
     // Renderizar a tela específica dentro do viewport

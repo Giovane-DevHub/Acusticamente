@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Student, MusicalLevel, Payment, PaymentMethod } from '../types';
-import { ICONS, openModal, closeModal, showToast } from '../utils/ui';
+import { ICONS, openModal, closeModal, showToast, confirmAction } from '../utils/ui';
 
 const INSTRUMENTOS_COMUNS = [
   'Violão',
@@ -198,7 +198,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       </div>
 
       <!-- Barra de Busca -->
-      <div style="margin-bottom: 20px; display: flex; gap: 12px;">
+      <div style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
         <div style="position: relative; flex: 1; max-width: 440px;">
           <input 
             type="text" 
@@ -212,6 +212,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             ${ICONS.search}
           </div>
         </div>
+        ${
+          searchTerm
+            ? `<button class="btn btn-secondary btn-sm" id="btn-clear-search">Limpar</button>`
+            : ''
+        }
       </div>
 
       <!-- Painel e Tabela de Alunos -->
@@ -224,12 +229,12 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           <table class="data-table">
             <thead>
               <tr>
-                <th>Aluno</th>
-                <th>Instrumento &amp; Nível</th>
-                <th>Contato / WhatsApp</th>
-                <th>Plano &amp; Reposições</th>
-                <th>Status</th>
-                <th style="text-align: right;">Ações</th>
+                <th style="min-width: 220px;">Aluno</th>
+                <th style="width: 180px;">Instrumento</th>
+                <th style="width: 160px;">Contato</th>
+                <th style="width: 180px;">Plano de Ensino</th>
+                <th style="width: 120px;">Status</th>
+                <th style="width: 120px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -240,126 +245,69 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                       .map(student => {
                         const plan = plans.find(p => p.id === student.planoId);
                         const isAtivo = student.status === 'ativo';
-                        const isOverdue = storageService.isStudentOverdue(student.id);
-                        const ageStr = calculateAge(student.dataNascimento);
-                        const waLink = getWhatsAppLink(student.telefone, student.nome);
-                        const saldo = student.saldoReposicoes || 0;
 
                         return `
                           <tr>
                             <td>
-                              <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); flex-shrink: 0; font-size: 0.95rem;">
+                              <div style="display: flex; align-items: center; gap: 10px; white-space: nowrap;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); flex-shrink: 0; font-size: 0.8rem;">
                                   ${student.nome[0] || 'A'}
                                 </div>
-                                <div>
-                                  <div style="font-weight: 600; color: var(--text-white); font-size: 0.9rem;">
-                                    ${student.nome}
-                                    ${ageStr ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 4px;">(${ageStr})</span>` : ''}
-                                  </div>
-                                  ${
-                                    student.responsavelNome
-                                      ? `<div style="font-size: 0.74rem; color: var(--text-secondary);">
-                                           Resp: <strong style="color: #ff9187;">${student.responsavelNome}</strong> ${student.responsavelParentesco ? `(${student.responsavelParentesco})` : ''}
-                                         </div>`
-                                      : `<div style="font-size: 0.74rem; color: var(--text-muted);">${student.moduloAtual || 'Iniciando'}</div>`
-                                  }
-                                </div>
+                                <span style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
+                                  ${student.nome}
+                                </span>
                               </div>
                             </td>
 
                             <td>
-                              <div style="display: flex; align-items: center; gap: 6px;">
-                                <span style="font-size: 1rem;">${getInstrumentIcon(student.instrumentoPrincipal)}</span>
-                                <span style="font-weight: 500; font-size: 0.85rem; color: var(--text-white);">
-                                  ${student.instrumentoPrincipal || 'Não definido'}
-                                </span>
-                              </div>
-                              <div style="margin-top: 3px;">
-                                ${getNivelBadge(student.nivelMusical)}
+                              <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                                <span style="font-size: 0.95rem;">${getInstrumentIcon(student.instrumentoPrincipal)}</span>
+                                <span style="font-size: 0.82rem; color: var(--text-white);">${student.instrumentoPrincipal || 'Geral'}</span>
                               </div>
                             </td>
 
                             <td>
-                              <div style="display: flex; align-items: center; gap: 6px;">
-                                <span style="font-size: 0.85rem; color: var(--text-white); font-weight: 500;">
-                                  ${student.telefone || 'Sem telefone'}
-                                </span>
+                              <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
+                                ${student.telefone || '-'}
+                              </span>
+                            </td>
+
+                            <td>
+                              <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
+                                ${plan?.nome || '<span style="color: var(--text-muted); font-style: italic;">Nenhum</span>'}
+                              </span>
+                            </td>
+
+                            <td>
+                              <span class="badge ${isAtivo ? 'badge-success' : 'badge-warning'}" style="font-size: 0.72rem; padding: 3px 8px;">
+                                ${isAtivo ? 'Ativo' : 'Inativo'}
+                              </span>
+                            </td>
+
+                            <td style="text-align: right;">
+                              <div style="display: flex; gap: 5px; justify-content: flex-end; align-items: center;">
+                                <button class="btn btn-secondary btn-icon-only btn-view-student" data-id="${student.id}" title="Ficha 360° do Aluno" style="width: 28px; height: 28px; padding: 0; color: #60a5fa;">
+                                  ${ICONS.profile}
+                                </button>
                                 ${
-                                  waLink
+                                  canEdit
                                     ? `
-                                      <a href="${waLink}" target="_blank" rel="noopener noreferrer" 
-                                         class="btn btn-secondary btn-icon-only" 
-                                         title="Abrir WhatsApp com ${student.nome}" 
-                                         style="width: 26px; height: 26px; padding: 0; color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
-                                        ${ICONS.whatsapp}
-                                      </a>
+                                      <button class="btn btn-secondary btn-icon-only btn-edit-student" data-id="${student.id}" title="Editar Dados do Aluno" style="width: 28px; height: 28px; padding: 0;">
+                                        ${ICONS.edit}
+                                      </button>
+                                    `
+                                    : ''
+                                }
+                                ${
+                                  canDelete
+                                    ? `
+                                      <button class="btn btn-danger btn-icon-only btn-delete-student" data-id="${student.id}" title="Excluir Aluno" style="width: 28px; height: 28px; padding: 0;">
+                                        ${ICONS.trash}
+                                      </button>
                                     `
                                     : ''
                                 }
                               </div>
-                              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
-                                ${student.email || 'Sem e-mail cadastrado'}
-                              </div>
-                            </td>
-
-                            <td>
-                              <div style="font-size: 0.84rem; color: var(--text-white); font-weight: 500;">
-                                ${plan?.nome || 'Nenhum plano'}
-                              </div>
-                              <div style="margin-top: 4px;">
-                                ${
-                                  saldo > 0
-                                    ? `<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.72rem;" title="Possui aulas de reposição pendentes">
-                                         🔄 ${saldo} reposição(ões)
-                                       </span>`
-                                    : `<span style="font-size: 0.72rem; color: var(--text-muted);">0 reposições pendentes</span>`
-                                }
-                              </div>
-                            </td>
-
-                            <td>
-                              <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-                                <span class="badge ${isAtivo ? 'badge-success' : 'badge-warning'}">
-                                  ${isAtivo ? '● Ativo' : '○ Inativo'}
-                                </span>
-                                ${
-                                  isAtivo
-                                    ? isOverdue
-                                      ? `<span class="badge badge-coral" style="font-size: 0.68rem; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;" title="Possui mensalidade em atraso!">
-                                           ⚠️ Atrasado
-                                         </span>`
-                                      : `<span class="badge" style="background: rgba(34, 197, 94, 0.12); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); font-size: 0.68rem; display: inline-flex; align-items: center; gap: 3px;" title="Mensalidades em dia">
-                                           ✓ Em dia
-                                         </span>`
-                                    : ''
-                                }
-                              </div>
-                            </td>
-
-                            <td style="text-align: right;">
-                              <button class="btn btn-secondary btn-icon-only btn-view-student" data-id="${student.id}" title="Ficha Completa e Histórico de Aulas" style="margin-right: 4px; color: #60a5fa;">
-                                ${ICONS.profile}
-                              </button>
-
-                              ${
-                                canEdit
-                                  ? `
-                                    <button class="btn btn-secondary btn-icon-only btn-edit-student" data-id="${student.id}" title="Editar Dados do Aluno">
-                                      ${ICONS.edit}
-                                    </button>
-                                  `
-                                  : ''
-                              }
-                              ${
-                                canDelete
-                                  ? `
-                                    <button class="btn btn-danger btn-icon-only btn-delete-student" data-id="${student.id}" title="Excluir Aluno" style="margin-left: 4px;">
-                                      ${ICONS.trash}
-                                    </button>
-                                  `
-                                  : ''
-                              }
                             </td>
                           </tr>
                         `;
@@ -382,6 +330,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         newSearchInput.focus();
         newSearchInput.selectionStart = newSearchInput.selectionEnd = newSearchInput.value.length;
       }
+    });
+
+    container.querySelector('#btn-clear-search')?.addEventListener('click', () => {
+      searchTerm = '';
+      renderList();
     });
 
     container.querySelector('#btn-new-student')?.addEventListener('click', () => {
@@ -411,10 +364,16 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       btn.addEventListener('click', (e) => {
         const id = (e.currentTarget as HTMLElement).dataset.id;
         const student = storageService.getStudents().find(s => s.id === id);
-        if (student && confirm(`Tem certeza que deseja excluir o aluno "${student.nome}"?`)) {
-          storageService.deleteStudent(student.id, user?.nome || 'Administrador');
-          showToast(`Aluno "${student.nome}" excluído.`, 'info');
-          renderList();
+        if (student) {
+          confirmAction({
+            title: 'Excluir Aluno',
+            message: `Tem certeza que deseja excluir o cadastro do aluno "<strong>${student.nome}</strong>"? Esta ação removerá também seus registros e agendamentos associados.`,
+            onConfirm: () => {
+              storageService.deleteStudent(student.id, user?.nome || 'Administrador');
+              showToast(`Aluno "${student.nome}" excluído.`, 'info');
+              renderList();
+            }
+          });
         }
       });
     });
@@ -746,9 +705,9 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
                           return `
                             <tr>
-                              <td>
+                              <td style="white-space: nowrap;">
                                 <strong style="color: var(--text-white);">${p.descricao}</strong>
-                                ${p.formaPagamento ? `<div style="font-size: 0.68rem; color: var(--text-muted);">${p.formaPagamento.toUpperCase()}</div>` : ''}
+                                ${p.formaPagamento ? `<span style="font-size: 0.68rem; color: var(--text-muted); margin-left: 6px;">(${p.formaPagamento.toUpperCase()})</span>` : ''}
                               </td>
                               <td>${p.dataVencimento.split('-').reverse().join('/')}</td>
                               <td style="font-weight: 600; color: var(--text-white);">R$ ${p.valor.toFixed(2)}</td>

@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, getUserPermissions, DEFAULT_PERMISSIONS_BY_ROLE } from '../services/authService';
 import { User, UserRole, UserPermissions } from '../types';
-import { ICONS, openModal, showToast } from '../utils/ui';
+import { ICONS, openModal, showToast, confirmAction } from '../utils/ui';
 
 export const PERMISSION_GROUPS: {
   key: keyof UserPermissions;
@@ -119,8 +119,16 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
     return container;
   }
 
+  let searchTerm = '';
+
   function renderList(): void {
-    const users = storageService.getUsers();
+    const allUsers = storageService.getUsers();
+    const term = searchTerm.toLowerCase();
+    const users = allUsers.filter(u =>
+      u.nome.toLowerCase().includes(term) ||
+      u.login.toLowerCase().includes(term) ||
+      u.papel.toLowerCase().includes(term)
+    );
 
     container.innerHTML = `
       <!-- Cabeçalho da Tela -->
@@ -134,21 +142,43 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
           </p>
         </div>
 
-        <button class="btn btn-primary" id="btn-new-user">
+        <button class="btn btn-primary" id="btn-new-user" style="display: flex; align-items: center; gap: 6px;">
           ${ICONS.plus} Cadastrar Novo Usuário
         </button>
       </div>
 
       <!-- Alerta Informativo sobre a Regra do Administrador Inicial -->
-      <div style="margin-bottom: 20px; background-color: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.25); border-radius: var(--radius-md); padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
+      <div style="margin-bottom: 16px; background-color: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.25); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
         <div style="font-size: 1.2rem; color: var(--color-coral);">🛡️</div>
-        <div style="font-size: 0.84rem; color: var(--text-secondary);">
+        <div style="font-size: 0.82rem; color: var(--text-secondary);">
           <strong style="color: var(--text-white);">Regra de Segurança:</strong> Apenas administradores acessam esta aba. O usuário administrador do sistema é protegido contra exclusão, mas seu login e senha podem ser alterados livremente.
         </div>
       </div>
 
+      <!-- Barra de Filtro / Busca -->
+      <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: center;">
+        <div style="position: relative; flex: 1; max-width: 380px;">
+          <input 
+            type="text" 
+            id="user-search-input" 
+            class="form-input" 
+            placeholder="Buscar por nome, login ou perfil..." 
+            value="${searchTerm}"
+            style="padding-left: 36px;"
+          />
+          <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
+            ${ICONS.search}
+          </div>
+        </div>
+        ${
+          searchTerm
+            ? `<button class="btn btn-secondary btn-sm" id="btn-clear-search">Limpar</button>`
+            : ''
+        }
+      </div>
+
       <!-- Painel e Tabela de Usuários -->
-      <div class="panel-card">
+      <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-card-header">
           <h3 class="panel-card-title">Usuários Cadastrados (${users.length})</h3>
         </div>
@@ -181,59 +211,52 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
           return `
                     <tr>
                       <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                          <div style="width: 32px; height: 32px; border-radius: 50%; background: ${user.isSistema ? 'var(--color-coral)' : '#282b3a'}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; color: #ffffff;">
+                        <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                          <div style="width: 28px; height: 28px; border-radius: 50%; background: ${user.isSistema ? 'var(--color-coral)' : '#282b3a'}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; color: #ffffff; flex-shrink: 0;">
                             ${user.nome[0] || 'U'}
                           </div>
-                          <div>
-                            <div style="font-weight: 600; color: var(--text-white);">${user.nome}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${user.isSistema ? 'Administrador Raiz' : 'Usuário Padrão'}</div>
-                          </div>
+                          <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem;">
+                            ${user.nome}
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <code style="background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; color: #ff9187;">
+                        <code style="background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px; font-size: 0.82rem; color: #ff9187; white-space: nowrap;">
                           ${user.login}
                         </code>
                       </td>
                       <td>
-                        <span class="badge ${user.papel === 'admin' ? 'badge-coral' : 'badge-info'}">
+                        <span class="badge ${user.papel === 'admin' ? 'badge-coral' : 'badge-info'}" style="font-size: 0.72rem; white-space: nowrap;">
                           ${roleLabel}
                         </span>
                       </td>
                       <td>
-                        ${user.papel === 'admin'
-              ? `<span class="badge badge-coral" title="Acesso total a todos os formulários e ações">Acesso Total (${TOTAL_SYSTEM_PERMISSIONS}/${TOTAL_SYSTEM_PERMISSIONS})</span>`
-              : `
-                              <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="badge ${grantedCount > 0 ? 'badge-success' : 'badge-danger'}">
-                                  ${grantedCount} de ${TOTAL_SYSTEM_PERMISSIONS} ações
-                                </span>
-                                <span style="font-size: 0.72rem; color: var(--text-muted);">
-                                  (${userPerms.alunos.acesso ? 'Alunos' : ''}${userPerms.agenda.acesso ? ', Agenda' : ''}${userPerms.planos.acesso ? ', Planos' : ''})
-                                </span>
-                              </div>
-                            `
-            }
+                        <span class="badge ${user.papel === 'admin' ? 'badge-coral' : grantedCount > 0 ? 'badge-success' : 'badge-secondary'}" style="font-size: 0.72rem; white-space: nowrap;" title="Ações permitidas para este perfil">
+                          ${user.papel === 'admin' ? `Acesso Total (${TOTAL_SYSTEM_PERMISSIONS})` : `${grantedCount} de ${TOTAL_SYSTEM_PERMISSIONS} ações`}
+                        </span>
                       </td>
                       <td>
-                        ${user.isSistema
-              ? `<span style="font-size: 0.78rem; color: #f59e0b; font-weight: 600;">🔒 Sistema (Protegido)</span>`
-              : `<span style="font-size: 0.78rem; color: var(--text-muted);">Comum</span>`
-            }
+                        ${
+                          user.isSistema
+                            ? `<span class="badge badge-warning" style="font-size: 0.72rem; white-space: nowrap;">🔒 Sistema</span>`
+                            : `<span style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">Comum</span>`
+                        }
                       </td>
                       <td style="text-align: right;">
-                        <button class="btn btn-secondary btn-icon-only btn-edit-user" data-id="${user.id}" title="Editar Dados e Permissões">
-                          ${ICONS.edit}
-                        </button>
-                        ${user.isSistema
-              ? `<button class="btn btn-secondary btn-icon-only" disabled title="Não é permitido excluir o administrador inicial do sistema" style="opacity: 0.3; cursor: not-allowed; margin-left: 6px;">
-                                 ${ICONS.trash}
-                               </button>`
-              : `<button class="btn btn-danger btn-icon-only btn-delete-user" data-id="${user.id}" title="Excluir Usuário" style="margin-left: 6px;">
-                                 ${ICONS.trash}
-                               </button>`
-            }
+                        <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                          <button class="btn btn-secondary btn-icon-only btn-edit-user" data-id="${user.id}" title="Editar Dados e Permissões" style="width: 28px; height: 28px; padding: 0;">
+                            ${ICONS.edit}
+                          </button>
+                          ${
+                            user.isSistema
+                              ? `<button class="btn btn-secondary btn-icon-only" disabled title="Não é permitido excluir o administrador inicial do sistema" style="opacity: 0.25; cursor: not-allowed; width: 28px; height: 28px; padding: 0;">
+                                   ${ICONS.trash}
+                                 </button>`
+                              : `<button class="btn btn-danger btn-icon-only btn-delete-user" data-id="${user.id}" title="Excluir Usuário" style="width: 28px; height: 28px; padding: 0;">
+                                   ${ICONS.trash}
+                                 </button>`
+                          }
+                        </div>
                       </td>
                     </tr>
                   `;
@@ -249,6 +272,24 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
       openUserModal();
     });
 
+    const searchInput = container.querySelector('#user-search-input') as HTMLInputElement;
+    if (searchInput) {
+      searchInput.addEventListener('input', e => {
+        searchTerm = (e.target as HTMLInputElement).value;
+        renderList();
+        const newSearchInput = container.querySelector('#user-search-input') as HTMLInputElement;
+        if (newSearchInput) {
+          newSearchInput.focus();
+          newSearchInput.setSelectionRange(newSearchInput.value.length, newSearchInput.value.length);
+        }
+      });
+    }
+
+    container.querySelector('#btn-clear-search')?.addEventListener('click', () => {
+      searchTerm = '';
+      renderList();
+    });
+
     container.querySelectorAll('.btn-edit-user').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = (e.currentTarget as HTMLElement).dataset.id;
@@ -262,15 +303,19 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
         const id = (e.currentTarget as HTMLElement).dataset.id;
         const user = storageService.getUsers().find(u => u.id === id);
         if (user) {
-          if (confirm(`Tem certeza que deseja excluir o usuário "${user.nome}" (login: ${user.login})?`)) {
-            try {
-              storageService.deleteUser(user.id, loggedUser?.nome || 'Administrador');
-              showToast(`Usuário "${user.nome}" excluído.`, 'info');
-              renderList();
-            } catch (err: any) {
-              showToast(err.message || 'Erro ao excluir usuário.', 'error');
+          confirmAction({
+            title: 'Excluir Usuário',
+            message: `Tem certeza que deseja excluir o usuário "<strong>${user.nome}</strong>" (login: <code>${user.login}</code>)?`,
+            onConfirm: () => {
+              try {
+                storageService.deleteUser(user.id, loggedUser?.nome || 'Administrador');
+                showToast(`Usuário "${user.nome}" excluído.`, 'info');
+                renderList();
+              } catch (err: any) {
+                showToast(err.message || 'Erro ao excluir usuário.', 'error');
+              }
             }
-          }
+          });
         }
       });
     });

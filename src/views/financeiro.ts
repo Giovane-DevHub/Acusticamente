@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Payment, PaymentMethod, PaymentStatus, Student } from '../types';
-import { ICONS, openModal, closeModal, showToast } from '../utils/ui';
+import { ICONS, openModal, closeModal, showToast, confirmAction } from '../utils/ui';
 import { openReceiptModal } from './alunos';
 
 export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElement {
@@ -10,7 +10,16 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
 
   let searchTerm = '';
   let statusFilter: 'todos' | PaymentStatus = 'todos';
-  let monthFilter = '';
+  let filterDate: Date | null = new Date();
+
+  const monthNames = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+
+  function formatDisplayMonth(date: Date): string {
+    return `${monthNames[date.getMonth()]} de ${date.getFullYear()}`;
+  }
 
   const canCreate = hasActionPermission(user, 'financeiro', 'cadastrar');
   const canEdit = hasActionPermission(user, 'financeiro', 'alterar');
@@ -19,7 +28,16 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
   function render(): void {
     const allPayments = storageService.getPayments();
     const students = storageService.getStudents();
-    const todayStr = storageService.getTodayDateString();
+    const today = new Date();
+
+    const isCurrentMonthSelected =
+      filterDate !== null &&
+      today.getMonth() === filterDate.getMonth() &&
+      today.getFullYear() === filterDate.getFullYear();
+
+    const targetMonthStr = filterDate
+      ? `${filterDate.getFullYear()}-${String(filterDate.getMonth() + 1).padStart(2, '0')}`
+      : '';
 
     // Métricas
     const totalRecebido = allPayments
@@ -48,18 +66,10 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         (p.mesReferencia && p.mesReferencia.includes(searchTerm));
 
       const matchStatus = statusFilter === 'todos' || p.status === statusFilter;
-      const matchMonth = !monthFilter || p.mesReferencia === monthFilter || p.dataVencimento.startsWith(monthFilter);
+      const matchMonth = !targetMonthStr || p.mesReferencia === targetMonthStr || p.dataVencimento.startsWith(targetMonthStr);
 
       return matchSearch && matchStatus && matchMonth;
     });
-
-    // Lista de meses disponíveis para filtro
-    const mesesSet = new Set<string>();
-    allPayments.forEach(p => {
-      if (p.mesReferencia) mesesSet.add(p.mesReferencia);
-      else if (p.dataVencimento) mesesSet.add(p.dataVencimento.substring(0, 7));
-    });
-    const mesesDisponiveis = Array.from(mesesSet).sort().reverse();
 
     container.innerHTML = `
       <!-- Cabeçalho Principal -->
@@ -132,14 +142,41 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         </div>
       </div>
 
-      <!-- Filtros e Barra de Ações -->
+      <!-- Barra de Controle de Período (Mês) Padronizada -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div class="calendar-title-group" style="display: flex; align-items: center; gap: 14px;">
+          <h3 class="calendar-month-title" style="min-width: 220px; font-size: 1.05rem; margin: 0; font-weight: 700;">
+            ${filterDate ? `Mensalidade / ${filterDate.getFullYear()}-${String(filterDate.getMonth() + 1).padStart(2, '0')}` : 'Todas as Mensalidades'}
+          </h3>
+          
+          <div class="calendar-nav-buttons" style="display: flex; gap: 4px;">
+            <button type="button" class="btn btn-secondary btn-icon-only" id="fin-btn-prev-month" title="Mês anterior" style="width: 28px; height: 28px; padding: 0;">
+              ◀
+            </button>
+            <button type="button" class="btn ${isCurrentMonthSelected ? 'btn-primary' : 'btn-secondary'}" id="fin-btn-current-month" style="padding: 6px 14px; font-size: 0.8rem;">
+              Mês Atual
+            </button>
+            <button type="button" class="btn btn-secondary btn-icon-only" id="fin-btn-next-month" title="Próximo mês" style="width: 28px; height: 28px; padding: 0;">
+              ▶
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn ${filterDate === null ? 'btn-primary' : 'btn-secondary'}" id="fin-btn-all-months" style="padding: 6px 14px; font-size: 0.8rem;" title="Ver todos os lançamentos sem filtrar por mês">
+            Ver Todos
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros e Barra de Busca -->
       <div style="margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <div style="position: relative; flex: 1; min-width: 260px;">
           <input 
             type="text" 
             id="fin-search-input" 
             class="form-input" 
-            placeholder="Buscar por aluno, descrição..." 
+            placeholder="Buscar por aluno ou descrição..." 
             value="${searchTerm}"
             style="padding-left: 36px;"
           />
@@ -147,6 +184,12 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
             ${ICONS.search}
           </div>
         </div>
+
+        ${
+          searchTerm
+            ? `<button type="button" class="btn btn-secondary btn-sm" id="btn-clear-fin-search">Limpar</button>`
+            : ''
+        }
 
         <div style="min-width: 150px;">
           <select id="fin-status-filter" class="form-select">
@@ -157,18 +200,11 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
           </select>
         </div>
 
-        <div style="min-width: 160px;">
-          <select id="fin-month-filter" class="form-select">
-            <option value="" ${monthFilter === '' ? 'selected' : ''}>Todos os Meses</option>
-            ${mesesDisponiveis.map(m => `<option value="${m}" ${monthFilter === m ? 'selected' : ''}>Mês: ${m}</option>`).join('')}
-          </select>
-        </div>
-
         ${
-          searchTerm || statusFilter !== 'todos' || monthFilter
+          statusFilter !== 'todos'
             ? `
-              <button class="btn btn-secondary btn-sm" id="btn-limpar-filtros" title="Limpar todos os filtros">
-                ✕ Limpar
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-limpar-status" title="Limpar filtro de status">
+                ✕ Todos os Status
               </button>
             `
             : ''
@@ -185,19 +221,18 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
           <table class="data-table">
             <thead>
               <tr>
-                <th>Aluno</th>
+                <th style="width: 260px;">Aluno</th>
                 <th>Descrição / Referência</th>
-                <th>Vencimento</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Pagamento</th>
-                <th style="text-align: right;">Ações</th>
+                <th style="width: 150px;">Vencimento</th>
+                <th style="width: 140px;">Valor</th>
+                <th style="width: 140px;">Status</th>
+                <th style="width: 150px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
               ${
                 filtered.length === 0
-                  ? `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum lançamento financeiro encontrado para os filtros selecionados.</td></tr>`
+                  ? `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum lançamento financeiro encontrado para os filtros selecionados.</td></tr>`
                   : filtered
                       .map(p => {
                         const student = students.find(s => s.id === p.alunoId);
@@ -213,77 +248,46 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
                           statusBadge = `<span class="badge badge-warning" style="font-size: 0.72rem;">⏳ Pendente</span>`;
                         }
 
-                        // WhatsApp Reminder Link para faturas pendentes ou atrasadas
-                        let waCobrarLink = '';
-                        if (student && student.telefone && !isPago) {
-                          const digits = student.telefone.replace(/\D/g, '');
-                          const num = digits.length <= 11 ? `55${digits}` : digits;
-                          const msg = isAtrasado
-                            ? `Olá, ${student.nome}! Notamos que a mensalidade de ${p.descricao} (R$ ${p.valor.toFixed(2)}) venceu em ${p.dataVencimento.split('-').reverse().join('/')}. Podemos lhe ajudar na regularização?`
-                            : `Olá, ${student.nome}! Lembramos que a mensalidade de ${p.descricao} (R$ ${p.valor.toFixed(2)}) vence em ${p.dataVencimento.split('-').reverse().join('/')}. Qualquer dúvida estamos à disposição!`;
-                          waCobrarLink = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
-                        }
-
                         return `
                           <tr>
                             <td>
-                              <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); font-size: 0.85rem; flex-shrink: 0;">
+                              <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); font-size: 0.8rem; flex-shrink: 0;">
                                   ${student?.nome ? student.nome[0] : '?'}
                                 </div>
-                                <div>
-                                  <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
-                                    ${student?.nome || 'Aluno não identificado'}
-                                  </div>
-                                  <div style="font-size: 0.72rem; color: var(--text-muted);">
-                                    ${student?.instrumentoPrincipal || 'Música Geral'} &bull; ${student?.telefone || '-'}
-                                  </div>
-                                </div>
+                                <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem;">
+                                  ${student?.nome || 'Aluno não identificado'}
+                                </span>
                               </div>
                             </td>
 
                             <td>
-                              <div style="font-weight: 600; color: var(--text-white); font-size: 0.85rem;">${p.descricao}</div>
-                              ${p.mesReferencia ? `<span style="font-size: 0.7rem; color: var(--text-muted);">Ref: ${p.mesReferencia}</span>` : ''}
-                              ${p.observacoes ? `<div style="font-size: 0.7rem; color: var(--text-secondary);">${p.observacoes}</div>` : ''}
+                              <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; white-space: nowrap;">
+                                ${p.descricao}${p.mesReferencia ? ` / ${p.mesReferencia}` : ''}
+                              </span>
                             </td>
 
-                            <td>
-                              <div style="font-size: 0.85rem; color: ${isAtrasado ? '#f87171' : 'var(--text-white)'}; font-weight: ${isAtrasado ? '700' : 'normal'};">
+                            <td style="white-space: nowrap;">
+                              <span style="font-size: 0.84rem; color: ${isAtrasado ? '#f87171' : 'var(--text-white)'}; font-weight: ${isAtrasado ? '700' : 'normal'};">
                                 ${p.dataVencimento.split('-').reverse().join('/')}
-                              </div>
+                              </span>
                             </td>
 
-                            <td>
-                              <div style="font-weight: 700; color: var(--text-white); font-size: 0.92rem;">
+                            <td style="white-space: nowrap;">
+                              <span style="font-weight: 700; color: var(--text-white); font-size: 0.88rem;">
                                 R$ ${p.valor.toFixed(2)}
-                              </div>
+                              </span>
                             </td>
 
-                            <td>${statusBadge}</td>
-
-                            <td>
-                              ${
-                                isPago
-                                  ? `
-                                    <div style="font-size: 0.82rem; color: #4ade80; font-weight: 600;">
-                                      ${p.dataPagamento ? p.dataPagamento.split('-').reverse().join('/') : 'Pago'}
-                                    </div>
-                                    <div style="font-size: 0.7rem; color: var(--text-muted);">
-                                      ${(p.formaPagamento || 'PIX').toUpperCase()}
-                                    </div>
-                                  `
-                                  : `<span style="font-size: 0.78rem; color: var(--text-muted);">-</span>`
-                              }
-                            </td>
+                            <td style="white-space: nowrap;">${statusBadge}</td>
 
                             <td style="text-align: right;">
-                              <div style="display: flex; gap: 4px; justify-content: flex-end; align-items: center;">
+                              <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
                                 ${
                                   !isPago && canEdit
                                     ? `
-                                      <button class="btn btn-primary btn-sm btn-action-baixa" data-id="${p.id}" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669;" title="Dar baixa e confirmar recebimento">
-                                        ✓ Baixa
+                                      <button class="btn btn-secondary btn-icon-only btn-action-baixa" data-id="${p.id}" title="Dar Baixa / Confirmar Recebimento" style="width: 28px; height: 28px; padding: 0; color: #34d399; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08); box-shadow: none;">
+                                        ${ICONS.check}
                                       </button>
                                     `
                                     : ''
@@ -292,7 +296,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
                                 ${
                                   isPago
                                     ? `
-                                      <button class="btn btn-secondary btn-icon-only btn-action-recibo" data-id="${p.id}" title="Imprimir Comprovante / Recibo" style="color: #60a5fa;">
+                                      <button class="btn btn-secondary btn-icon-only btn-action-recibo" data-id="${p.id}" title="Imprimir Comprovante / Recibo" style="color: #60a5fa; width: 28px; height: 28px; padding: 0; box-shadow: none;">
                                         🖨️
                                       </button>
                                     `
@@ -300,22 +304,9 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
                                 }
 
                                 ${
-                                  waCobrarLink
-                                    ? `
-                                      <a href="${waCobrarLink}" target="_blank" rel="noopener noreferrer" 
-                                         class="btn btn-secondary btn-icon-only" 
-                                         title="Lembrar cobrança via WhatsApp" 
-                                         style="color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
-                                        ${ICONS.whatsapp}
-                                      </a>
-                                    `
-                                    : ''
-                                }
-
-                                ${
                                   canEdit
                                     ? `
-                                      <button class="btn btn-secondary btn-icon-only btn-action-edit" data-id="${p.id}" title="Editar Lançamento">
+                                      <button class="btn btn-secondary btn-icon-only btn-action-edit" data-id="${p.id}" title="Editar Lançamento" style="width: 28px; height: 28px; padding: 0; box-shadow: none;">
                                         ${ICONS.edit}
                                       </button>
                                     `
@@ -325,7 +316,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
                                 ${
                                   canDelete
                                     ? `
-                                      <button class="btn btn-danger btn-icon-only btn-action-delete" data-id="${p.id}" title="Excluir Lançamento">
+                                      <button class="btn btn-danger btn-icon-only btn-action-delete" data-id="${p.id}" title="Excluir Lançamento" style="width: 28px; height: 28px; padding: 0; box-shadow: none;">
                                         ${ICONS.trash}
                                       </button>
                                     `
@@ -344,6 +335,29 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
       </div>
     `;
 
+    // Eventos de Navegação de Mês/Período
+    container.querySelector('#fin-btn-prev-month')?.addEventListener('click', () => {
+      if (!filterDate) filterDate = new Date();
+      filterDate = new Date(filterDate.getFullYear(), filterDate.getMonth() - 1, 1);
+      render();
+    });
+
+    container.querySelector('#fin-btn-next-month')?.addEventListener('click', () => {
+      if (!filterDate) filterDate = new Date();
+      filterDate = new Date(filterDate.getFullYear(), filterDate.getMonth() + 1, 1);
+      render();
+    });
+
+    container.querySelector('#fin-btn-current-month')?.addEventListener('click', () => {
+      filterDate = new Date();
+      render();
+    });
+
+    container.querySelector('#fin-btn-all-months')?.addEventListener('click', () => {
+      filterDate = null;
+      render();
+    });
+
     // Eventos de Busca e Filtros
     const searchInput = container.querySelector('#fin-search-input') as HTMLInputElement;
     searchInput?.addEventListener('input', (e) => {
@@ -356,22 +370,19 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
       }
     });
 
+    container.querySelector('#btn-clear-fin-search')?.addEventListener('click', () => {
+      searchTerm = '';
+      render();
+    });
+
     const statusSel = container.querySelector('#fin-status-filter') as HTMLSelectElement;
     statusSel?.addEventListener('change', () => {
       statusFilter = statusSel.value as any;
       render();
     });
 
-    const monthSel = container.querySelector('#fin-month-filter') as HTMLSelectElement;
-    monthSel?.addEventListener('change', () => {
-      monthFilter = monthSel.value;
-      render();
-    });
-
-    container.querySelector('#btn-limpar-filtros')?.addEventListener('click', () => {
-      searchTerm = '';
+    container.querySelector('#btn-limpar-status')?.addEventListener('click', () => {
       statusFilter = 'todos';
-      monthFilter = '';
       render();
     });
 
@@ -418,25 +429,13 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         const p = allPayments.find(item => item.id === id);
         if (!p) return;
 
-        openModal({
-          title: 'Confirmar Exclusão',
-          bodyHtml: `
-            <p style="font-size: 0.9rem; color: var(--text-white); margin-bottom: 8px;">
-              Deseja realmente excluir o lançamento <strong>"${p.descricao}"</strong> no valor de <strong>R$ ${p.valor.toFixed(2)}</strong>?
-            </p>
-            <p style="font-size: 0.78rem; color: #f87171; margin: 0;">
-              ⚠️ Esta operação será gravada na auditoria do sistema e não poderá ser desfeita.
-            </p>
-          `,
-          modalClass: 'modal-sm',
-          confirmText: 'Excluir',
-          confirmBtnClass: 'btn-danger',
-          cancelText: 'Cancelar',
+        confirmAction({
+          title: 'Excluir Lançamento Financeiro',
+          message: `Deseja realmente excluir o lançamento "<strong>${p.descricao}</strong>" no valor de <strong>R$ ${p.valor.toFixed(2)}</strong>? Esta operação ficará registrada na auditoria e não poderá ser desfeita.`,
           onConfirm: () => {
             storageService.deletePayment(p.id, user?.nome || 'Administrador');
-            showToast('Lançamento excluído com sucesso!', 'success');
+            showToast('Lançamento excluído com sucesso!', 'info');
             render();
-            return true;
           }
         });
       });
