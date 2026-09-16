@@ -1,5 +1,6 @@
 import { authService } from '../services/authService';
-import { getAcusticamenteLogo } from '../assets/logo';
+import { storageService } from '../services/storageService';
+import { renderBrandLogo } from '../assets/logo';
 import { showToast } from '../utils/ui';
 
 const REMEMBER_KEY = 'acusticamente_auth_remember';
@@ -8,6 +9,9 @@ const MANUAL_LOGOUT_KEY = 'acusticamente_manual_logout';
 export function renderLogin(onLoginSuccess: () => void): HTMLElement {
   const container = document.createElement('div');
   container.className = 'login-page';
+
+  const settings = storageService.getSettings();
+  const brandTitle = settings.nomeMenu || settings.nomeFantasia || 'Acusticamente';
 
   let savedAuth = { username: '', password: '', remember: false, autoLogin: false };
   try {
@@ -24,9 +28,9 @@ export function renderLogin(onLoginSuccess: () => void): HTMLElement {
     <div class="login-branding-side">
       <div class="login-brand-header">
         <div class="sidebar-logo">
-          ${getAcusticamenteLogo(50)}
+          ${renderBrandLogo(settings.logotipoCustomizado, 50)}
         </div>
-        <h2>ACUSTICAMENTE</h2>
+        <h2>${brandTitle}</h2>
       </div>
 
       <div class="login-pitch-box">
@@ -49,7 +53,7 @@ export function renderLogin(onLoginSuccess: () => void): HTMLElement {
       <div class="login-card">
         <div class="login-card-header">
           <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            ${getAcusticamenteLogo(58)}
+            ${renderBrandLogo(settings.logotipoCustomizado, 58)}
           </div>
           <h3>Bem-vindo</h3>
           <p>Entre com seu usuário e senha para acessar o painel</p>

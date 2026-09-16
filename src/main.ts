@@ -1,5 +1,6 @@
 import { authService, hasPermission } from './services/authService';
-import { getAcusticamenteLogo } from './assets/logo';
+import { storageService } from './services/storageService';
+import { renderBrandLogo } from './assets/logo';
 import { ICONS, showToast, confirmAction } from './utils/ui';
 import { AppScreen, User } from './types';
 
@@ -53,6 +54,19 @@ class AppRouter {
       }
     });
 
+    // Atualiza visualização do menu (logotipo e nome) em tempo real quando alterados
+    window.addEventListener('app-settings-updated', () => {
+      const currentSettings = storageService.getSettings();
+      const brandNameEl = document.querySelector('.sidebar-brand-name');
+      if (brandNameEl) {
+        brandNameEl.textContent = currentSettings.nomeMenu || 'Acusticamente';
+      }
+      const logoContainerEl = document.querySelector('.sidebar-logo');
+      if (logoContainerEl) {
+        logoContainerEl.innerHTML = renderBrandLogo(currentSettings.logotipoCustomizado, 46);
+      }
+    });
+
     this.render();
   }
 
@@ -102,6 +116,8 @@ class AppRouter {
 
     const currentUser = authService.getCurrentUser();
     const isAdmin = currentUser?.papel === 'admin';
+    const currentSettings = storageService.getSettings();
+    const menuBrandName = currentSettings.nomeMenu || 'Acusticamente';
 
     layout.innerHTML = `
       <!-- Fundo translúcido para fechar sidebar no mobile -->
@@ -110,11 +126,11 @@ class AppRouter {
       <!-- Sidebar Lateral -->
       <aside class="sidebar" id="app-sidebar">
         <div class="sidebar-header">
-          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
             <div class="sidebar-logo">
-              ${getAcusticamenteLogo(46)}
+              ${renderBrandLogo(currentSettings.logotipoCustomizado, 46)}
             </div>
-            <span class="sidebar-brand-name">ACUSTICAMENTE</span>
+            <span class="sidebar-brand-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${menuBrandName}</span>
           </div>
           <button type="button" class="btn-sidebar-close" id="btn-sidebar-close" title="Fechar menu">
             ${ICONS.close}

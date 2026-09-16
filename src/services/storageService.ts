@@ -34,7 +34,9 @@ class StorageService {
     mongoUri: 'mongodb://localhost:27017',
     mongoDatabase: 'acusticamente_db',
     mongoStatus: 'simulado',
-    notificacoesAtivas: true
+    notificacoesAtivas: true,
+    nomeMenu: 'Acusticamente',
+    logotipoCustomizado: ''
   };
 
   constructor() {
@@ -996,11 +998,16 @@ class StorageService {
     this.settings = { ...this.settings, ...updates };
     this.saveSettings();
 
+    // Notifica toda a aplicação sobre atualização visual (menu, logotipos, etc.)
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('app-settings-updated', { detail: this.getSettings() }));
+    }
+
     auditService.log({
       tela: 'Configurações',
       acao: 'Alteração de Configurações',
       usuarioNome: currentUserName,
-      detalhes: `Parâmetros do sistema atualizados (MongoDB: ${this.settings.mongoDatabase}).`
+      detalhes: `Parâmetros do sistema atualizados (Menu: ${this.settings.nomeMenu || 'Padrão'}, Logo: ${this.settings.logotipoCustomizado ? 'Personalizado' : 'Padrão'}).`
     });
 
     return this.settings;

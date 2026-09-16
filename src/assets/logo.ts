@@ -54,3 +54,15 @@ export function getAcusticamenteLogo(size: number = 40): string {
     </svg>
   `;
 }
+
+/**
+ * Renderiza o logotipo da instituição. Caso exista uma imagem customizada definida pelo usuário,
+ * ela é exibida respeitando proporções. Caso contrário, exibe o vetor SVG oficial de alta fidelidade.
+ */
+export function renderBrandLogo(customLogoUrl?: string, size: number = 40): string {
+  if (customLogoUrl && customLogoUrl.trim() !== '') {
+    return `<img src="${customLogoUrl}" alt="Logotipo" class="brand-logo-custom" style="width: ${size}px; height: ${size}px; object-fit: contain; border-radius: 6px; display: block;" />`;
+  }
+  return getAcusticamenteLogo(size);
+}
+

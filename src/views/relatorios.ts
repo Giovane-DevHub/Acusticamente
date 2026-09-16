@@ -601,9 +601,75 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
   }
 
   // ========================================================
-  // RENDERIZADOR DO LOGOTIPO ACUSTICAMENTE EM PNG PARA O PDF
+  // RENDERIZADOR DO LOGOTIPO EM PNG PARA O PDF (SUPORTA LOGO PERSONALIZADO)
   // ========================================================
-  function getAcusticamenteLogoPng(): Promise<string> {
+  function getAcusticamenteLogoPng(customLogoUrl?: string): Promise<string> {
+    return new Promise((resolve) => {
+      // Caso haja logotipo customizado, renderiza a imagem no canvas com proporção adequada
+      if (customLogoUrl && customLogoUrl.trim() !== '') {
+        const customImg = new Image();
+        customImg.crossOrigin = 'Anonymous';
+        customImg.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 160;
+            canvas.height = 160;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(customLogoUrl);
+              return;
+            }
+            // Fundo arredondado elegante para manter destaque
+            const radius = 24;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(160 - radius, 0);
+            ctx.quadraticCurveTo(160, 0, 160, radius);
+            ctx.lineTo(160, 160 - radius);
+            ctx.quadraticCurveTo(160, 160, 160 - radius, 160);
+            ctx.lineTo(radius, 160);
+            ctx.quadraticCurveTo(0, 160, 0, 160 - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Calcula proporções preservando aspecto
+            const pad = 12;
+            const maxW = 160 - pad * 2;
+            const maxH = 160 - pad * 2;
+            let drawW = maxW;
+            let drawH = maxH;
+            const aspect = customImg.width / customImg.height;
+
+            if (aspect > 1) {
+              drawH = maxW / aspect;
+            } else {
+              drawW = maxH * aspect;
+            }
+
+            const drawX = pad + (maxW - drawW) / 2;
+            const drawY = pad + (maxH - drawH) / 2;
+
+            ctx.drawImage(customImg, drawX, drawY, drawW, drawH);
+            resolve(canvas.toDataURL('image/png'));
+          } catch {
+            resolve(customLogoUrl);
+          }
+        };
+        customImg.onerror = () => {
+          renderDefaultLogoSvgPng().then(resolve);
+        };
+        customImg.src = customLogoUrl;
+        return;
+      }
+
+      renderDefaultLogoSvgPng().then(resolve);
+    });
+  }
+
+  function renderDefaultLogoSvgPng(): Promise<string> {
     return new Promise((resolve) => {
       try {
         const canvas = document.createElement('canvas');
@@ -680,7 +746,7 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
   async function emitirPdfAlunos(settings: any, alunos: Student[], plans: TeachingPlan[]): Promise<void> {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const dataEmissao = new Date().toLocaleString('pt-BR');
-    const nomeEmpresa = settings.nomeFantasia || settings.nomeEscola || 'ACUSTICAMENTE';
+    const nomeEmpresa = settings.nomeMenu || settings.nomeFantasia || settings.nomeEscola || 'ACUSTICAMENTE';
     const razao = settings.razaoSocial || 'Acusticamente Ensino Musical Ltda';
     const cnpj = settings.cnpj ? `CNPJ: ${settings.cnpj}` : '';
     const contato = [settings.telefoneContato, settings.emailContato].filter(Boolean).join(' • ');
@@ -692,8 +758,8 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
       settings.cep ? `CEP: ${settings.cep}` : ''
     ].filter(Boolean).join(' • ');
 
-    // 1. Logotipo oficial da instituição
-    const logoPng = await getAcusticamenteLogoPng();
+    // 1. Logotipo oficial da instituição (customizado ou padrão)
+    const logoPng = await getAcusticamenteLogoPng(settings.logotipoCustomizado);
     if (logoPng) {
       doc.addImage(logoPng, 'PNG', 14, 12, 17, 17);
     }
@@ -878,7 +944,7 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const studentMap = new Map(students.map(s => [s.id, s.nome]));
     const dataEmissao = new Date().toLocaleString('pt-BR');
-    const nomeEmpresa = settings.nomeFantasia || settings.nomeEscola || 'ACUSTICAMENTE';
+    const nomeEmpresa = settings.nomeMenu || settings.nomeFantasia || settings.nomeEscola || 'ACUSTICAMENTE';
     const razao = settings.razaoSocial || 'Acusticamente Ensino Musical Ltda';
     const cnpj = settings.cnpj ? `CNPJ: ${settings.cnpj}` : '';
     const contato = [settings.telefoneContato, settings.emailContato].filter(Boolean).join(' • ');
@@ -895,8 +961,8 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
     const totalPago = lancamentos.filter(p => p.status === 'pago').reduce((acc, p) => acc + p.valor, 0);
     const totalPendente = lancamentos.filter(p => p.status !== 'pago').reduce((acc, p) => acc + p.valor, 0);
 
-    // 1. Logotipo oficial
-    const logoPng = await getAcusticamenteLogoPng();
+    // 1. Logotipo oficial da instituição (customizado ou padrão)
+    const logoPng = await getAcusticamenteLogoPng(settings.logotipoCustomizado);
     if (logoPng) {
       doc.addImage(logoPng, 'PNG', 14, 12, 17, 17);
     }

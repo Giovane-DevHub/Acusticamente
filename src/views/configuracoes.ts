@@ -1,6 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { MongoConnectionService } from '../services/mongoService';
+import { renderBrandLogo } from '../assets/logo';
 import { showToast } from '../utils/ui';
 
 export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLElement {
@@ -16,12 +17,12 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
         Configurações do Sistema
       </h2>
       <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-        Gerencie os dados cadastrais da instituição e os parâmetros do banco de dados.
+        Gerencie as preferências gerais, logotipo da instituição, dados cadastrais e banco de dados.
       </p>
     </div>
 
     <!-- Seletor de Abas com Contraste Nítido -->
-    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+    <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
       <button 
         type="button" 
         class="btn-cfg-tab active" 
@@ -30,6 +31,16 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
         style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--color-coral); color: #ffffff; border: 1px solid var(--color-coral); cursor: pointer; transition: all 0.15s ease;"
       >
         <span>🏢</span> Dados da Instituição
+      </button>
+
+      <button 
+        type="button" 
+        class="btn-cfg-tab" 
+        id="btn-tab-gerais" 
+        data-tab="gerais" 
+        style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.15s ease;"
+      >
+        <span>⚙️</span> Configurações Gerais
       </button>
 
       <button 
@@ -47,7 +58,7 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
     <!-- Painel de Conteúdo das Abas -->
     <div class="panel-card" style="margin-bottom: 16px;">
       <!-- CONTEÚDO DA ABA 1: DADOS DA INSTITUIÇÃO -->
-      <div id="tab-content-instituicao" style="padding: 20px 24px;">
+      <div id="tab-content-instituicao" style="padding: 20px 24px; display: block;">
         <form id="form-settings-institucional">
           <!-- Identificação & Contato -->
           <div style="margin-bottom: 16px;">
@@ -234,7 +245,101 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
         </form>
       </div>
 
-      <!-- CONTEÚDO DA ABA 2: BANCO DE DADOS (MONGODB) -->
+      <!-- CONTEÚDO DA ABA 2: CONFIGURAÇÕES GERAIS -->
+      <div id="tab-content-gerais" style="padding: 20px 24px; display: none;">
+        <form id="form-settings-gerais">
+          <!-- Nome no Menu Lateral -->
+          <div style="margin-bottom: 18px; max-width: 440px;">
+            <label class="form-label" for="cfg-menu-name" style="font-size: 0.78rem; font-weight: 600;">Nome no Menu Lateral</label>
+            <input 
+              type="text" 
+              id="cfg-menu-name" 
+              class="form-input" 
+              value="${settings.nomeMenu || 'Acusticamente'}" 
+              placeholder="Ex: Acusticamente"
+              maxlength="32"
+              required 
+            />
+          </div>
+
+          <!-- Divisor -->
+          <div style="border-top: 1px solid var(--border-subtle); margin: 18px 0;"></div>
+
+          <!-- Logotipo da Instituição -->
+          <div style="margin-bottom: 20px;">
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 12px; display: block;">Logotipo (Menu &amp; Relatórios)</label>
+
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start;">
+              <!-- Coluna 1: No Menu + Botão Selecionar Imagem -->
+              <div style="width: 160px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="background: #11141e; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 14px; text-align: center; box-sizing: border-box;">
+                  <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                    No Menu
+                  </span>
+                  <div id="preview-logo-menu" style="width: 44px; height: 44px; margin: 0 auto 6px auto; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border-radius: 6px; border: 1px dashed rgba(255,255,255,0.15); overflow: hidden;">
+                    ${renderBrandLogo(settings.logotipoCustomizado, 40)}
+                  </div>
+                  <span id="preview-menu-brand-name" style="font-family: var(--font-heading); font-size: 0.74rem; font-weight: 700; color: var(--text-white); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${settings.nomeMenu || 'Acusticamente'}
+                  </span>
+                </div>
+
+                <button 
+                  type="button" 
+                  class="btn btn-primary" 
+                  id="btn-upload-logo"
+                  style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem; padding: 8px 10px; box-sizing: border-box;"
+                >
+                  <span>📁</span> Selecionar Imagem
+                </button>
+              </div>
+
+              <!-- Coluna 2: No Relatório + Botão Restaurar Padrão -->
+              <div style="width: 160px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 12px 14px; text-align: center; box-sizing: border-box;">
+                  <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 6px;">
+                    No Relatório
+                  </span>
+                  <div id="preview-logo-report" style="width: 44px; height: 44px; margin: 0 auto 6px auto; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1; overflow: hidden;">
+                    ${renderBrandLogo(settings.logotipoCustomizado, 40)}
+                  </div>
+                  <span id="preview-report-brand-name" style="font-family: sans-serif; font-size: 0.74rem; font-weight: 700; color: #0f172a; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${settings.nomeMenu || 'Acusticamente'}
+                  </span>
+                </div>
+
+                <button 
+                  type="button" 
+                  class="btn btn-secondary" 
+                  id="btn-reset-logo"
+                  style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem; padding: 8px 10px; box-sizing: border-box; color: ${settings.logotipoCustomizado ? '#ef4444' : 'var(--text-muted)'};"
+                  ${!settings.logotipoCustomizado ? 'disabled' : ''}
+                >
+                  <span>🗑️</span> Restaurar Padrão
+                </button>
+              </div>
+            </div>
+
+            <input type="file" id="input-logo-file" accept="image/png, image/jpeg, image/webp, image/svg+xml" style="display: none;" />
+            <div id="logo-feedback-msg" style="font-size: 0.74rem; margin-top: 8px; display: none;"></div>
+          </div>
+
+          <!-- Ação Salvar Configurações Gerais -->
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px; display: flex; justify-content: flex-start;">
+            ${
+              canAlter
+                ? `
+                  <button type="submit" class="btn btn-primary" id="btn-save-gerais" style="padding: 8px 22px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                    <span>💾</span> Salvar Configurações Gerais
+                  </button>
+                `
+                : `<span style="font-size: 0.8rem; color: var(--text-muted);">🔒 Modo somente leitura</span>`
+            }
+          </div>
+        </form>
+      </div>
+
+      <!-- CONTEÚDO DA ABA 3: BANCO DE DADOS (MONGODB) -->
       <div id="tab-content-mongo" style="padding: 24px; display: none;">
         <div style="max-width: 580px;">
           <h4 style="font-size: 0.84rem; font-weight: 700; color: var(--text-white); margin: 0 0 14px 0;">
@@ -307,38 +412,164 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
     </div>
   `;
 
-  // Alternância das Abas com Contraste Nítido
+  // ========================================================
+  // ALTERNÂNCIA DAS 3 ABAS COM CONTRASTE NÍTIDO
+  // ========================================================
+  const tabGeraisBtn = container.querySelector('#btn-tab-gerais') as HTMLButtonElement;
   const tabInstituicaoBtn = container.querySelector('#btn-tab-instituicao') as HTMLButtonElement;
   const tabMongoBtn = container.querySelector('#btn-tab-mongo') as HTMLButtonElement;
+
+  const contentGerais = container.querySelector('#tab-content-gerais') as HTMLElement;
   const contentInstituicao = container.querySelector('#tab-content-instituicao') as HTMLElement;
   const contentMongo = container.querySelector('#tab-content-mongo') as HTMLElement;
 
-  function setTabStyles(activeBtn: HTMLButtonElement, inactiveBtn: HTMLButtonElement): void {
-    activeBtn.style.background = 'var(--color-coral)';
-    activeBtn.style.color = '#ffffff';
-    activeBtn.style.borderColor = 'var(--color-coral)';
-    activeBtn.style.fontWeight = '700';
-
-    inactiveBtn.style.background = 'var(--bg-surface)';
-    inactiveBtn.style.color = 'var(--text-secondary)';
-    inactiveBtn.style.borderColor = 'var(--border-subtle)';
-    inactiveBtn.style.fontWeight = '600';
-  }
-
-  function switchTab(activeTab: 'instituicao' | 'mongo'): void {
-    if (activeTab === 'instituicao') {
-      contentInstituicao.style.display = 'block';
-      contentMongo.style.display = 'none';
-      setTabStyles(tabInstituicaoBtn, tabMongoBtn);
+  function styleTabButton(btn: HTMLButtonElement, isActive: boolean): void {
+    if (isActive) {
+      btn.style.background = 'var(--color-coral)';
+      btn.style.color = '#ffffff';
+      btn.style.borderColor = 'var(--color-coral)';
+      btn.style.fontWeight = '700';
     } else {
-      contentInstituicao.style.display = 'none';
-      contentMongo.style.display = 'block';
-      setTabStyles(tabMongoBtn, tabInstituicaoBtn);
+      btn.style.background = 'var(--bg-surface)';
+      btn.style.color = 'var(--text-secondary)';
+      btn.style.borderColor = 'var(--border-subtle)';
+      btn.style.fontWeight = '600';
     }
   }
 
+  function switchTab(activeTab: 'gerais' | 'instituicao' | 'mongo'): void {
+    contentGerais.style.display = activeTab === 'gerais' ? 'block' : 'none';
+    contentInstituicao.style.display = activeTab === 'instituicao' ? 'block' : 'none';
+    contentMongo.style.display = activeTab === 'mongo' ? 'block' : 'none';
+
+    styleTabButton(tabGeraisBtn, activeTab === 'gerais');
+    styleTabButton(tabInstituicaoBtn, activeTab === 'instituicao');
+    styleTabButton(tabMongoBtn, activeTab === 'mongo');
+  }
+
+  tabGeraisBtn?.addEventListener('click', () => switchTab('gerais'));
   tabInstituicaoBtn?.addEventListener('click', () => switchTab('instituicao'));
   tabMongoBtn?.addEventListener('click', () => switchTab('mongo'));
+
+  // ========================================================
+  // LÓGICA E INTERATIVIDADE DA ABA: CONFIGURAÇÕES GERAIS
+  // ========================================================
+  let tempCustomLogo = settings.logotipoCustomizado || '';
+
+  const inputMenuName = container.querySelector('#cfg-menu-name') as HTMLInputElement;
+  const previewMenuBrand = container.querySelector('#preview-menu-brand-name') as HTMLElement;
+  const previewReportBrand = container.querySelector('#preview-report-brand-name') as HTMLElement;
+
+  const previewLogoMenu = container.querySelector('#preview-logo-menu') as HTMLElement;
+  const previewLogoReport = container.querySelector('#preview-logo-report') as HTMLElement;
+
+  const inputLogoFile = container.querySelector('#input-logo-file') as HTMLInputElement;
+  const btnUploadLogo = container.querySelector('#btn-upload-logo') as HTMLButtonElement;
+  const btnResetLogo = container.querySelector('#btn-reset-logo') as HTMLButtonElement;
+  const logoFeedbackMsg = container.querySelector('#logo-feedback-msg') as HTMLElement;
+
+  // Atualização em tempo real do nome da marca nas prévias
+  inputMenuName?.addEventListener('input', () => {
+    const val = inputMenuName.value.trim() || 'Acusticamente';
+    if (previewMenuBrand) previewMenuBrand.textContent = val;
+    if (previewReportBrand) previewReportBrand.textContent = val;
+  });
+
+  // Ação de upload de imagem
+  btnUploadLogo?.addEventListener('click', () => {
+    inputLogoFile?.click();
+  });
+
+  inputLogoFile?.addEventListener('change', (e) => {
+    const files = (e.target as HTMLInputElement).files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+
+    // Validação de tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      showToast('Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).', 'info');
+      return;
+    }
+
+    // Validação de tamanho (máximo 3MB)
+    if (file.size > 3 * 1024 * 1024) {
+      showToast('A imagem selecionada é muito pesada. Escolha uma imagem de até 3 MB.', 'info');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => {
+      tempCustomLogo = (loadEvent.target?.result as string) || '';
+      
+      // Atualiza os previews
+      if (previewLogoMenu) previewLogoMenu.innerHTML = renderBrandLogo(tempCustomLogo, 40);
+      if (previewLogoReport) previewLogoReport.innerHTML = renderBrandLogo(tempCustomLogo, 40);
+
+      // Habilita o botão de restaurar
+      if (btnResetLogo) {
+        btnResetLogo.disabled = false;
+        btnResetLogo.style.color = '#ef4444';
+      }
+
+      if (logoFeedbackMsg) {
+        logoFeedbackMsg.style.display = 'block';
+        logoFeedbackMsg.style.color = 'var(--status-success)';
+        logoFeedbackMsg.textContent = 'Imagem carregada no preview. Clique em Salvar.';
+      }
+
+      showToast('Logotipo carregado na pré-visualização!', 'info');
+    };
+
+    reader.onerror = () => {
+      showToast('Erro ao processar o arquivo de imagem.', 'error');
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+  // Ação de restaurar logotipo padrão
+  btnResetLogo?.addEventListener('click', () => {
+    tempCustomLogo = '';
+    if (inputLogoFile) inputLogoFile.value = '';
+
+    if (previewLogoMenu) previewLogoMenu.innerHTML = renderBrandLogo('', 40);
+    if (previewLogoReport) previewLogoReport.innerHTML = renderBrandLogo('', 40);
+
+    if (btnResetLogo) {
+      btnResetLogo.disabled = true;
+      btnResetLogo.style.color = 'var(--text-muted)';
+    }
+
+    if (logoFeedbackMsg) {
+      logoFeedbackMsg.style.display = 'block';
+      logoFeedbackMsg.style.color = 'var(--color-coral)';
+      logoFeedbackMsg.textContent = 'Logotipo padrão no preview. Clique em Salvar.';
+    }
+
+    showToast('Logotipo padrão restaurado no preview.', 'info');
+  });
+
+  // Salvar configurações gerais
+  const formGerais = container.querySelector('#form-settings-gerais') as HTMLFormElement;
+  formGerais?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nomeMenu = inputMenuName.value.trim() || 'Acusticamente';
+
+    storageService.updateSettings(
+      {
+        nomeMenu,
+        logotipoCustomizado: tempCustomLogo
+      },
+      user?.nome || 'Administrador'
+    );
+
+    if (logoFeedbackMsg) {
+      logoFeedbackMsg.style.display = 'none';
+    }
+
+    showToast('Configurações gerais salvas com sucesso!', 'success');
+  });
 
   // Máscaras visuais automáticas para campos de tamanho fixo (CNPJ, CEP e UF)
   const inputCnpj = container.querySelector('#cfg-cnpj') as HTMLInputElement;

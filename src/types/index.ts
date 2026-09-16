@@ -184,6 +184,8 @@ export interface SystemSettings {
   nomeClinica?: string;
   razaoSocial?: string;
   nomeFantasia?: string;
+  nomeMenu?: string;
+  logotipoCustomizado?: string;
   cnpj?: string;
   inscricaoEstadual?: string;
   telefoneContato: string;
