@@ -8,6 +8,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     agenda: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     planos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     home: { acesso: true },
+    financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     auditoria: { acesso: true },
     configuracoes: { acesso: true, alterar: true }
   },
@@ -16,6 +17,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     planos: { acesso: true, cadastrar: false, alterar: false, excluir: false },
     home: { acesso: true },
+    financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
     auditoria: { acesso: false },
     configuracoes: { acesso: false, alterar: false }
   },
@@ -24,6 +26,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     planos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
     home: { acesso: true },
+    financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     auditoria: { acesso: false },
     configuracoes: { acesso: false, alterar: false }
   }
@@ -36,6 +39,7 @@ export function getUserPermissions(user?: User | null): UserPermissions {
       agenda: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       planos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       home: { acesso: false },
+      financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       auditoria: { acesso: false },
       configuracoes: { acesso: false, alterar: false }
     };
@@ -75,6 +79,12 @@ export function getUserPermissions(user?: User | null): UserPermissions {
     },
     home: {
       acesso: isOldBool(raw.home) ? raw.home : (raw.home?.acesso ?? defaults.home.acesso)
+    },
+    financeiro: {
+      acesso: isOldBool(raw.financeiro) ? raw.financeiro : (raw.financeiro?.acesso ?? defaults.financeiro?.acesso ?? false),
+      cadastrar: isOldBool(raw.financeiro) ? raw.financeiro : (raw.financeiro?.cadastrar ?? defaults.financeiro?.cadastrar ?? false),
+      alterar: isOldBool(raw.financeiro) ? raw.financeiro : (raw.financeiro?.alterar ?? defaults.financeiro?.alterar ?? false),
+      excluir: isOldBool(raw.financeiro) ? false : (raw.financeiro?.excluir ?? defaults.financeiro?.excluir ?? false)
     },
     auditoria: {
       acesso: isOldBool(raw.auditoria) ? raw.auditoria : (raw.auditoria?.acesso ?? defaults.auditoria.acesso)

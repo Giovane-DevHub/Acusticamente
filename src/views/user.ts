@@ -43,6 +43,17 @@ export const PERMISSION_GROUPS: {
       ]
     },
     {
+      key: 'financeiro',
+      title: 'Financeiro',
+      icon: '💰',
+      items: [
+        { key: 'acesso', label: 'Acesso ao módulo financeiro e mensalidades' },
+        { key: 'cadastrar', label: 'Lançar novos pagamentos e gerar mensalidades' },
+        { key: 'alterar', label: 'Dar baixa e alterar lançamentos' },
+        { key: 'excluir', label: 'Excluir registros financeiros' }
+      ]
+    },
+    {
       key: 'home',
       title: 'Início',
       icon: '🏠',
@@ -479,6 +490,12 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
               cadastrar: (document.getElementById('perm-planos-cadastrar') as HTMLInputElement)?.checked ?? false,
               alterar: (document.getElementById('perm-planos-alterar') as HTMLInputElement)?.checked ?? false,
               excluir: (document.getElementById('perm-planos-excluir') as HTMLInputElement)?.checked ?? false
+            },
+            financeiro: {
+              acesso: (document.getElementById('perm-financeiro-acesso') as HTMLInputElement)?.checked ?? false,
+              cadastrar: (document.getElementById('perm-financeiro-cadastrar') as HTMLInputElement)?.checked ?? false,
+              alterar: (document.getElementById('perm-financeiro-alterar') as HTMLInputElement)?.checked ?? false,
+              excluir: (document.getElementById('perm-financeiro-excluir') as HTMLInputElement)?.checked ?? false
             },
             home: {
               acesso: (document.getElementById('perm-home-acesso') as HTMLInputElement)?.checked ?? false

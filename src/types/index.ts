@@ -2,7 +2,7 @@
 
 export type UserRole = 'admin' | 'professor' | 'atendente';
 
-export type AppFormScreen = 'home' | 'agenda' | 'alunos' | 'planos' | 'auditoria' | 'configuracoes';
+export type AppFormScreen = 'home' | 'agenda' | 'alunos' | 'planos' | 'auditoria' | 'configuracoes' | 'financeiro';
 
 export interface AlunosPermissions {
   acesso: boolean;
@@ -38,6 +38,13 @@ export interface ConfiguracoesPermissions {
   alterar: boolean;
 }
 
+export interface FinanceiroPermissions {
+  acesso: boolean;
+  cadastrar: boolean;
+  alterar: boolean;
+  excluir: boolean;
+}
+
 export interface UserPermissions {
   alunos: AlunosPermissions;
   agenda: AgendaPermissions;
@@ -45,6 +52,7 @@ export interface UserPermissions {
   home: HomePermissions;
   auditoria: AuditoriaPermissions;
   configuracoes: ConfiguracoesPermissions;
+  financeiro: FinanceiroPermissions;
 }
 
 export interface User {
@@ -75,6 +83,8 @@ export interface Student {
   planoId: string;
   moduloAtual?: string;
   saldoReposicoes?: number;
+  valorMensalidade?: number;
+  diaVencimento?: number;
   status: 'ativo' | 'inativo';
   observacoes?: string;
   criadoEm: string;
@@ -122,6 +132,23 @@ export interface Appointment {
   criadoEm: string;
 }
 
+export type PaymentStatus = 'pago' | 'pendente' | 'atrasado';
+export type PaymentMethod = 'pix' | 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'boleto' | 'transferencia';
+
+export interface Payment {
+  id: string;
+  alunoId: string;
+  descricao: string; // Ex: Mensalidade Setembro/2026, Matrícula
+  mesReferencia?: string; // YYYY-MM
+  valor: number;
+  dataVencimento: string; // YYYY-MM-DD
+  dataPagamento?: string; // YYYY-MM-DD
+  status: PaymentStatus;
+  formaPagamento?: PaymentMethod;
+  observacoes?: string;
+  criadoEm: string;
+}
+
 export interface AuditLog {
   id: string;
   dataHora: string; // ISO string
@@ -141,6 +168,7 @@ export type AppScreen =
   | 'alunos'
   | 'user'
   | 'planos'
+  | 'financeiro'
   | 'auditoria'
   | 'configuracoes';
 

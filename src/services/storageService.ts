@@ -1,4 +1,4 @@
-import { User, Student, TeachingPlan, Appointment, SystemSettings } from '../types';
+import { User, Student, TeachingPlan, Appointment, SystemSettings, Payment, PaymentStatus, PaymentMethod } from '../types';
 import { auditService } from './auditService';
 
 const USERS_KEY = 'acusticamente_users';
@@ -6,12 +6,14 @@ const STUDENTS_KEY = 'acusticamente_students';
 const PLANS_KEY = 'acusticamente_plans';
 const APPOINTMENTS_KEY = 'acusticamente_appointments';
 const SETTINGS_KEY = 'acusticamente_settings';
+const PAYMENTS_KEY = 'acusticamente_payments';
 
 class StorageService {
   private users: User[] = [];
   private students: Student[] = [];
   private plans: TeachingPlan[] = [];
   private appointments: Appointment[] = [];
+  private payments: Payment[] = [];
   private settings: SystemSettings = {
     nomeEscola: 'Acusticamente - Escola de Música',
     nomeClinica: 'Acusticamente - Escola de Música',
@@ -31,7 +33,19 @@ class StorageService {
     // 1. Usuários
     const savedUsers = localStorage.getItem(USERS_KEY);
     if (savedUsers) {
-      this.users = JSON.parse(savedUsers);
+      this.users = JSON.parse(savedUsers).map((u: any) => ({
+        ...u,
+        permissoes: {
+          ...u.permissoes,
+          financeiro: u.permissoes?.financeiro || (
+            u.papel === 'admin'
+              ? { acesso: true, cadastrar: true, alterar: true, excluir: true }
+              : u.papel === 'atendente'
+              ? { acesso: true, cadastrar: true, alterar: true, excluir: false }
+              : { acesso: false, cadastrar: false, alterar: false, excluir: false }
+          )
+        }
+      }));
     } else {
       // Usuário administrador inicial obrigatório: login 1, senha 1
       this.users = [
@@ -45,6 +59,7 @@ class StorageService {
             alunos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             agenda: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             planos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
+            financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             home: { acesso: true },
             auditoria: { acesso: true },
             configuracoes: { acesso: true, alterar: true }
@@ -62,6 +77,7 @@ class StorageService {
             alunos: { acesso: true, cadastrar: true, alterar: true, excluir: false },
             agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
             planos: { acesso: true, cadastrar: false, alterar: false, excluir: false },
+            financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
             home: { acesso: true },
             auditoria: { acesso: false },
             configuracoes: { acesso: false, alterar: false }
@@ -117,14 +133,15 @@ class StorageService {
     }
 
     // 3. Alunos
-    // 3. Alunos
     const savedStudents = localStorage.getItem(STUDENTS_KEY);
     if (savedStudents) {
       this.students = JSON.parse(savedStudents).map((s: any) => ({
         ...s,
         saldoReposicoes: typeof s.saldoReposicoes === 'number' ? s.saldoReposicoes : 0,
         instrumentoPrincipal: s.instrumentoPrincipal || 'Violão',
-        nivelMusical: s.nivelMusical || 'iniciante'
+        nivelMusical: s.nivelMusical || 'iniciante',
+        valorMensalidade: typeof s.valorMensalidade === 'number' ? s.valorMensalidade : 280,
+        diaVencimento: typeof s.diaVencimento === 'number' ? s.diaVencimento : 10
       }));
     } else {
       this.students = [
@@ -142,6 +159,8 @@ class StorageService {
           planoId: 'plano_1',
           moduloAtual: 'Módulo 2: Discriminação de Timbres',
           saldoReposicoes: 1,
+          valorMensalidade: 280,
+          diaVencimento: 10,
           status: 'ativo',
           observacoes: 'Apresenta grande facilidade com ritmo.',
           criadoEm: new Date().toISOString()
@@ -160,6 +179,8 @@ class StorageService {
           planoId: 'plano_2',
           moduloAtual: 'Módulo 1: Primeiros Acordes e Levadas',
           saldoReposicoes: 0,
+          valorMensalidade: 260,
+          diaVencimento: 20,
           status: 'ativo',
           observacoes: 'Iniciando estudos no violão popular.',
           criadoEm: new Date().toISOString()
@@ -175,6 +196,8 @@ class StorageService {
           planoId: 'plano_3',
           moduloAtual: 'Módulo 1: Digitação e Postura',
           saldoReposicoes: 0,
+          valorMensalidade: 320,
+          diaVencimento: 10,
           status: 'ativo',
           observacoes: 'Excelente dedicação nas aulas de piano.',
           criadoEm: new Date().toISOString()
@@ -193,6 +216,8 @@ class StorageService {
           planoId: 'plano_1',
           moduloAtual: 'Módulo 3: Harmonia Básica e Canto',
           saldoReposicoes: 2,
+          valorMensalidade: 250,
+          diaVencimento: 5,
           status: 'ativo',
           observacoes: 'Foco no canto coral.',
           criadoEm: new Date().toISOString()
@@ -266,6 +291,88 @@ class StorageService {
       this.settings = JSON.parse(savedSettings);
     }
 
+    // 6. Pagamentos & Mensalidades (Financeiro)
+    const savedPayments = localStorage.getItem(PAYMENTS_KEY);
+    if (savedPayments) {
+      this.payments = JSON.parse(savedPayments);
+    } else {
+      this.payments = [
+        {
+          id: 'pag_1',
+          alunoId: 'aluno_1',
+          descricao: 'Mensalidade Agosto/2026',
+          mesReferencia: '2026-08',
+          valor: 280,
+          dataVencimento: '2026-08-10',
+          dataPagamento: '2026-08-08',
+          formaPagamento: 'pix',
+          status: 'pago',
+          observacoes: 'Pago pontualmente via Chave Pix',
+          criadoEm: '2026-08-01T10:00:00.000Z'
+        },
+        {
+          id: 'pag_2',
+          alunoId: 'aluno_1',
+          descricao: 'Mensalidade Setembro/2026',
+          mesReferencia: '2026-09',
+          valor: 280,
+          dataVencimento: '2026-09-10',
+          status: 'atrasado',
+          observacoes: 'Venceu dia 10 e aguarda regularização',
+          criadoEm: '2026-09-01T10:00:00.000Z'
+        },
+        {
+          id: 'pag_3',
+          alunoId: 'aluno_2',
+          descricao: 'Mensalidade Setembro/2026',
+          mesReferencia: '2026-09',
+          valor: 260,
+          dataVencimento: '2026-09-20',
+          status: 'pendente',
+          observacoes: 'A vencer no dia 20',
+          criadoEm: '2026-09-01T10:00:00.000Z'
+        },
+        {
+          id: 'pag_4',
+          alunoId: 'aluno_3',
+          descricao: 'Mensalidade Setembro/2026',
+          mesReferencia: '2026-09',
+          valor: 320,
+          dataVencimento: '2026-09-10',
+          dataPagamento: '2026-09-10',
+          formaPagamento: 'cartao_credito',
+          status: 'pago',
+          observacoes: 'Pago no balcão da escola',
+          criadoEm: '2026-09-01T10:00:00.000Z'
+        },
+        {
+          id: 'pag_5',
+          alunoId: 'aluno_4',
+          descricao: 'Mensalidade Agosto/2026',
+          mesReferencia: '2026-08',
+          valor: 250,
+          dataVencimento: '2026-08-05',
+          dataPagamento: '2026-08-05',
+          formaPagamento: 'dinheiro',
+          status: 'pago',
+          observacoes: 'Comprovante emitido',
+          criadoEm: '2026-08-01T10:00:00.000Z'
+        },
+        {
+          id: 'pag_6',
+          alunoId: 'aluno_4',
+          descricao: 'Mensalidade Setembro/2026',
+          mesReferencia: '2026-09',
+          valor: 250,
+          dataVencimento: '2026-09-05',
+          status: 'atrasado',
+          observacoes: 'Mensalidade vencida dia 05',
+          criadoEm: '2026-09-01T10:00:00.000Z'
+        }
+      ];
+      this.savePayments();
+    }
+
     // Auto-sanitização para assegurar 100% de foco em Escola de Música
     if (this.settings.nomeClinica && this.settings.nomeClinica.includes('Terapêutico')) {
       this.settings.nomeEscola = 'Acusticamente - Escola de Música';
@@ -315,6 +422,7 @@ class StorageService {
   private saveStudents() { localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students)); }
   private savePlans() { localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans)); }
   private saveAppointments() { localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments)); }
+  private savePayments() { localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments)); }
   private saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings)); }
 
   // ===================== USUÁRIOS =====================
@@ -666,6 +774,199 @@ class StorageService {
         const dateB = `${b.data}T${b.horaInicio}`;
         return dateB.localeCompare(dateA);
       });
+  }
+
+  // ===================== FINANCEIRO / PAGAMENTOS =====================
+  public getPayments(): Payment[] {
+    const todayStr = this.getTodayDateString();
+    let changed = false;
+
+    // Atualiza dinamicamente status pendente que já venceu para atrasado
+    this.payments.forEach(p => {
+      if (p.status === 'pendente' && p.dataVencimento < todayStr) {
+        p.status = 'atrasado';
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      this.savePayments();
+    }
+
+    return [...this.payments].sort((a, b) => b.dataVencimento.localeCompare(a.dataVencimento));
+  }
+
+  public getStudentPayments(studentId: string): Payment[] {
+    return this.getPayments().filter(p => p.alunoId === studentId);
+  }
+
+  // Verifica se o aluno está ativo e possui pendências financeiras atrasadas
+  public isStudentOverdue(studentId: string): boolean {
+    const todayStr = this.getTodayDateString();
+    return this.payments.some(p => 
+      p.alunoId === studentId && 
+      (p.status === 'atrasado' || (p.status === 'pendente' && p.dataVencimento < todayStr))
+    );
+  }
+
+  public addPayment(data: Omit<Payment, 'id' | 'criadoEm'>, currentUserName: string): Payment {
+    const todayStr = this.getTodayDateString();
+    let calculatedStatus = data.status;
+    if (calculatedStatus === 'pendente' && data.dataVencimento < todayStr) {
+      calculatedStatus = 'atrasado';
+    }
+
+    const newPayment: Payment = {
+      ...data,
+      status: calculatedStatus,
+      id: `pag_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      criadoEm: new Date().toISOString()
+    };
+
+    this.payments.push(newPayment);
+    this.savePayments();
+
+    const student = this.students.find(s => s.id === newPayment.alunoId);
+    auditService.log({
+      tela: 'Financeiro',
+      acao: 'Cadastro de Pagamento/Mensalidade',
+      usuarioNome: currentUserName,
+      detalhes: `Lançamento "${newPayment.descricao}" (R$ ${newPayment.valor.toFixed(2)}) cadastrado para o aluno "${student?.nome || 'N/A'}" com vencimento em ${newPayment.dataVencimento}.`
+    });
+
+    return newPayment;
+  }
+
+  public darBaixaPayment(
+    paymentId: string,
+    dataPagamento: string,
+    formaPagamento: PaymentMethod,
+    currentUserName: string,
+    observacoes?: string
+  ): Payment {
+    const index = this.payments.findIndex(p => p.id === paymentId);
+    if (index === -1) throw new Error('Lançamento financeiro não encontrado');
+
+    const payment = this.payments[index];
+    const prevStatus = payment.status;
+    payment.status = 'pago';
+    payment.dataPagamento = dataPagamento;
+    payment.formaPagamento = formaPagamento;
+    if (observacoes !== undefined) {
+      payment.observacoes = observacoes.trim() ? observacoes.trim() : payment.observacoes;
+    }
+
+    this.savePayments();
+
+    const student = this.students.find(s => s.id === payment.alunoId);
+    auditService.log({
+      tela: 'Financeiro',
+      acao: 'Baixa de Mensalidade',
+      usuarioNome: currentUserName,
+      detalhes: `Baixa efetuada para "${payment.descricao}" de "${student?.nome || 'N/A'}". Valor R$ ${payment.valor.toFixed(2)} recebido via ${formaPagamento.toUpperCase()} em ${dataPagamento} (Status anterior: ${prevStatus}).`
+    });
+
+    return payment;
+  }
+
+  public updatePayment(id: string, updates: Partial<Payment>, currentUserName: string): Payment {
+    const index = this.payments.findIndex(p => p.id === id);
+    if (index === -1) throw new Error('Lançamento financeiro não encontrado');
+
+    const todayStr = this.getTodayDateString();
+    let updatedStatus = updates.status || this.payments[index].status;
+    const vencimento = updates.dataVencimento || this.payments[index].dataVencimento;
+
+    if (updatedStatus === 'pendente' && vencimento < todayStr) {
+      updatedStatus = 'atrasado';
+    }
+
+    this.payments[index] = {
+      ...this.payments[index],
+      ...updates,
+      status: updatedStatus
+    };
+
+    this.savePayments();
+
+    const p = this.payments[index];
+    const student = this.students.find(s => s.id === p.alunoId);
+    auditService.log({
+      tela: 'Financeiro',
+      acao: 'Alteração de Lançamento',
+      usuarioNome: currentUserName,
+      detalhes: `Lançamento financeiro "${p.descricao}" do aluno "${student?.nome || 'N/A'}" atualizado.`
+    });
+
+    return this.payments[index];
+  }
+
+  public deletePayment(id: string, currentUserName: string): void {
+    const p = this.payments.find(item => item.id === id);
+    if (!p) return;
+
+    this.payments = this.payments.filter(item => item.id !== id);
+    this.savePayments();
+
+    const student = this.students.find(s => s.id === p.alunoId);
+    auditService.log({
+      tela: 'Financeiro',
+      acao: 'Exclusão de Lançamento',
+      usuarioNome: currentUserName,
+      detalhes: `Lançamento "${p.descricao}" no valor de R$ ${p.valor.toFixed(2)} do aluno "${student?.nome || 'N/A'}" foi excluído.`
+    });
+  }
+
+  // Gera mensalidades em lote para todos os alunos ativos que ainda não têm lançamento no mês
+  public gerarMensalidadesMes(ano: number, mes: number, currentUserName: string): { criadas: number; puladas: number } {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const mesReferencia = `${ano}-${pad(mes)}`;
+    const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const nomeMes = nomesMeses[mes - 1] || mesReferencia;
+
+    const alunosAtivos = this.students.filter(s => s.status === 'ativo');
+    let criadas = 0;
+    let puladas = 0;
+
+    alunosAtivos.forEach(student => {
+      // Verifica se já existe mensalidade para este aluno com o mesmo mesReferencia ou data de vencimento correspondente
+      const jaExiste = this.payments.some(p => 
+        p.alunoId === student.id && (p.mesReferencia === mesReferencia || p.dataVencimento.startsWith(mesReferencia))
+      );
+
+      if (jaExiste) {
+        puladas++;
+        return;
+      }
+
+      const diaVenc = student.diaVencimento || 10;
+      // Trata limite de dias do mês (ex: dia 31 em mês de 30 dias)
+      const ultimoDiaMes = new Date(ano, mes, 0).getDate();
+      const diaAjustado = Math.min(diaVenc, ultimoDiaMes);
+      const dataVencimento = `${ano}-${pad(mes)}-${pad(diaAjustado)}`;
+      const valor = typeof student.valorMensalidade === 'number' && student.valorMensalidade > 0 ? student.valorMensalidade : 280;
+
+      this.addPayment({
+        alunoId: student.id,
+        descricao: `Mensalidade ${nomeMes}/${ano}`,
+        mesReferencia,
+        valor,
+        dataVencimento,
+        status: 'pendente',
+        observacoes: `Gerado automaticamente para o plano ${student.moduloAtual || student.instrumentoPrincipal || 'Música'}`
+      }, currentUserName);
+
+      criadas++;
+    });
+
+    auditService.log({
+      tela: 'Financeiro',
+      acao: 'Geração de Mensalidades em Lote',
+      usuarioNome: currentUserName,
+      detalhes: `Geração em lote para ${nomeMes}/${ano}: ${criadas} mensalidade(s) criada(s) e ${puladas} já existente(s) pulada(s).`
+    });
+
+    return { criadas, puladas };
   }
 
   // ===================== CONFIGURAÇÕES =====================

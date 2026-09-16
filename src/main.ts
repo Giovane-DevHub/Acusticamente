@@ -10,6 +10,7 @@ import { renderAgenda } from './views/agenda';
 import { renderAlunos } from './views/alunos';
 import { renderUser } from './views/user';
 import { renderPlanos } from './views/planos';
+import { renderFinanceiro } from './views/financeiro';
 import { renderAuditoria } from './views/auditoria';
 import { renderConfiguracoes } from './views/configuracoes';
 
@@ -36,7 +37,7 @@ class AppRouter {
     const hash = window.location.hash.replace('#', '') as AppScreen;
     if (
       hash &&
-      ['home', 'agenda', 'alunos', 'user', 'planos', 'auditoria', 'configuracoes'].includes(hash) &&
+      ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'user', 'auditoria', 'configuracoes'].includes(hash) &&
       hasPermission(currentUser, hash)
     ) {
       this.currentScreen = hash;
@@ -56,7 +57,7 @@ class AppRouter {
 
   private getFirstAllowedScreen(user: User | null): AppScreen {
     if (!user) return 'login';
-    const screens: AppScreen[] = ['home', 'agenda', 'alunos', 'planos', 'auditoria', 'configuracoes'];
+    const screens: AppScreen[] = ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'auditoria', 'configuracoes'];
     for (const s of screens) {
       if (hasPermission(user, s)) return s;
     }
@@ -145,6 +146,13 @@ class AppRouter {
             <a class="nav-item ${this.currentScreen === 'planos' ? 'active' : ''}" data-screen="planos">
               <span class="nav-item-icon">${ICONS.planos}</span>
               <span>Planos de Ensino</span>
+            </a>
+          ` : ''}
+
+          ${hasPermission(currentUser, 'financeiro') ? `
+            <a class="nav-item ${this.currentScreen === 'financeiro' ? 'active' : ''}" data-screen="financeiro">
+              <span class="nav-item-icon">${ICONS.financeiro}</span>
+              <span>Financeiro</span>
             </a>
           ` : ''}
 
@@ -270,6 +278,8 @@ class AppRouter {
         return renderUser(navCallback);
       case 'planos':
         return renderPlanos(navCallback);
+      case 'financeiro':
+        return renderFinanceiro(navCallback);
       case 'auditoria':
         return renderAuditoria(navCallback);
       case 'configuracoes':
@@ -286,6 +296,7 @@ class AppRouter {
       case 'alunos': return 'Alunos';
       case 'user': return 'Usuários';
       case 'planos': return 'Planos de Ensino';
+      case 'financeiro': return 'Financeiro & Mensalidades';
       case 'auditoria': return 'Auditoria';
       case 'configuracoes': return 'Configurações';
       default: return 'Acusticamente';
@@ -299,6 +310,7 @@ class AppRouter {
       case 'alunos': return 'Listagem, matrículas e acompanhamento de alunos';
       case 'user': return 'Gerenciamento de operadores e permissões de acesso';
       case 'planos': return 'Estruturação de planos pedagógicos e seus módulos';
+      case 'financeiro': return 'Controle de recebimentos, mensalidades e baixas';
       case 'auditoria': return 'Histórico auditado de todas as alterações do sistema';
       case 'configuracoes': return 'Dados institucionais e conexão com o MongoDB';
       default: return '';
