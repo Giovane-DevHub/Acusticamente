@@ -58,6 +58,19 @@ function calculateAge(birthdate?: string): string {
   return `${age} anos`;
 }
 
+function getNumericAge(birthdate?: string): number | null {
+  if (!birthdate) return null;
+  const birth = new Date(birthdate + 'T00:00:00');
+  if (isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
 function getWhatsAppLink(phone: string, studentName: string): string {
   const digits = phone.replace(/\D/g, '');
   if (!digits) return '';
@@ -903,7 +916,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         <!-- PAINEL 1: DADOS PESSOAIS -->
         <div id="form-panel-tab-pessoal" class="form-tab-panel" style="display: flex; flex-direction: column; gap: 12px;">
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-nome">Nome Completo do Aluno</label>
+            <label class="form-label" for="student-nome">Nome Completo do Aluno <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
             <input type="text" id="student-nome" class="form-input" placeholder="Ex: Clara Mendes" value="${existingStudent?.nome || ''}" required />
           </div>
 
@@ -925,13 +938,21 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
         <!-- PAINEL 2: DADOS DO RESPONSÁVEL -->
         <div id="form-panel-tab-resp" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
+          <div id="student-resp-alert" style="display: none; background: rgba(234, 67, 53, 0.12); border: 1px solid rgba(234, 67, 53, 0.35); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.76rem; color: #fca5a5; margin-bottom: 2px;">
+            ⚠️ <strong>Aluno menor de 18 anos detectado.</strong> O preenchimento do responsável é obrigatório.
+          </div>
+
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-resp-nome">Nome do Responsável</label>
+            <label class="form-label" for="student-resp-nome">
+              Nome do Responsável <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
+            </label>
             <input type="text" id="student-resp-nome" class="form-input" placeholder="Ex: Patrícia Mendes" value="${existingStudent?.responsavelNome || ''}" />
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-resp-parentesco">Parentesco</label>
+            <label class="form-label" for="student-resp-parentesco">
+              Parentesco <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
+            </label>
             <select id="student-resp-parentesco" class="form-select">
               <option value="">Selecione...</option>
               <option value="Mãe" ${existingStudent?.responsavelParentesco === 'Mãe' ? 'selected' : ''}>Mãe</option>
@@ -943,7 +964,9 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-resp-tel">Telefone / WhatsApp do Responsável</label>
+            <label class="form-label" for="student-resp-tel">
+              Telefone / WhatsApp do Responsável <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
+            </label>
             <input type="text" id="student-resp-tel" class="form-input" placeholder="(11) 98888-8888" value="${existingStudent?.responsavelTelefone || ''}" />
           </div>
 
@@ -973,7 +996,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-status">Status da Matrícula</label>
+            <label class="form-label" for="student-status">Status da Matrícula <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
             <select id="student-status" class="form-select">
               <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
               <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
@@ -1009,12 +1032,12 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             </div>
 
             <div class="form-group" style="margin: 0; width: 100%;">
-              <label class="form-label" for="student-valor-mensalidade">Valor da Mensalidade (R$)</label>
+              <label class="form-label" for="student-valor-mensalidade">Valor da Mensalidade (R$) <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
               <input type="number" id="student-valor-mensalidade" class="form-input" min="0" step="10" placeholder="280.00" value="${existingStudent?.valorMensalidade ?? 280}" required />
             </div>
 
             <div class="form-group" style="margin: 0; width: 100%;">
-              <label class="form-label" for="student-dia-vencimento">Dia de Vencimento Padrão</label>
+              <label class="form-label" for="student-dia-vencimento">Dia de Vencimento Padrão (1 a 31) <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
               <input type="number" id="student-dia-vencimento" class="form-input" min="1" max="31" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
             </div>
 
@@ -1121,9 +1144,169 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
         const obs = (document.getElementById('student-obs') as HTMLTextAreaElement).value.trim();
 
+        // ========================================================
+        // VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
+        // ========================================================
+        interface ValidationItem {
+          label: string;
+          fieldId: string;
+          tabId: string;
+        }
+
+        const pendingErrors: ValidationItem[] = [];
+
+        // 1. Nome Completo (obrigatório)
         if (!nome) {
-          showToast('Informe o nome do aluno.', 'error');
-          return false;
+          pendingErrors.push({
+            label: 'Nome Completo do Aluno',
+            fieldId: 'student-nome',
+            tabId: 'tab-pessoal'
+          });
+        }
+
+        // 2. Responsável Obrigatório caso Aluno seja Menor de Idade
+        const alunoIdade = getNumericAge(dataNascimento);
+        const isMenor = alunoIdade !== null && alunoIdade < 18;
+
+        if (isMenor) {
+          if (!responsavelNome) {
+            pendingErrors.push({
+              label: `Nome do Responsável (Aluno possui ${alunoIdade} anos - Menor de Idade)`,
+              fieldId: 'student-resp-nome',
+              tabId: 'tab-resp'
+            });
+          }
+          if (!responsavelParentesco) {
+            pendingErrors.push({
+              label: `Parentesco do Responsável (Aluno possui ${alunoIdade} anos - Menor de Idade)`,
+              fieldId: 'student-resp-parentesco',
+              tabId: 'tab-resp'
+            });
+          }
+          if (!responsavelTelefone) {
+            pendingErrors.push({
+              label: `Telefone / WhatsApp do Responsável (Aluno possui ${alunoIdade} anos - Menor de Idade)`,
+              fieldId: 'student-resp-tel',
+              tabId: 'tab-resp'
+            });
+          }
+        }
+
+        // 3. Status da Matrícula (obrigatório)
+        if (!status) {
+          pendingErrors.push({
+            label: 'Status da Matrícula (Ativo ou Inativo)',
+            fieldId: 'student-status',
+            tabId: 'tab-musica'
+          });
+        }
+
+        // 4. Valor da Mensalidade (obrigatório)
+        if (!valorMensalidadeInput || isNaN(parseFloat(valorMensalidadeInput)) || parseFloat(valorMensalidadeInput) < 0) {
+          pendingErrors.push({
+            label: 'Valor da Mensalidade (R$)',
+            fieldId: 'student-valor-mensalidade',
+            tabId: 'tab-financeiro'
+          });
+        }
+
+        // 5. Dia de Vencimento (obrigatório de 1 a 31)
+        const diaNum = parseInt(diaVencimentoInput, 10);
+        if (!diaVencimentoInput || isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+          pendingErrors.push({
+            label: 'Dia de Vencimento Padrão (deve ser entre 1 e 31)',
+            fieldId: 'student-dia-vencimento',
+            tabId: 'tab-financeiro'
+          });
+        }
+
+        // Se houver pendências, exibe a listagem com botão OK e direciona o foco
+        if (pendingErrors.length > 0) {
+          const switchTab = (targetTab: string) => {
+            const tabBtns = document.querySelectorAll('.btn-form-tab');
+            const panels = document.querySelectorAll('.form-tab-panel') as NodeListOf<HTMLElement>;
+
+            tabBtns.forEach(b => {
+              if ((b as HTMLElement).dataset.tab === targetTab) {
+                b.classList.add('active');
+              } else {
+                b.classList.remove('active');
+              }
+            });
+
+            panels.forEach(p => {
+              p.style.display = p.id === `form-panel-${targetTab}` ? 'flex' : 'none';
+            });
+          };
+
+          // Cria alerta modal com lista de campos
+          const alertOverlay = document.createElement('div');
+          alertOverlay.id = 'student-validation-alert';
+          alertOverlay.style.cssText = `
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+          `;
+
+          alertOverlay.innerHTML = `
+            <div style="background: #1d202d; border: 1px solid rgba(234, 67, 53, 0.45); border-radius: 12px; max-width: 480px; width: 100%; box-shadow: 0 24px 48px rgba(0,0,0,0.8); overflow: hidden;">
+              <div style="padding: 16px 20px; background: rgba(234, 67, 53, 0.1); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.4rem;">⚠️</span>
+                <div>
+                  <h4 style="margin: 0; font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--text-white);">
+                    Campos Obrigatórios Pendentes
+                  </h4>
+                  <p style="margin: 2px 0 0 0; font-size: 0.76rem; color: var(--text-secondary);">
+                    Preencha os itens abaixo para concluir o cadastro:
+                  </p>
+                </div>
+              </div>
+              
+              <div style="padding: 18px 22px; max-height: 280px; overflow-y: auto;">
+                <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem; color: #fca5a5;">
+                  ${pendingErrors.map(err => `<li style="line-height: 1.4;"><strong style="color: #ffffff;">${err.label}</strong></li>`).join('')}
+                </ul>
+              </div>
+
+              <div style="padding: 12px 20px; background: rgba(0,0,0,0.25); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: flex-end;">
+                <button type="button" class="btn btn-primary" id="btn-validation-ok" style="padding: 8px 26px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 10px rgba(234, 67, 53, 0.4);">
+                  OK, preencher
+                </button>
+              </div>
+            </div>
+          `;
+
+          document.body.appendChild(alertOverlay);
+
+          const btnOk = alertOverlay.querySelector('#btn-validation-ok') as HTMLButtonElement;
+          btnOk?.focus();
+          btnOk?.addEventListener('click', () => {
+            alertOverlay.remove();
+            const first = pendingErrors[0];
+            switchTab(first.tabId);
+
+            setTimeout(() => {
+              const el = document.getElementById(first.fieldId) as HTMLElement;
+              if (el) {
+                el.focus();
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.outline = '2px solid var(--color-coral)';
+                el.style.borderColor = 'var(--color-coral)';
+                setTimeout(() => {
+                  el.style.outline = '';
+                  el.style.borderColor = '';
+                }, 3500);
+              }
+            }, 100);
+          });
+
+          return false; // Bloqueia fechamento do modal
         }
 
         const currentUserName = user?.nome || 'Administrador';
@@ -1182,7 +1365,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       }
     });
 
-    // Conectar alternância de abas do formulário
+    // Conectar alternância de abas do formulário e verificação dinâmica de menor de idade
     setTimeout(() => {
       const tabBtns = document.querySelectorAll('.btn-form-tab');
       const panels = document.querySelectorAll('.form-tab-panel') as NodeListOf<HTMLElement>;
@@ -1200,6 +1383,32 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           });
         });
       });
+
+      // Monitora data de nascimento para sinalizar menor de idade em tempo real
+      const birthInput = document.getElementById('student-nascimento') as HTMLInputElement;
+      const respAlert = document.getElementById('student-resp-alert');
+      const respStars = document.querySelectorAll('.resp-req-star');
+
+      const checkMinorStatus = () => {
+        const val = birthInput?.value;
+        const idade = getNumericAge(val);
+        const menor = idade !== null && idade < 18;
+
+        if (respAlert) {
+          respAlert.style.display = menor ? 'block' : 'none';
+          if (menor) {
+            respAlert.innerHTML = `⚠️ <strong>Aluno menor de 18 anos (${idade} anos).</strong> O preenchimento do responsável é obrigatório.`;
+          }
+        }
+
+        respStars.forEach(s => {
+          (s as HTMLElement).style.display = menor ? 'inline' : 'none';
+        });
+      };
+
+      birthInput?.addEventListener('input', checkMinorStatus);
+      birthInput?.addEventListener('change', checkMinorStatus);
+      checkMinorStatus();
     }, 50);
   }
 
