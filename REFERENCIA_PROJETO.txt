@@ -27,6 +27,7 @@ Login : Tela de entrada com usuário e senha
 
 3. ESTRUTURA DE ARQUIVOS
 --------------------------------------------------------------------------------
+api/ : Conexão e sincronização direta com o MongoDB Atlas na Vercel
 src/views/ : Telas visuais do sistema que o usuário vê e usa
 src/services/ : Regras que salvam dados, calculam valores e controlam acesso
 src/types/ : Definições do que cada cadastro possui (aluno, aula, etc.)
