@@ -77,9 +77,10 @@ export default async function handler(req: any, res: any) {
         await db.collection('students').deleteMany({});
         await db.collection('payments').deleteMany({});
         await db.collection('appointments').deleteMany({});
+        await db.collection('plans').deleteMany({});
         await db.collection('auditorias').deleteMany({});
         await db.collection('audit').deleteMany({});
-        return res.status(200).json({ success: true, message: 'Sistema e auditorias zerados com sucesso para entrega.' });
+        return res.status(200).json({ success: true, message: 'Base de dados e auditorias zerados com sucesso para entrega.' });
       }
 
       if (!collection) {

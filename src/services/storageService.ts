@@ -311,10 +311,12 @@ class StorageService {
     this.students = [];
     this.payments = [];
     this.appointments = [];
+    this.plans = [];
 
     localStorage.setItem(STUDENTS_KEY, JSON.stringify([]));
     localStorage.setItem(PAYMENTS_KEY, JSON.stringify([]));
     localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify([]));
+    localStorage.setItem(PLANS_KEY, JSON.stringify([]));
 
     await this.pushToCloud('all', 'reset_clean', {});
     await auditService.clearLogs();
