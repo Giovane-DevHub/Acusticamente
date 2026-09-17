@@ -181,8 +181,21 @@ var Ve=Object.defineProperty;var He=($,e,t)=>e in $?Ve($,e,{enumerable:!0,config
     <header class="site-header">
       <div class="site-header-container">
         
-        <!-- Canto Superior Esquerdo: Botão Pequeno Entrar estritamente conforme solicitado -->
-        <div class="site-header-left">
+        <!-- Canto Esquerdo: Marca e Logotipo -->
+        <div class="site-brand" id="site-logo-link">
+          <div class="site-logo">
+            ${le(t.logotipoCustomizado,36)}
+          </div>
+          <span class="site-brand-title">${s}</span>
+        </div>
+
+        <!-- Canto Direito: Entrar em contato e ao lado direito o Entrar -->
+        <div class="site-header-right">
+          <a href="${p}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp">
+            ${ke}
+            <span>Entrar em contato</span>
+          </a>
+
           <button type="button" class="btn-site-login" id="btn-header-login" title="Acessar Sistema">
             <span class="site-login-icon">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -193,22 +206,6 @@ var Ve=Object.defineProperty;var He=($,e,t)=>e in $?Ve($,e,{enumerable:!0,config
             </span>
             <span>Entrar</span>
           </button>
-        </div>
-
-        <!-- Centro: Marca e Logotipo -->
-        <div class="site-brand" id="site-logo-link">
-          <div class="site-logo">
-            ${le(t.logotipoCustomizado,36)}
-          </div>
-          <span class="site-brand-title">${s}</span>
-        </div>
-
-        <!-- Canto Direito: Apenas WhatsApp com logo e texto Entrar em contato -->
-        <div class="site-header-right">
-          <a href="${p}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp">
-            ${ke}
-            <span>Entrar em contato</span>
-          </a>
         </div>
       </div>
     </header>

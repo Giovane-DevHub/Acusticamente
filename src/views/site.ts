@@ -28,8 +28,21 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
     <header class="site-header">
       <div class="site-header-container">
         
-        <!-- Canto Superior Esquerdo: Botão Pequeno Entrar estritamente conforme solicitado -->
-        <div class="site-header-left">
+        <!-- Canto Esquerdo: Marca e Logotipo -->
+        <div class="site-brand" id="site-logo-link">
+          <div class="site-logo">
+            ${renderBrandLogo(settings.logotipoCustomizado, 36)}
+          </div>
+          <span class="site-brand-title">${schoolShortName}</span>
+        </div>
+
+        <!-- Canto Direito: Entrar em contato e ao lado direito o Entrar -->
+        <div class="site-header-right">
+          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp">
+            ${WA_ICON_SVG}
+            <span>Entrar em contato</span>
+          </a>
+
           <button type="button" class="btn-site-login" id="btn-header-login" title="Acessar Sistema">
             <span class="site-login-icon">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -40,22 +53,6 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
             </span>
             <span>Entrar</span>
           </button>
-        </div>
-
-        <!-- Centro: Marca e Logotipo -->
-        <div class="site-brand" id="site-logo-link">
-          <div class="site-logo">
-            ${renderBrandLogo(settings.logotipoCustomizado, 36)}
-          </div>
-          <span class="site-brand-title">${schoolShortName}</span>
-        </div>
-
-        <!-- Canto Direito: Apenas WhatsApp com logo e texto Entrar em contato -->
-        <div class="site-header-right">
-          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp">
-            ${WA_ICON_SVG}
-            <span>Entrar em contato</span>
-          </a>
         </div>
       </div>
     </header>
