@@ -236,6 +236,12 @@ class StorageService {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
+  public cloudStatus: 'connected' | 'fallback' | 'checking' = 'checking';
+
+  public getCloudStatus(): 'connected' | 'fallback' | 'checking' {
+    return this.cloudStatus;
+  }
+
   // ===================== SINCRONIZAÇÃO EM NUVEM (MONGODB) =====================
   public async pushToCloud(collection: string, action: string, data: any): Promise<void> {
     try {
@@ -254,28 +260,39 @@ class StorageService {
     try {
       if (typeof window === 'undefined') return false;
       const res = await fetch('/api/sync');
-      if (!res.ok) return false;
+      if (!res.ok) {
+        this.cloudStatus = 'fallback';
+        window.dispatchEvent(new CustomEvent('acusticamente:cloud-status-changed', { detail: 'fallback' }));
+        return false;
+      }
       const json = await res.json();
-      if (!json.success || !json.data) return false;
+      if (!json.success || !json.data) {
+        this.cloudStatus = 'fallback';
+        window.dispatchEvent(new CustomEvent('acusticamente:cloud-status-changed', { detail: 'fallback' }));
+        return false;
+      }
+
+      this.cloudStatus = 'connected';
+      window.dispatchEvent(new CustomEvent('acusticamente:cloud-status-changed', { detail: 'connected' }));
 
       const cloud = json.data;
 
-      if (Array.isArray(cloud.students) && cloud.students.length > 0) {
+      if (Array.isArray(cloud.students)) {
         this.students = cloud.students;
         localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
       }
 
-      if (Array.isArray(cloud.payments) && cloud.payments.length > 0) {
+      if (Array.isArray(cloud.payments)) {
         this.payments = cloud.payments;
         localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
       }
 
-      if (Array.isArray(cloud.appointments) && cloud.appointments.length > 0) {
+      if (Array.isArray(cloud.appointments)) {
         this.appointments = cloud.appointments;
         localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
       }
 
-      if (Array.isArray(cloud.plans) && cloud.plans.length > 0) {
+      if (Array.isArray(cloud.plans)) {
         this.plans = cloud.plans;
         localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
       }
@@ -302,6 +319,10 @@ class StorageService {
       window.dispatchEvent(new CustomEvent('acusticamente:data-synced'));
       return true;
     } catch {
+      this.cloudStatus = 'fallback';
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('acusticamente:cloud-status-changed', { detail: 'fallback' }));
+      }
       return false;
     }
   }

@@ -339,7 +339,7 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
           <span>🎵</span> Acusticamente
         </span>
         <span class="badge badge-primary" style="font-family: monospace; font-size: 0.68rem; padding: 1px 6px;">v1.0.0</span>
-        <span style="display: inline-flex; align-items: center; gap: 4px; color: #4ade80; font-size: 0.72rem; margin-left: 6px;">
+        <span id="footer-cloud-status" style="display: inline-flex; align-items: center; gap: 4px; color: #4ade80; font-size: 0.72rem; margin-left: 6px;">
           <span style="width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
           MongoDB Conectado
         </span>
@@ -574,6 +574,36 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
 
     showToast('Dados da instituição salvos com sucesso!', 'success');
   });
+
+  // Atualização dinâmica do status do MongoDB no rodapé
+  const statusEl = container.querySelector('#footer-cloud-status') as HTMLElement;
+  const updateStatusBadge = (status: string) => {
+    if (!statusEl) return;
+    if (status === 'connected') {
+      statusEl.innerHTML = `
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
+        MongoDB Conectado
+      `;
+      statusEl.style.color = '#4ade80';
+    } else if (status === 'fallback') {
+      statusEl.innerHTML = `
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+        Offline / Modo Local
+      `;
+      statusEl.style.color = '#fbbf24';
+    } else {
+      statusEl.innerHTML = `
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
+        Sincronizando...
+      `;
+      statusEl.style.color = '#94a3b8';
+    }
+  };
+
+  updateStatusBadge(storageService.getCloudStatus());
+  window.addEventListener('acusticamente:cloud-status-changed', ((e: CustomEvent) => {
+    updateStatusBadge(e.detail);
+  }) as EventListener);
 
   return container;
 }
