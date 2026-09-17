@@ -597,11 +597,203 @@
 }
 
 /* ========================================================
+   DESTAQUE SUTIL DO INSTAGRAM
+   ======================================================== */
+.instagram-highlight-container {
+  margin-top: 48px;
+}
+
+.instagram-highlight-card {
+  background: linear-gradient(135deg, rgba(225, 48, 108, 0.08) 0%, rgba(131, 58, 180, 0.05) 50%, rgba(18, 19, 25, 0.9) 100%);
+  border: 1px solid rgba(225, 48, 108, 0.22);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: all 200ms ease;
+}
+
+.instagram-highlight-card:hover {
+  border-color: rgba(225, 48, 108, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(225, 48, 108, 0.15);
+}
+
+.insta-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.insta-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.35);
+}
+
+.insta-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f472b6;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.insta-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.insta-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #cbd5e1);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.btn-site-instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.35);
+  transition: all 180ms ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-site-instagram:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(225, 48, 108, 0.5);
+  filter: brightness(1.08);
+}
+
+/* ========================================================
+   SEÇÃO DE LOCALIZAÇÃO (GRAVATAÍ - RS)
+   ======================================================== */
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+.location-card {
+  background: #171922;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.location-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.location-icon {
+  font-size: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-item h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.location-item p {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #cbd5e1);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.btn-location-maps {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 9px 18px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 180ms ease;
+}
+
+.btn-location-maps:hover {
+  background: rgba(234, 67, 53, 0.15);
+  border-color: rgba(234, 67, 53, 0.4);
+  transform: translateY(-1px);
+}
+
+.location-map-box {
+  background: #171922;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 320px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ========================================================
    RESPONSIVIDADE (MOBILE & TABLET)
    ======================================================== */
 @media (max-width: 860px) {
   .methodology-split {
     grid-template-columns: 1fr;
+  }
+
+  .location-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instagram-highlight-card {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .footer-grid {
