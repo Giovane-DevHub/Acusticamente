@@ -197,7 +197,8 @@ var He=Object.defineProperty;var Ue=($,e,t)=>e in $?He($,e,{enumerable:!0,config
         <div class="site-header-right">
           <a href="${E}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp" title="Fale conosco no WhatsApp">
             ${ve}
-            <span>Entrar em contato</span>
+            <span class="btn-text-full">Entrar em contato</span>
+            <span class="btn-text-short">Contato</span>
           </a>
 
           <button type="button" class="btn-site-login" id="btn-header-login" title="Acessar Sistema">
@@ -239,6 +240,27 @@ var He=Object.defineProperty;var Ue=($,e,t)=>e in $?He($,e,{enumerable:!0,config
     <!-- Seção de Cursos & Instrumentos Atendidos -->
     <section class="site-section" id="cursos">
       <div class="site-container">
+
+        <!-- Destaque Sutil para o Instagram (Acima do título de Cursos) -->
+        <div class="instagram-highlight-container" style="margin-top: 0; margin-bottom: 44px;">
+          <div class="instagram-highlight-card">
+            <div class="insta-left">
+              <div class="insta-icon-wrapper">
+                ${Te}
+              </div>
+              <div class="insta-text">
+                <div class="insta-tag">ACOMPANHE NOSSA ESCOLA</div>
+                <h4 class="insta-title">@acusticamente.rs</h4>
+                <p class="insta-subtitle">Veja a rotina das aulas, eventos e a evolução dos nossos alunos no Instagram.</p>
+              </div>
+            </div>
+            <a href="${p}" target="_blank" rel="noopener noreferrer" class="btn-site-instagram" title="Abrir perfil no Instagram">
+              ${Te}
+              <span>Ver no Instagram</span>
+            </a>
+          </div>
+        </div>
+
         <div class="site-section-header">
           <span class="section-tag">INSTRUMENTOS ATENDIDOS</span>
           <h2 class="section-title">Aulas Feitas Para a Sua Evolução</h2>
@@ -319,26 +341,6 @@ var He=Object.defineProperty;var Ue=($,e,t)=>e in $?He($,e,{enumerable:!0,config
             </ul>
           </div>
 
-        </div>
-
-        <!-- Destaque Sutil para o Instagram -->
-        <div class="instagram-highlight-container">
-          <div class="instagram-highlight-card">
-            <div class="insta-left">
-              <div class="insta-icon-wrapper">
-                ${Te}
-              </div>
-              <div class="insta-text">
-                <div class="insta-tag">ACOMPANHE NOSSA ESCOLA</div>
-                <h4 class="insta-title">@acusticamente.rs</h4>
-                <p class="insta-subtitle">Veja a rotina das aulas, eventos e a evolução dos nossos alunos no Instagram.</p>
-              </div>
-            </div>
-            <a href="${p}" target="_blank" rel="noopener noreferrer" class="btn-site-instagram" title="Abrir perfil no Instagram">
-              ${Te}
-              <span>Ver no Instagram</span>
-            </a>
-          </div>
         </div>
 
       </div>

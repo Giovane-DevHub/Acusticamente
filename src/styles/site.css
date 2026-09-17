@@ -779,6 +779,10 @@
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
 }
 
+.btn-text-short {
+  display: none;
+}
+
 /* ========================================================
    RESPONSIVIDADE (MOBILE & TABLET)
    ======================================================== */
@@ -808,22 +812,37 @@
 
 @media (max-width: 540px) {
   .site-header-container {
-    padding: 10px 14px;
-    gap: 10px;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .site-brand {
+    gap: 8px;
+    min-width: 0;
   }
 
   .site-brand-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .site-header-right {
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .btn-site-login {
     padding: 5px 10px;
     font-size: 0.74rem;
+    flex-shrink: 0;
   }
 
   .btn-site-whatsapp {
-    padding: 5px 10px;
+    padding: 5px 11px;
     font-size: 0.74rem;
+    flex-shrink: 0;
   }
 
   .site-hero {
@@ -832,5 +851,40 @@
 
   .site-hero-title {
     font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .site-header-container {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .site-header-right {
+    gap: 6px;
+  }
+
+  .btn-text-full {
+    display: none;
+  }
+
+  .btn-text-short {
+    display: inline;
+  }
+
+  .btn-site-whatsapp {
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+
+  .btn-site-login {
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .site-brand-title {
+    display: none;
   }
 }

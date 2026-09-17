@@ -47,7 +47,8 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
         <div class="site-header-right">
           <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp" title="Fale conosco no WhatsApp">
             ${WA_ICON_SVG}
-            <span>Entrar em contato</span>
+            <span class="btn-text-full">Entrar em contato</span>
+            <span class="btn-text-short">Contato</span>
           </a>
 
           <button type="button" class="btn-site-login" id="btn-header-login" title="Acessar Sistema">
@@ -89,6 +90,27 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
     <!-- Seção de Cursos & Instrumentos Atendidos -->
     <section class="site-section" id="cursos">
       <div class="site-container">
+
+        <!-- Destaque Sutil para o Instagram (Acima do título de Cursos) -->
+        <div class="instagram-highlight-container" style="margin-top: 0; margin-bottom: 44px;">
+          <div class="instagram-highlight-card">
+            <div class="insta-left">
+              <div class="insta-icon-wrapper">
+                ${INSTA_ICON_SVG}
+              </div>
+              <div class="insta-text">
+                <div class="insta-tag">ACOMPANHE NOSSA ESCOLA</div>
+                <h4 class="insta-title">@acusticamente.rs</h4>
+                <p class="insta-subtitle">Veja a rotina das aulas, eventos e a evolução dos nossos alunos no Instagram.</p>
+              </div>
+            </div>
+            <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="btn-site-instagram" title="Abrir perfil no Instagram">
+              ${INSTA_ICON_SVG}
+              <span>Ver no Instagram</span>
+            </a>
+          </div>
+        </div>
+
         <div class="site-section-header">
           <span class="section-tag">INSTRUMENTOS ATENDIDOS</span>
           <h2 class="section-title">Aulas Feitas Para a Sua Evolução</h2>
@@ -169,26 +191,6 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
             </ul>
           </div>
 
-        </div>
-
-        <!-- Destaque Sutil para o Instagram -->
-        <div class="instagram-highlight-container">
-          <div class="instagram-highlight-card">
-            <div class="insta-left">
-              <div class="insta-icon-wrapper">
-                ${INSTA_ICON_SVG}
-              </div>
-              <div class="insta-text">
-                <div class="insta-tag">ACOMPANHE NOSSA ESCOLA</div>
-                <h4 class="insta-title">@acusticamente.rs</h4>
-                <p class="insta-subtitle">Veja a rotina das aulas, eventos e a evolução dos nossos alunos no Instagram.</p>
-              </div>
-            </div>
-            <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="btn-site-instagram" title="Abrir perfil no Instagram">
-              ${INSTA_ICON_SVG}
-              <span>Ver no Instagram</span>
-            </a>
-          </div>
         </div>
 
       </div>
