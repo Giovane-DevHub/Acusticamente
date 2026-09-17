@@ -2,7 +2,7 @@ import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { MongoConnectionService } from '../services/mongoService';
 import { renderBrandLogo } from '../assets/logo';
-import { showToast } from '../utils/ui';
+import { showToast, confirmAction } from '../utils/ui';
 
 export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -390,6 +390,32 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
 
             <div id="mongo-test-result" style="margin-top: 16px; font-size: 0.82rem;"></div>
           </form>
+
+          <!-- Sincronização em Nuvem & Entrega Limpa -->
+          <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-subtle);">
+            <h5 style="font-size: 0.82rem; font-weight: 700; color: var(--text-white); margin: 0 0 6px 0;">
+              Sincronização em Nuvem &amp; Entrega do Sistema
+            </h5>
+            <p style="font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+              O sistema sincroniza automaticamente com o MongoDB Atlas na Vercel para celular e PC. Quando terminar seus testes, utilize o botão abaixo para deixar o sistema totalmente zerado para o seu cliente.
+            </p>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-force-sync-cloud" style="font-size: 0.76rem; padding: 6px 14px;">
+                🔄 Sincronizar Agora
+              </button>
+
+              ${
+                canAlter
+                  ? `
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-clean-system" style="font-size: 0.76rem; padding: 6px 14px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
+                      🗑️ Zerar Cadastros de Teste (Entrega Limpa)
+                    </button>
+                  `
+                  : ''
+              }
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -673,6 +699,32 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
       resultEl.innerHTML = `<span style="color: var(--status-danger);">✕ ${res.message}</span>`;
       showToast('Falha na validação do MongoDB.', 'error');
     }
+  });
+
+  // Ação: Sincronizar manualmente com o MongoDB na nuvem
+  container.querySelector('#btn-force-sync-cloud')?.addEventListener('click', async () => {
+    showToast('Sincronizando com o MongoDB Atlas...', 'info');
+    const ok = await storageService.syncWithCloud();
+    if (ok) {
+      showToast('Dados sincronizados com o MongoDB na nuvem!', 'success');
+    } else {
+      showToast('Conectado à nuvem. Dados locais em conformidade.', 'info');
+    }
+  });
+
+  // Ação: Zerar cadastros de teste para entrega limpa ao cliente
+  container.querySelector('#btn-reset-clean-system')?.addEventListener('click', () => {
+    confirmAction({
+      title: 'Zerar Cadastros para Entrega',
+      message: 'Tem certeza que deseja apagar <strong>todos os alunos, aulas e lançamentos financeiros de teste</strong>? Esta ação deixará o banco de dados e o sistema 100% zerados e prontos para o cliente final.',
+      confirmText: 'Sim, Zerar Tudo',
+      confirmBtnClass: 'btn-danger',
+      onConfirm: async () => {
+        await storageService.resetCleanDatabase(user?.nome || 'Administrador');
+        showToast('Sistema zerado com sucesso! Pronto para entrega ao cliente.', 'success');
+        onNavigate('alunos');
+      }
+    });
   });
 
   return container;

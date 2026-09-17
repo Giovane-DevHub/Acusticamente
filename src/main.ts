@@ -67,6 +67,16 @@ class AppRouter {
       }
     });
 
+    // Atualiza a tela automaticamente quando chegam dados novos da nuvem (MongoDB Atlas)
+    window.addEventListener('acusticamente:data-synced', () => {
+      if (authService.isAuthenticated() && this.currentScreen !== 'login') {
+        this.render();
+      }
+    });
+
+    // Sincronização inicial com o MongoDB Atlas na nuvem
+    storageService.syncWithCloud();
+
     this.render();
   }
 
@@ -95,6 +105,9 @@ class AppRouter {
     this.currentScreen = screen;
     window.location.hash = screen;
     this.render();
+
+    // Sincroniza em background para manter os dados atualizados entre dispositivos
+    storageService.syncWithCloud();
   }
 
   private render(): void {

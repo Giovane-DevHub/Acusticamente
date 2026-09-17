@@ -437,13 +437,117 @@ class StorageService {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
-  // Salvamentos internos
-  private saveUsers() { localStorage.setItem(USERS_KEY, JSON.stringify(this.users)); }
-  private saveStudents() { localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students)); }
-  private savePlans() { localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans)); }
-  private saveAppointments() { localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments)); }
-  private savePayments() { localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments)); }
-  private saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings)); }
+  // ===================== SINCRONIZAÇÃO EM NUVEM (MONGODB) =====================
+  public async pushToCloud(collection: string, action: string, data: any): Promise<void> {
+    try {
+      if (typeof window === 'undefined') return;
+      await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collection, action, data })
+      });
+    } catch {
+      // Falhas de conexão em segundo plano não bloqueiam o uso offline
+    }
+  }
+
+  public async syncWithCloud(): Promise<boolean> {
+    try {
+      if (typeof window === 'undefined') return false;
+      const res = await fetch('/api/sync');
+      if (!res.ok) return false;
+      const json = await res.json();
+      if (!json.success || !json.data) return false;
+
+      const cloud = json.data;
+
+      if (Array.isArray(cloud.students) && cloud.students.length > 0) {
+        this.students = cloud.students;
+        localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
+      }
+
+      if (Array.isArray(cloud.payments) && cloud.payments.length > 0) {
+        this.payments = cloud.payments;
+        localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
+      }
+
+      if (Array.isArray(cloud.appointments) && cloud.appointments.length > 0) {
+        this.appointments = cloud.appointments;
+        localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
+      }
+
+      if (Array.isArray(cloud.plans) && cloud.plans.length > 0) {
+        this.plans = cloud.plans;
+        localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
+      }
+
+      if (Array.isArray(cloud.users) && cloud.users.length > 0) {
+        this.users = cloud.users;
+        localStorage.setItem(USERS_KEY, JSON.stringify(this.users));
+      }
+
+      if (cloud.settings) {
+        this.settings = { ...this.settings, ...cloud.settings };
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings));
+      }
+
+      // Notifica o frontend para recarregar com os dados da nuvem
+      window.dispatchEvent(new CustomEvent('acusticamente:data-synced'));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Ação para o usuário zerar todos os cadastros de teste e entregar o sistema limpo ao cliente
+  public async resetCleanDatabase(currentUserName: string): Promise<void> {
+    this.students = [];
+    this.payments = [];
+    this.appointments = [];
+
+    localStorage.setItem(STUDENTS_KEY, JSON.stringify([]));
+    localStorage.setItem(PAYMENTS_KEY, JSON.stringify([]));
+    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify([]));
+
+    await this.pushToCloud('all', 'reset_clean', {});
+
+    auditService.log({
+      tela: 'Configurações',
+      acao: 'Zerar Cadastros de Teste',
+      usuarioNome: currentUserName,
+      detalhes: 'Todos os alunos, aulas e lançamentos financeiros foram zerados para entrega do sistema.'
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('acusticamente:data-synced'));
+    }
+  }
+
+  // Salvamentos internos com replicação na nuvem
+  private saveUsers() { 
+    localStorage.setItem(USERS_KEY, JSON.stringify(this.users)); 
+    this.pushToCloud('users', 'replace_all', this.users);
+  }
+  private saveStudents() { 
+    localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students)); 
+    this.pushToCloud('students', 'replace_all', this.students);
+  }
+  private savePlans() { 
+    localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans)); 
+    this.pushToCloud('plans', 'replace_all', this.plans);
+  }
+  private saveAppointments() { 
+    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments)); 
+    this.pushToCloud('appointments', 'replace_all', this.appointments);
+  }
+  private savePayments() { 
+    localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments)); 
+    this.pushToCloud('payments', 'replace_all', this.payments);
+  }
+  private saveSettings() { 
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings)); 
+    this.pushToCloud('settings', 'upsert', this.settings);
+  }
 
   // ===================== USUÁRIOS =====================
   public getUsers(): User[] {
