@@ -394,19 +394,15 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
     </div>
 
     <!-- Linha Fina com Informações do Sistema -->
-    <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.78rem; color: var(--text-secondary);">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 6px;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 6px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; color: var(--text-secondary);">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 5px;">
           <span>🎵</span> Acusticamente
         </span>
-        <span class="badge badge-primary" style="font-family: monospace; font-size: 0.7rem; padding: 2px 7px;">v1.0.0</span>
-        <span style="color: var(--border-subtle);">|</span>
-        <span>Gestão Educacional &amp; Escolar</span>
+        <span class="badge badge-primary" style="font-family: monospace; font-size: 0.68rem; padding: 1px 6px;">v1.0.0</span>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <span>Engine: <code style="color: #ff9187; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">MongoDB + TypeScript</code></span>
-        <span style="color: var(--border-subtle);">|</span>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <span>Desenvolvido por <strong style="color: var(--color-coral); font-weight: 600;">DevHub</strong></span>
       </div>
     </div>

@@ -241,23 +241,23 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
           </div>
         </div>
 
-        <!-- Indicadores de Alunos -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Total Localizado</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">${totalAlunos}</div>
+        <!-- Indicadores de Alunos (2 em cima, 2 em baixo) -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total Localizado</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">${totalAlunos}</div>
           </div>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Alunos Ativos</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: #4ade80; margin-top: 2px;">${totalAtivos}</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Alunos Ativos</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #4ade80; margin-top: 2px;">${totalAtivos}</div>
           </div>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Alunos Inativos</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: #facc15; margin-top: 2px;">${totalInativos}</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Alunos Inativos</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #facc15; margin-top: 2px;">${totalInativos}</div>
           </div>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Inadimplentes</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: #f87171; margin-top: 2px;">${totalInadimplentes}</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Inadimplentes</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #f87171; margin-top: 2px;">${totalInadimplentes}</div>
           </div>
         </div>
 
@@ -396,23 +396,23 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
           </div>
         </div>
 
-        <!-- Indicadores Financeiros -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Total Registros</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">${totalLancamentos}</div>
+        <!-- Indicadores Financeiros (2 em cima, 2 em baixo) -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total Registros</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">${totalLancamentos}</div>
           </div>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Total Geral</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">R$ ${valorTotal.toFixed(2)}</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total Geral</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">R$ ${valorTotal.toFixed(2)}</div>
           </div>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Recebido / Quitado</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: #4ade80; margin-top: 2px;">R$ ${valorPago.toFixed(2)}</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Recebido / Quitado</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #4ade80; margin-top: 2px;">R$ ${valorPago.toFixed(2)}</div>
           </div>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px;">
-            <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Pendente / Atrasado</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: #f87171; margin-top: 2px;">R$ ${valorPendente.toFixed(2)}</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Pendente / Atrasado</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #f87171; margin-top: 2px;">R$ ${valorPendente.toFixed(2)}</div>
           </div>
         </div>
 
