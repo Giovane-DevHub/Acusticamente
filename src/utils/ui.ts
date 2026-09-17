@@ -68,9 +68,7 @@ export function openModal(options: {
 
   closeBtn.onclick = close;
   cancelBtn.onclick = close;
-  backdrop.onclick = (e) => {
-    if (e.target === backdrop) close();
-  };
+  // Bloqueado fechamento ao clicar fora do painel (evita perda acidental de dados)
 
   if (confirmBtn && options.onConfirm) {
     confirmBtn.onclick = async () => {
