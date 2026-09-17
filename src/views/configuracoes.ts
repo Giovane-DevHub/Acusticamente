@@ -343,79 +343,38 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
       <!-- CONTEÚDO DA ABA 3: BANCO DE DADOS (MONGODB) -->
       <div id="tab-content-mongo" style="padding: 24px; display: none;">
         <div style="max-width: 580px;">
-          <h4 style="font-size: 0.84rem; font-weight: 700; color: var(--text-white); margin: 0 0 14px 0;">
-            Parâmetros de Conexão com o Banco de Dados
-          </h4>
-
-          <form id="form-settings-mongo">
-            <div class="form-group">
-              <label class="form-label" for="cfg-mongo-uri">URI de Conexão MongoDB</label>
-              <input 
-                type="text" 
-                id="cfg-mongo-uri" 
-                class="form-input" 
-                value="${settings.mongoUri}" 
-                placeholder="mongodb://localhost:27017" 
-                required 
-              />
+          
+          <!-- Status Automático da Nuvem -->
+          <div style="background: rgba(34, 197, 94, 0.06); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-weight: 700; color: #4ade80; font-size: 0.88rem;">✓ Conectado ao MongoDB Atlas</div>
+              <div style="font-size: 0.76rem; color: var(--text-secondary); margin-top: 2px;">
+                Sincronização em nuvem ativa e automática entre celular e computador.
+              </div>
             </div>
+            <span class="badge badge-success" style="font-size: 0.7rem; padding: 3px 8px;">● Operacional</span>
+          </div>
 
-            <div class="form-group">
-              <label class="form-label" for="cfg-mongo-db">Nome do Banco (Database)</label>
-              <input 
-                type="text" 
-                id="cfg-mongo-db" 
-                class="form-input" 
-                value="${settings.mongoDatabase}" 
-                placeholder="acusticamente_db" 
-                required 
-              />
-            </div>
-
-            <div style="display: flex; gap: 12px; margin-top: 20px; align-items: center; flex-wrap: wrap;">
-              <button type="button" class="btn btn-secondary" id="btn-test-mongo">
-                Testar Conexão MongoDB
-              </button>
-
-              ${
-                canAlter
-                  ? `
-                    <button type="submit" class="btn btn-primary" id="btn-save-mongo">
-                      Salvar Conexão do Banco
-                    </button>
-                  `
-                  : ''
-              }
-            </div>
-
-            <div id="mongo-test-result" style="margin-top: 16px; font-size: 0.82rem;"></div>
-          </form>
-
-          <!-- Sincronização em Nuvem & Entrega Limpa -->
-          <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-subtle);">
-            <h5 style="font-size: 0.82rem; font-weight: 700; color: var(--text-white); margin: 0 0 6px 0;">
-              Sincronização em Nuvem &amp; Entrega do Sistema
+          <!-- Painel para Entrega Limpa ao Cliente -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px;">
+            <h5 style="font-size: 0.84rem; font-weight: 700; color: var(--text-white); margin: 0 0 6px 0;">
+              Entrega do Sistema ao Cliente
             </h5>
-            <p style="font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
-              O sistema sincroniza automaticamente com o MongoDB Atlas na Vercel para celular e PC. Quando terminar seus testes, utilize o botão abaixo para deixar o sistema totalmente zerado para o seu cliente.
+            <p style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4;">
+              Quando concluir seus testes no celular e no computador, utilize o botão abaixo para apagar todos os cadastros de teste e entregar o sistema completamente zerado.
             </p>
 
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-force-sync-cloud" style="font-size: 0.76rem; padding: 6px 14px;">
-                🔄 Sincronizar Agora
-              </button>
-
-              ${
-                canAlter
-                  ? `
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-clean-system" style="font-size: 0.76rem; padding: 6px 14px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
-                      🗑️ Zerar Cadastros de Teste (Entrega Limpa)
-                    </button>
-                  `
-                  : ''
-              }
-            </div>
+            ${
+              canAlter
+                ? `
+                  <button type="button" class="btn btn-secondary" id="btn-reset-clean-system" style="font-size: 0.8rem; padding: 8px 16px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4); display: flex; align-items: center; gap: 8px;">
+                    <span>🗑️</span> Zerar Cadastros de Teste (Entrega Limpa)
+                  </button>
+                `
+                : `<span style="font-size: 0.8rem; color: var(--text-muted);">🔒 Exclusivo para administradores</span>`
+            }
           </div>
+
         </div>
       </div>
     </div>
@@ -662,54 +621,6 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
     );
 
     showToast('Dados da instituição salvos com sucesso!', 'success');
-  });
-
-  // Salvar configurações do Banco MongoDB
-  const formMongo = container.querySelector('#form-settings-mongo') as HTMLFormElement;
-  formMongo?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const mongoUri = (container.querySelector('#cfg-mongo-uri') as HTMLInputElement).value;
-    const mongoDb = (container.querySelector('#cfg-mongo-db') as HTMLInputElement).value;
-
-    storageService.updateSettings(
-      {
-        mongoUri,
-        mongoDatabase: mongoDb
-      },
-      user?.nome || 'Administrador'
-    );
-
-    showToast('Configurações do MongoDB salvas com sucesso!', 'success');
-  });
-
-  // Testar conexão MongoDB
-  const btnTestMongo = container.querySelector('#btn-test-mongo');
-  btnTestMongo?.addEventListener('click', async () => {
-    const mongoUri = (container.querySelector('#cfg-mongo-uri') as HTMLInputElement).value;
-    const mongoDb = (container.querySelector('#cfg-mongo-db') as HTMLInputElement).value;
-    const resultEl = container.querySelector('#mongo-test-result') as HTMLElement;
-
-    resultEl.innerHTML = '<span style="color: var(--color-coral);">Testando conexão com o MongoDB...</span>';
-
-    const res = await MongoConnectionService.testConnection(mongoUri, mongoDb);
-    if (res.success) {
-      resultEl.innerHTML = `<span style="color: var(--status-success);">✓ ${res.message} (Latência: ${res.latencyMs}ms)</span>`;
-      showToast('MongoDB validado com sucesso!', 'success');
-    } else {
-      resultEl.innerHTML = `<span style="color: var(--status-danger);">✕ ${res.message}</span>`;
-      showToast('Falha na validação do MongoDB.', 'error');
-    }
-  });
-
-  // Ação: Sincronizar manualmente com o MongoDB na nuvem
-  container.querySelector('#btn-force-sync-cloud')?.addEventListener('click', async () => {
-    showToast('Sincronizando com o MongoDB Atlas...', 'info');
-    const ok = await storageService.syncWithCloud();
-    if (ok) {
-      showToast('Dados sincronizados com o MongoDB na nuvem!', 'success');
-    } else {
-      showToast('Conectado à nuvem. Dados locais em conformidade.', 'info');
-    }
   });
 
   // Ação: Zerar cadastros de teste para entrega limpa ao cliente
