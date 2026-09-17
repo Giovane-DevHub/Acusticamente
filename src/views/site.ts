@@ -71,7 +71,7 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
           Descubra o prazer de <span>tocar o instrumento</span> dos seus sonhos.
         </h1>
         <p class="site-hero-subtitle">
-          Aulas práticas e acolhedoras de violão, piano, técnica vocal, bateria e musicalização. 
+          Aulas práticas e acolhedoras de violão, piano, bateria, contrabaixo e musicalização infantil. 
           Aprenda no seu ritmo, com atenção individual e professores dedicados.
         </p>
         <div class="site-hero-actions">
@@ -104,10 +104,6 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
               <li>✓ Batidas populares, Pop, Rock e MPB</li>
               <li>✓ Leitura facilitada de cifras e tablaturas</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">
-              ${WA_ICON_SVG}
-              <span>Entrar em contato</span>
-            </a>
           </div>
 
           <!-- Curso 2: Piano & Teclado -->
@@ -120,29 +116,9 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
               <li>✓ Noções harmônicas e leitura musical</li>
               <li>✓ Músicas clássicas e populares</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">
-              ${WA_ICON_SVG}
-              <span>Entrar em contato</span>
-            </a>
           </div>
 
-          <!-- Curso 3: Canto & Técnica Vocal -->
-          <div class="site-course-card">
-            <div class="course-icon-badge">🎤</div>
-            <h3>Técnica Vocal &amp; Canto</h3>
-            <p>Desenvolva afinação, respiração correta e segurança para cantar sem cansaço vocal.</p>
-            <ul class="course-topics">
-              <li>✓ Apoio respiratório e ressonância</li>
-              <li>✓ Afinação e alcance vocal natural</li>
-              <li>✓ Repertório de acordo com o seu estilo</li>
-            </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">
-              ${WA_ICON_SVG}
-              <span>Entrar em contato</span>
-            </a>
-          </div>
-
-          <!-- Curso 4: Bateria -->
+          <!-- Curso 3: Bateria -->
           <div class="site-course-card">
             <div class="course-icon-badge">🥁</div>
             <h3>Bateria &amp; Ritmo</h3>
@@ -152,13 +128,9 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
               <li>✓ Levadas e viradas essenciais</li>
               <li>✓ Prática musical com instrumentos reais</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">
-              ${WA_ICON_SVG}
-              <span>Entrar em contato</span>
-            </a>
           </div>
 
-          <!-- Curso 5: Musicalização Infantil -->
+          <!-- Curso 4: Musicalização Infantil -->
           <div class="site-course-card highlight">
             <div class="course-icon-badge">🎶</div>
             <h3>Musicalização Infantil</h3>
@@ -168,13 +140,9 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
               <li>✓ Percepção rítmica e de timbres</li>
               <li>✓ Primeiro contato carinhoso com instrumentos</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">
-              ${WA_ICON_SVG}
-              <span>Entrar em contato</span>
-            </a>
           </div>
 
-          <!-- Curso 6: Contrabaixo -->
+          <!-- Curso 5: Contrabaixo -->
           <div class="site-course-card">
             <div class="course-icon-badge">🎸</div>
             <h3>Contrabaixo</h3>
@@ -184,10 +152,6 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
               <li>✓ Linhas de baixo e harmonia</li>
               <li>✓ Conexão rítmica com a bateria</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">
-              ${WA_ICON_SVG}
-              <span>Entrar em contato</span>
-            </a>
           </div>
 
         </div>
