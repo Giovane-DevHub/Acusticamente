@@ -1,91 +1,48 @@
 ================================================================================
-                        ACUSTICAMENTE - DOCUMENTO DE REFERÊNCIA
+                    ACUSTICAMENTE - GUIA RÁPIDO DO PROJETO
 ================================================================================
 
-1. IDENTIFICAÇÃO DO PROJETO
+1. O QUE É O PROJETO
 --------------------------------------------------------------------------------
-Nome do Projeto: Acusticamente
-Segmento: Gestão de Escola de Música
-Versão da Aplicação: 1.0.0
-Desenvolvedor: DevHub
+Sistema web completo para gestão de escola de música (alunos, agenda, financeiro e relatórios).
+
+- Acesso inicial:
+  Login : 1
+  Senha : 1
 
 
-2. ESPECIFICAÇÕES TÉCNICAS E VERSÕES
+2. TELAS DO SISTEMA
 --------------------------------------------------------------------------------
-- Linguagem de Programação:
-    * TypeScript: v5.4.5 (Target ES2020)
-    * JavaScript: ECMAScript 2020+ (ESNext)
-
-- Ambiente de Execução (Runtime):
-    * Node.js: v24.19.0 LTS (compatível com Node v18+, v20+ e v24+)
-    * Gerenciador de Pacotes: npm v10.x+
-
-- Servidor e Build Tool:
-    * Vite: v5.2.11 (Porta padrão: 3000, host: true)
-
-- Banco de Dados Oficial:
-    * MongoDB: v7.0 / v6.0+ (Community Server ou MongoDB Atlas)
-    * URI Padrão Local: mongodb://localhost:27017
-    * Database Padrão: acusticamente_db
-    * Driver / ORM Recomendado: mongodb ^6.x / mongoose ^8.x
-    * Coleções Mapeadas:
-        - usuarios (Credenciais, perfis e permissões)
-        - alunos (Dados cadastrais e matrículas)
-        - planos_ensino (Cursos musicais e módulos dinâmicos)
-        - agenda (Aulas e compromissos com horários)
-        - auditorias (Trilha imutável de compliance e ações)
+Início : Visão geral com resumo do dia e próximas aulas
+Agenda : Calendário com horários de aulas e controle de reposições
+Alunos : Cadastro de alunos, ficha pedagógica e histórico
+Financeiro : Controle de mensalidades, cobranças e baixas de pagamento
+Planos : Cursos oferecidos, valores e módulos de ensino
+Relatórios : Emissão e impressão de relatórios de alunos e finanças em PDF
+Usuários : Cadastro de professores e atendentes com controle de permissões
+Auditoria : Registro automático de quem fez cada alteração no sistema
+Configurações : Dados da escola (nome, logo, CNPJ) e conexão com banco de dados
+Login : Tela de entrada com usuário e senha
 
 
-3. CREDENCIAIS INICIAIS DO SISTEMA
+3. ESTRUTURA DE ARQUIVOS
 --------------------------------------------------------------------------------
-- Usuário Administrador Padrão:
-    * Login: 1
-    * Senha: 1
+src/views/ : Telas visuais do sistema que o usuário vê e usa
+src/services/ : Regras que salvam dados, calculam valores e controlam acesso
+src/types/ : Definições do que cada cadastro possui (aluno, aula, etc.)
+src/styles/ : Cores, botões, responsividade e visual do sistema
+src/utils/ : Ferramentas auxiliares (avisos, datas e janelas pop-up)
 
 
-4. PALETA DE CORES OFICIAL
+4. CORES PRINCIPAIS
 --------------------------------------------------------------------------------
-- Fundo (Preto Azulado Escuro): 
-    HEX: #17181f
-    RGB: rgb(23, 24, 31)
-
-- Destaque / Ação (Vermelho Coral Vibrante): 
-    HEX: #ea4335
-    RGB: rgb(234, 67, 53)
-
-- Textos & Destaque (Branco Gelo Puro): 
-    HEX: #ffffff
-    RGB: rgb(255, 255, 255)
-
-Cores Complementares da Interface:
-- Superfícies dos Cards e Menus: #1f212b
-- Superfícies Elevadas e Modais: #262936
-- Bordas e Divisores Sutis: #2e3242
-- Textos Secundários / Mudos: #9aa0b4
-- Badges de Sucesso: #22c55e (Fundo: rgba(34, 197, 94, 0.15))
-- Badges de Alerta / Pendente: #f59e0b (Fundo: rgba(245, 158, 11, 0.15))
+Fundo Escuro (#17181f) : Cor de fundo principal de todas as telas
+Coral Vibrante (#ea4335) : Cor dos botões principais e destaques
+Texto Claro (#ffffff) : Cor dos textos para leitura nítida
+Cartões (#1f212b) : Cor dos painéis e caixas de informação
 
 
-5. ESTRUTURA E CAMINHOS ÚTEIS
+5. COMO RODAR O PROJETO
 --------------------------------------------------------------------------------
-- Telas da Aplicação:
-    * src/views/home.ts          -> Dashboard inicial e aulas de hoje
-    * src/views/agenda.ts        -> Calendário mensal estilo Google e agendamentos
-    * src/views/alunos.ts        -> Cadastro e gestão de alunos
-    * src/views/planos.ts        -> Planos de ensino e módulos musicais
-    * src/views/user.ts          -> Gestão de usuários do sistema
-    * src/views/auditoria.ts     -> Histórico auditado de todas as operações
-    * src/views/configuracoes.ts -> Parâmetros da escola, MongoDB e Sobre o Sistema
-    * src/views/login.ts         -> Autenticação de usuários
-
-- Serviços e Tipos:
-    * src/types/index.ts             -> Interfaces e modelos de dados
-    * src/services/storageService.ts -> Camada de dados e persistência
-    * src/services/authService.ts    -> Sessão e controle de login
-    * src/services/auditService.ts   -> Registro de logs de auditoria
-    * src/services/mongoService.ts   -> Definições de Schemas do MongoDB
-
-- Configurações do Ambiente:
-    * vite.config.ts  -> Configuração de porta, rede local e servidor
-    * tsconfig.json   -> Regras de compilação do TypeScript
-    * package.json    -> Dependências e scripts do projeto
+npm run dev : Inicia o sistema para testes no computador
+npm run build : Prepara os arquivos finais para publicação na nuvem
