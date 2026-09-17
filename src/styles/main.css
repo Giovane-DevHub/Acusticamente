@@ -867,6 +867,55 @@ html, body {
 }
 
 /* ==========================================================================
+   ABAS DE MODAL (FINAS, MODERNAS E SEM BARRA DE ROLAGEM)
+   ========================================================================== */
+
+.modal-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 0 3px 0;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-tab-link {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 6px 4px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: all var(--transition-fast);
+}
+
+.modal-tab-link:hover {
+  color: var(--text-white);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.modal-tab-link.active {
+  color: var(--color-coral);
+  border-bottom-color: var(--color-coral);
+  font-weight: 700;
+  background-color: rgba(234, 67, 53, 0.06);
+}
+
+/* ==========================================================================
    TELA DE LOGIN (DIVIDIDA / MOCKUP)
    ========================================================================== */
 

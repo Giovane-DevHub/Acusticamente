@@ -894,77 +894,72 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
     const bodyHtml = `
       <form id="student-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         
-        <!-- Seletor de Abas do Formulário (Evita rolagem longa) -->
-        <div style="display: flex; gap: 6px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; overflow-x: auto;">
-          <button type="button" class="btn btn-sm btn-form-tab active" data-tab="tab-pessoal" style="font-size: 0.78rem;">
-            👤 1. Dados Pessoais
+        <!-- Seletor de Abas Fino, Moderno e Sem Barra de Rolagem -->
+        <div class="modal-tabs-nav">
+          <button type="button" class="modal-tab-link btn-form-tab active" data-tab="tab-pessoal">
+            Pessoal
           </button>
-          <button type="button" class="btn btn-sm btn-form-tab btn-secondary" data-tab="tab-resp" style="font-size: 0.78rem;">
-            🛡️ 2. Responsável
+          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-resp">
+            Responsável
           </button>
-          <button type="button" class="btn btn-sm btn-form-tab btn-secondary" data-tab="tab-musica" style="font-size: 0.78rem;">
-            🎵 3. Música &amp; Plano
+          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-musica">
+            Pedagógico
           </button>
-          <button type="button" class="btn btn-sm btn-form-tab btn-secondary" data-tab="tab-financeiro" style="font-size: 0.78rem;">
-            💰 4. Mensalidade
+          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-financeiro">
+            Mensalidade
           </button>
-          <button type="button" class="btn btn-sm btn-form-tab btn-secondary" data-tab="tab-obs" style="font-size: 0.78rem;">
-            📝 5. Observações
+          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-obs">
+            Observações
           </button>
         </div>
 
         <!-- PAINEL 1: DADOS PESSOAIS -->
         <div id="form-panel-tab-pessoal" class="form-tab-panel" style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-nome">Nome Completo do Aluno</label>
-              <input type="text" id="student-nome" class="form-input" placeholder="Ex: Clara Mendes" value="${existingStudent?.nome || ''}" required />
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-nascimento">Data de Nascimento</label>
-              <input type="date" id="student-nascimento" class="form-input" value="${existingStudent?.dataNascimento || ''}" />
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-nome">Nome Completo do Aluno</label>
+            <input type="text" id="student-nome" class="form-input" placeholder="Ex: Clara Mendes" value="${existingStudent?.nome || ''}" required />
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-telefone">Telefone / WhatsApp</label>
-              <input type="text" id="student-telefone" class="form-input" placeholder="(11) 99999-9999" value="${existingStudent?.telefone || ''}" />
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-telefone">Telefone / WhatsApp</label>
+            <input type="text" id="student-telefone" class="form-input" placeholder="(11) 99999-9999" value="${existingStudent?.telefone || ''}" />
+          </div>
 
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-email">E-mail</label>
-              <input type="email" id="student-email" class="form-input" placeholder="aluno@email.com" value="${existingStudent?.email || ''}" />
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-nascimento">Data de Nascimento</label>
+            <input type="date" id="student-nascimento" class="form-input" value="${existingStudent?.dataNascimento || ''}" />
+          </div>
+
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-email">E-mail</label>
+            <input type="email" id="student-email" class="form-input" placeholder="aluno@email.com" value="${existingStudent?.email || ''}" />
           </div>
         </div>
 
         <!-- PAINEL 2: DADOS DO RESPONSÁVEL -->
         <div id="form-panel-tab-resp" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
-          <div style="display: grid; grid-template-columns: 2fr 1fr 1.2fr; gap: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-resp-nome">Nome do Responsável</label>
-              <input type="text" id="student-resp-nome" class="form-input" placeholder="Ex: Patrícia Mendes" value="${existingStudent?.responsavelNome || ''}" />
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-resp-parentesco">Parentesco</label>
-              <select id="student-resp-parentesco" class="form-select">
-                <option value="">Selecione...</option>
-                <option value="Mãe" ${existingStudent?.responsavelParentesco === 'Mãe' ? 'selected' : ''}>Mãe</option>
-                <option value="Pai" ${existingStudent?.responsavelParentesco === 'Pai' ? 'selected' : ''}>Pai</option>
-                <option value="Avô/Avó" ${existingStudent?.responsavelParentesco === 'Avô/Avó' ? 'selected' : ''}>Avô/Avó</option>
-                <option value="Cônjuge" ${existingStudent?.responsavelParentesco === 'Cônjuge' ? 'selected' : ''}>Cônjuge</option>
-                <option value="Outro" ${existingStudent?.responsavelParentesco === 'Outro' ? 'selected' : ''}>Outro</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-resp-tel">Telefone / WhatsApp</label>
-              <input type="text" id="student-resp-tel" class="form-input" placeholder="(11) 98888-8888" value="${existingStudent?.responsavelTelefone || ''}" />
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-resp-nome">Nome do Responsável</label>
+            <input type="text" id="student-resp-nome" class="form-input" placeholder="Ex: Patrícia Mendes" value="${existingStudent?.responsavelNome || ''}" />
           </div>
+
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-resp-parentesco">Parentesco</label>
+            <select id="student-resp-parentesco" class="form-select">
+              <option value="">Selecione...</option>
+              <option value="Mãe" ${existingStudent?.responsavelParentesco === 'Mãe' ? 'selected' : ''}>Mãe</option>
+              <option value="Pai" ${existingStudent?.responsavelParentesco === 'Pai' ? 'selected' : ''}>Pai</option>
+              <option value="Avô/Avó" ${existingStudent?.responsavelParentesco === 'Avô/Avó' ? 'selected' : ''}>Avô/Avó</option>
+              <option value="Cônjuge" ${existingStudent?.responsavelParentesco === 'Cônjuge' ? 'selected' : ''}>Cônjuge</option>
+              <option value="Outro" ${existingStudent?.responsavelParentesco === 'Outro' ? 'selected' : ''}>Outro</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-resp-tel">Telefone / WhatsApp do Responsável</label>
+            <input type="text" id="student-resp-tel" class="form-input" placeholder="(11) 98888-8888" value="${existingStudent?.responsavelTelefone || ''}" />
+          </div>
+
           <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
             * Obrigatório para alunos menores de 18 anos ou para contato de emergência.
           </p>
@@ -972,74 +967,68 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
         <!-- PAINEL 3: DADOS MUSICAIS E PEDAGÓGICOS -->
         <div id="form-panel-tab-musica" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-instrumento">Instrumento Principal</label>
-              <select id="student-instrumento" class="form-select">
-                <option value="">Selecione...</option>
-                ${instrumentOptions}
-              </select>
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-nivel">Nível Musical</label>
-              <select id="student-nivel" class="form-select">
-                <option value="iniciante" ${existingStudent?.nivelMusical === 'iniciante' ? 'selected' : ''}>Iniciante</option>
-                <option value="basico" ${existingStudent?.nivelMusical === 'basico' ? 'selected' : ''}>Básico</option>
-                <option value="intermediario" ${existingStudent?.nivelMusical === 'intermediario' ? 'selected' : ''}>Intermediário</option>
-                <option value="avancado" ${existingStudent?.nivelMusical === 'avancado' ? 'selected' : ''}>Avançado</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-status">Status da Matrícula</label>
-              <select id="student-status" class="form-select">
-                <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-                <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
-              </select>
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-instrumento">Instrumento Principal</label>
+            <select id="student-instrumento" class="form-select">
+              <option value="">Selecione...</option>
+              ${instrumentOptions}
+            </select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.5fr 1.5fr 1fr; gap: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-plano">Plano de Ensino</label>
-              <select id="student-plano" class="form-select">
-                <option value="">Selecione um plano...</option>
-                ${planOptions}
-              </select>
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-nivel">Nível Musical</label>
+            <select id="student-nivel" class="form-select">
+              <option value="iniciante" ${existingStudent?.nivelMusical === 'iniciante' ? 'selected' : ''}>Iniciante</option>
+              <option value="basico" ${existingStudent?.nivelMusical === 'basico' ? 'selected' : ''}>Básico</option>
+              <option value="intermediario" ${existingStudent?.nivelMusical === 'intermediario' ? 'selected' : ''}>Intermediário</option>
+              <option value="avancado" ${existingStudent?.nivelMusical === 'avancado' ? 'selected' : ''}>Avançado</option>
+            </select>
+          </div>
 
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-modulo">Módulo Atual</label>
-              <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Teoria" value="${existingStudent?.moduloAtual || ''}" />
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-status">Status da Matrícula</label>
+            <select id="student-status" class="form-select">
+              <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+              <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+            </select>
+          </div>
 
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-saldo-reposicoes" title="Aulas que o aluno tem direito a repor">
-                Créditos Reposição
-              </label>
-              <input type="number" id="student-saldo-reposicoes" class="form-input" min="0" max="20" value="${existingStudent?.saldoReposicoes ?? 0}" />
-            </div>
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-plano">Plano de Ensino</label>
+            <select id="student-plano" class="form-select">
+              <option value="">Selecione um plano...</option>
+              ${planOptions}
+            </select>
+          </div>
+
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-modulo">Módulo Atual</label>
+            <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Teoria" value="${existingStudent?.moduloAtual || ''}" />
+          </div>
+
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-saldo-reposicoes" title="Aulas que o aluno tem direito a repor">
+              Créditos de Reposição
+            </label>
+            <input type="number" id="student-saldo-reposicoes" class="form-input" min="0" max="20" value="${existingStudent?.saldoReposicoes ?? 0}" />
           </div>
         </div>
 
         <!-- PAINEL 4: MENSALIDADE E FINANCEIRO -->
         <div id="form-panel-tab-financeiro" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
-          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px;">
-            <div style="font-weight: 700; font-size: 0.85rem; color: #fbbf24; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="font-weight: 700; font-size: 0.85rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
               <span>💰</span> Parâmetros da Mensalidade
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
-              <div class="form-group" style="margin: 0;">
-                <label class="form-label" for="student-valor-mensalidade">Valor da Mensalidade (R$)</label>
-                <input type="number" id="student-valor-mensalidade" class="form-input" min="0" step="10" placeholder="280.00" value="${existingStudent?.valorMensalidade ?? 280}" required />
-              </div>
+            <div class="form-group" style="margin: 0; width: 100%;">
+              <label class="form-label" for="student-valor-mensalidade">Valor da Mensalidade (R$)</label>
+              <input type="number" id="student-valor-mensalidade" class="form-input" min="0" step="10" placeholder="280.00" value="${existingStudent?.valorMensalidade ?? 280}" required />
+            </div>
 
-              <div class="form-group" style="margin: 0;">
-                <label class="form-label" for="student-dia-vencimento">Dia de Vencimento Padrão</label>
-                <input type="number" id="student-dia-vencimento" class="form-input" min="1" max="31" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
-              </div>
+            <div class="form-group" style="margin: 0; width: 100%;">
+              <label class="form-label" for="student-dia-vencimento">Dia de Vencimento Padrão</label>
+              <input type="number" id="student-dia-vencimento" class="form-input" min="1" max="31" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
             </div>
 
             <div style="font-size: 0.74rem; color: var(--text-secondary); line-height: 1.3;">
@@ -1215,10 +1204,8 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         btn.addEventListener('click', (e) => {
           const target = (e.currentTarget as HTMLElement).dataset.tab;
           tabBtns.forEach(b => {
-            b.classList.add('btn-secondary');
             b.classList.remove('active');
           });
-          (e.currentTarget as HTMLElement).classList.remove('btn-secondary');
           (e.currentTarget as HTMLElement).classList.add('active');
 
           panels.forEach(p => {
