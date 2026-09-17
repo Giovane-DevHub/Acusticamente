@@ -916,42 +916,47 @@ html, body {
 }
 
 /* ==========================================================================
-   GRID DE ABAS DO ALUNO (2 NÍVEIS COM ESPAÇAMENTO E DESTAQUE MODERNO)
+   GRID DE ABAS (PADRONIZADO / PÍLULAS COM INDICADOR LUMINOSO)
    ========================================================================== */
 
+.app-tabs-wrapper,
 .student-modal-tabs-wrapper {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 8px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
 }
 
+.app-tabs-row,
 .student-modal-tabs-row {
   display: grid;
   gap: 8px;
   width: 100%;
 }
 
-.student-modal-tabs-row.row-top {
-  grid-template-columns: repeat(3, 1fr);
-}
-
+.app-tabs-row.cols-2,
 .student-modal-tabs-row.row-bottom {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.app-tabs-row.cols-3,
+.student-modal-tabs-row.row-top {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.app-tab-pill,
 .student-tab-pill {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 8px 10px;
+  padding: 8px 12px;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.03);
@@ -963,12 +968,14 @@ html, body {
   user-select: none;
 }
 
+.app-tab-pill:hover,
 .student-tab-pill:hover {
   color: var(--text-white);
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
 }
 
+.app-tab-pill.active,
 .student-tab-pill.active {
   color: #ffffff;
   background: rgba(234, 67, 53, 0.16);
@@ -976,6 +983,7 @@ html, body {
   box-shadow: 0 2px 8px rgba(234, 67, 53, 0.22);
 }
 
+.app-tab-pill-dot,
 .student-tab-pill-dot {
   width: 6px;
   height: 6px;
@@ -986,6 +994,7 @@ html, body {
   transition: all var(--transition-fast);
 }
 
+.app-tab-pill.active .app-tab-pill-dot,
 .student-tab-pill.active .student-tab-pill-dot {
   background-color: var(--color-coral);
   border-color: var(--color-coral);

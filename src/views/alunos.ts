@@ -409,40 +409,33 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
     const bodyHtml = `
       <div style="display: flex; flex-direction: column; gap: 14px;">
         
-        <!-- Cartão Superior de Perfil do Aluno -->
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+        <!-- Cartão Superior do Aluno (Visual Clean & Organizado) -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
           <div style="display: flex; gap: 12px; align-items: center;">
-            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--color-coral); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; color: #ffffff;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(234, 67, 53, 0.15); border: 1px solid rgba(234, 67, 53, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: var(--color-coral);">
               ${student.nome[0] || 'A'}
             </div>
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-white);">${student.nome}</span>
-                <span class="badge ${isAtivo ? 'badge-success' : 'badge-warning'}" style="font-size: 0.65rem;">
+                <span style="font-size: 1.02rem; font-weight: 700; color: var(--text-white);">${student.nome}</span>
+                <span class="badge ${isAtivo ? 'badge-success' : 'badge-secondary'}" style="font-size: 0.65rem; padding: 2px 7px;">
                   ${isAtivo ? '● Ativo' : '○ Inativo'}
                 </span>
-                ${
-                  isAtivo
-                    ? isOverdue
-                      ? `<span class="badge badge-coral" style="font-size: 0.65rem; font-weight: 700;">⚠️ Inadimplente</span>`
-                      : `<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.65rem;">✓ Mensalidade em dia</span>`
-                    : ''
-                }
               </div>
-              <div style="display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-secondary);">
+              <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-secondary);">
                 <span>${getInstrumentIcon(student.instrumentoPrincipal)} ${student.instrumentoPrincipal || 'Instrumento Geral'}</span>
                 &bull;
-                ${getNivelBadge(student.nivelMusical)}
+                <span>${student.nivelMusical ? student.nivelMusical.toUpperCase() : 'INICIANTE'}</span>
                 ${ageStr ? `&bull; <span style="color: var(--text-muted);">${ageStr}</span>` : ''}
               </div>
             </div>
           </div>
 
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 8px; align-items: center;">
             ${
               waLink
                 ? `
-                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 5px; color: #22c55e; border-color: rgba(34, 197, 94, 0.3); font-size: 0.75rem; padding: 4px 10px;">
+                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; padding: 5px 10px;">
                     ${ICONS.whatsapp} WhatsApp
                   </a>
                 `
@@ -451,105 +444,110 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           </div>
         </div>
 
-        <!-- Seletor de Abas da Ficha do Aluno -->
-        <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
-          <button type="button" class="btn btn-sm btn-profile-tab active" id="btn-tab-pedagogico" style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
-            🎓 Pedagógico &amp; Aulas
-          </button>
-          <button type="button" class="btn btn-sm btn-profile-tab btn-secondary" id="btn-tab-financeiro" style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
-            💰 Histórico Financeiro
-            ${
-              isOverdue
-                ? `<span class="badge badge-coral" style="font-size: 0.65rem; padding: 1px 5px;">Atrasado</span>`
-                : `<span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; font-size: 0.65rem; padding: 1px 5px;">${payments.length}</span>`
-            }
-          </button>
+        <!-- Seletor de Abas Padronizado em Pílula -->
+        <div class="app-tabs-wrapper" style="margin-bottom: 4px;">
+          <div class="app-tabs-row cols-2">
+            <button type="button" class="app-tab-pill active" id="btn-tab-pedagogico">
+              <span class="app-tab-pill-dot"></span>
+              <span>Pedagógico &amp; Aulas</span>
+            </button>
+            <button type="button" class="app-tab-pill" id="btn-tab-financeiro">
+              <span class="app-tab-pill-dot"></span>
+              <span>Histórico Financeiro</span>
+              ${
+                isOverdue
+                  ? `<span class="badge badge-coral" style="font-size: 0.62rem; padding: 1px 6px; margin-left: 4px;">Pendente</span>`
+                  : `<span class="badge" style="background: rgba(255, 255, 255, 0.08); font-size: 0.62rem; padding: 1px 6px; margin-left: 4px;">${payments.length}</span>`
+              }
+            </button>
+          </div>
         </div>
 
         <!-- CONTEÚDO DA ABA 1: PEDAGÓGICO -->
-        <div id="panel-tab-pedagogico" style="display: flex; flex-direction: column; gap: 14px;">
-          <!-- Informações de Contato e Responsável -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px;">
-              <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px;">
-                Contatos Pessoais
+        <div id="panel-tab-pedagogico" style="display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Contatos & Responsável em Grid Limpo -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px;">
+              <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">
+                Contato Pessoal
               </span>
-              <div style="font-size: 0.82rem; color: var(--text-white);">📱 ${student.telefone || 'Sem telefone'}</div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">✉️ ${student.email || 'Sem e-mail'}</div>
+              <div style="font-size: 0.8rem; color: var(--text-white);">${student.telefone || 'Sem telefone'}</div>
+              <div style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 1px;">${student.email || 'Sem e-mail'}</div>
             </div>
 
-            <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px;">
-              <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px;">
-                Responsável Legal / Emergência
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px;">
+              <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">
+                Responsável Legal
               </span>
               ${
                 student.responsavelNome
                   ? `
-                    <div style="font-size: 0.82rem; color: var(--text-white);">
-                      👤 <strong>${student.responsavelNome}</strong> ${student.responsavelParentesco ? `(${student.responsavelParentesco})` : ''}
+                    <div style="font-size: 0.8rem; color: var(--text-white);">
+                      ${student.responsavelNome} ${student.responsavelParentesco ? `<span style="color: var(--text-muted); font-size: 0.72rem;">(${student.responsavelParentesco})</span>` : ''}
                     </div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-                      📞 ${student.responsavelTelefone || 'Sem telefone informado'}
+                    <div style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 1px;">
+                      ${student.responsavelTelefone || 'Sem telefone'}
                     </div>
                   `
-                  : `<div style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">Não informado / Aluno maior de idade</div>`
+                  : `<div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">Aluno independente</div>`
               }
             </div>
           </div>
 
-          <!-- Métricas Rápidas de Presença e Reposições -->
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.15rem; font-weight: 700; color: #60a5fa;">${totalAulas}</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Aulas Agendadas</div>
+          <!-- Métricas Pedagógicas em Barra Sóbria -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-white);">${totalAulas}</div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Agendadas</div>
             </div>
 
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.15rem; font-weight: 700; color: #4ade80;">${concluidas}</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Presenças</div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 1.05rem; font-weight: 700; color: #4ade80;">${concluidas}</div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Presenças</div>
             </div>
 
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.15rem; font-weight: 700; color: #f59e0b;">${faltasJust}</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Faltas Justificadas</div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-secondary);">${faltasJust + faltasInjust}</div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Faltas</div>
             </div>
 
-            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.15rem; font-weight: 700; color: #22c55e;">${saldo}</div>
-              <div style="font-size: 0.7rem; color: #86efac; margin-top: 2px;">Saldo Reposições</div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--color-coral);">${saldo}</div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Reposições</div>
             </div>
           </div>
 
           <!-- Linha do Tempo / Histórico de Aulas -->
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-white); margin: 0;">
-                Histórico Pedagógico de Aulas &amp; Faltas
-              </h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-white);">
+                Aulas Recentes (${history.length})
+              </span>
               ${
                 saldo > 0
                   ? `
-                    <button type="button" class="btn btn-primary btn-sm" id="btn-quick-schedule-reposicao" style="font-size: 0.72rem; padding: 3px 8px;">
-                      🔄 Agendar Reposição (${saldo} disp.)
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-schedule-reposicao" style="font-size: 0.7rem; padding: 2px 8px;">
+                      Agendar Reposição (${saldo})
                     </button>
                   `
                   : ''
               }
             </div>
 
-            <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface);">
+            <div style="max-height: 190px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface);">
               ${
                 history.length === 0
-                  ? `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.82rem;">Nenhuma aula registrada ainda para este aluno.</div>`
+                  ? `<div style="padding: 18px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">Nenhuma aula registrada.</div>`
                   : `
-                    <table class="data-table" style="margin: 0; font-size: 0.8rem;">
+                    <table class="data-table" style="margin: 0; font-size: 0.78rem;">
                       <thead>
                         <tr>
-                          <th>Data &amp; Hora</th>
-                          <th>Título da Aula</th>
+                          <th>Data</th>
+                          <th>Aula</th>
                           <th class="col-hide-sm">Tipo</th>
                           <th>Status</th>
-                          <th class="col-hide-sm">Observações / Justificativa</th>
+                          <th class="col-hide-sm">Observações</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -557,35 +555,33 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                           const dateFormatted = app.data.split('-').reverse().join('/');
                           let statusBadge = '';
                           if (app.status === 'concluido') {
-                            statusBadge = `<span class="badge badge-success" style="font-size: 0.65rem;">✓ Presente</span>`;
+                            statusBadge = `<span class="badge badge-success" style="font-size: 0.62rem;">Presente</span>`;
                           } else if (app.status === 'falta_justificada') {
-                            statusBadge = `<span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.65rem;">⚠️ Falta Just.</span>`;
+                            statusBadge = `<span class="badge badge-warning" style="font-size: 0.62rem;">Falta Just.</span>`;
                           } else if (app.status === 'falta_injustificada') {
-                            statusBadge = `<span class="badge badge-danger" style="font-size: 0.65rem;">✕ Injustificada</span>`;
+                            statusBadge = `<span class="badge badge-danger" style="font-size: 0.62rem;">Falta</span>`;
                           } else if (app.status === 'cancelado') {
-                            statusBadge = `<span class="badge badge-secondary" style="font-size: 0.65rem;">🚫 Cancelado</span>`;
+                            statusBadge = `<span class="badge badge-secondary" style="font-size: 0.62rem;">Cancelado</span>`;
                           } else {
-                            statusBadge = `<span class="badge badge-warning" style="font-size: 0.65rem;">⏳ Agendado</span>`;
+                            statusBadge = `<span class="badge badge-secondary" style="font-size: 0.62rem;">Agendado</span>`;
                           }
 
                           const tipoBadge = app.tipoAula === 'reposicao'
-                            ? `<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; font-size: 0.65rem;">Reposição</span>`
+                            ? `<span class="badge" style="background: rgba(255, 255, 255, 0.08); font-size: 0.62rem;">Reposição</span>`
                             : `<span style="color: var(--text-muted); font-size: 0.7rem;">Regular</span>`;
 
                           return `
                             <tr>
-                              <td>
-                                <strong>${dateFormatted}</strong><br>
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">${app.horaInicio} - ${app.horaFim}</span>
+                              <td style="white-space: nowrap;">
+                                <strong>${dateFormatted}</strong>
+                                <span style="font-size: 0.68rem; color: var(--text-muted); margin-left: 4px;">${app.horaInicio}</span>
                               </td>
-                              <td>
-                                <div style="font-weight: 600; color: var(--text-white);">${app.titulo}</div>
-                              </td>
+                              <td><div style="color: var(--text-white); font-weight: 500;">${app.titulo}</div></td>
                               <td class="col-hide-sm">${tipoBadge}</td>
                               <td>${statusBadge}</td>
                               <td class="col-hide-sm">
-                                <span style="color: var(--text-secondary); font-size: 0.75rem;">
-                                  ${app.justificativaFalta ? `<em>Motivo: ${app.justificativaFalta}</em>` : app.observacoes || '-'}
+                                <span style="color: var(--text-secondary); font-size: 0.72rem;">
+                                  ${app.justificativaFalta || app.observacoes || '-'}
                                 </span>
                               </td>
                             </tr>
@@ -601,8 +597,8 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           ${
             student.observacoes
               ? `
-                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.78rem; color: var(--text-secondary);">
-                  📝 <strong>Observações:</strong> ${student.observacoes}
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.75rem; color: var(--text-secondary);">
+                  <strong style="color: var(--text-white);">Obs:</strong> ${student.observacoes}
                 </div>
               `
               : ''
@@ -610,82 +606,66 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         </div>
 
         <!-- CONTEÚDO DA ABA 2: FINANCEIRO -->
-        <div id="panel-tab-financeiro" style="display: none; flex-direction: column; gap: 14px;">
-          <!-- Card de Alerta de Situação Financeira -->
-          ${
-            isOverdue
-              ? `
-                <div style="background: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.3); border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
-                  <div>
-                    <div style="font-weight: 700; color: #f87171; font-size: 0.88rem;">⚠️ Mensalidade em Atraso</div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-                      Este aluno possui pagamentos com vencimento expirado que aguardam regularização.
-                    </div>
-                  </div>
-                  <span class="badge badge-coral" style="font-size: 0.75rem;">Pendente</span>
-                </div>
-              `
-              : `
-                <div style="background: rgba(34, 197, 94, 0.06); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
-                  <div>
-                    <div style="font-weight: 700; color: #4ade80; font-size: 0.88rem;">✓ Situação Financeira Regularizada</div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-                      Não constam mensalidades em atraso para este aluno.
-                    </div>
-                  </div>
-                  <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.75rem;">Em Dia</span>
-                </div>
-              `
-          }
+        <div id="panel-tab-financeiro" style="display: none; flex-direction: column; gap: 12px;">
+          <!-- Status Sucinto -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-size: 0.8rem; color: var(--text-white);">
+              ${
+                isOverdue
+                  ? `<span style="color: #f87171; font-weight: 600;">⚠️ Mensalidade em atraso</span>`
+                  : `<span style="color: #4ade80; font-weight: 600;">✓ Mensalidades em dia</span>`
+              }
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">
+              Vencimento todo dia ${student.diaVencimento ?? 10}
+            </span>
+          </div>
 
-          <!-- Resumo Financeiro do Aluno -->
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px; text-align: center;">
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Mensalidade Padrão</div>
-              <div style="font-size: 1.15rem; font-weight: 700; color: #fbbf24; margin-top: 2px;">
+          <!-- Resumo Financeiro Sucinto -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Mensalidade</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-white); margin-top: 1px;">
                 R$ ${(student.valorMensalidade ?? 280).toFixed(2)}
               </div>
-              <div style="font-size: 0.7rem; color: var(--text-secondary);">Vence todo dia ${student.diaVencimento ?? 10}</div>
             </div>
 
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px; text-align: center;">
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Total Já Pago</div>
-              <div style="font-size: 1.15rem; font-weight: 700; color: #4ade80; margin-top: 2px;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Total Pago</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: #4ade80; margin-top: 1px;">
                 R$ ${totalPago.toFixed(2)}
               </div>
-              <div style="font-size: 0.7rem; color: var(--text-secondary);">${payments.filter(p => p.status === 'pago').length} mensalidade(s)</div>
             </div>
 
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px; text-align: center;">
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Total em Aberto</div>
-              <div style="font-size: 1.15rem; font-weight: 700; color: ${totalPendente > 0 ? '#f87171' : 'var(--text-white)'}; margin-top: 2px;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Em Aberto</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: ${totalPendente > 0 ? '#f87171' : 'var(--text-white)'}; margin-top: 1px;">
                 R$ ${totalPendente.toFixed(2)}
               </div>
-              <div style="font-size: 0.7rem; color: var(--text-secondary);">${payments.filter(p => p.status !== 'pago').length} pendente(s)</div>
             </div>
           </div>
 
-          <!-- Tabela de Lançamentos Financeiros do Aluno -->
+          <!-- Tabela de Mensalidades -->
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-white); margin: 0;">
-                Histórico de Mensalidades &amp; Pagamentos (${payments.length})
-              </h4>
+            <div style="margin-bottom: 6px;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-white);">
+                Histórico de Mensalidades (${payments.length})
+              </span>
             </div>
 
-            <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface);">
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface);">
               ${
                 payments.length === 0
-                  ? `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.82rem;">Nenhum lançamento financeiro registrado para este aluno ainda.</div>`
+                  ? `<div style="padding: 18px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">Nenhum lançamento financeiro registrado.</div>`
                   : `
-                    <table class="data-table" style="margin: 0; font-size: 0.8rem;">
+                    <table class="data-table" style="margin: 0; font-size: 0.78rem;">
                       <thead>
                         <tr>
                           <th>Descrição</th>
                           <th class="col-hide-sm">Vencimento</th>
                           <th>Valor</th>
                           <th>Status</th>
-                          <th class="col-hide-sm">Data Pagto</th>
+                          <th class="col-hide-sm">Pagamento</th>
                           <th style="text-align: right;">Ações</th>
                         </tr>
                       </thead>
@@ -696,18 +676,17 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
                           let badgeHtml = '';
                           if (isPago) {
-                            badgeHtml = `<span class="badge badge-success" style="font-size: 0.65rem;">✓ Pago</span>`;
+                            badgeHtml = `<span class="badge badge-success" style="font-size: 0.62rem;">Pago</span>`;
                           } else if (isAtrasado) {
-                            badgeHtml = `<span class="badge badge-coral" style="font-size: 0.65rem; font-weight: 700;">⚠️ Atrasado</span>`;
+                            badgeHtml = `<span class="badge badge-danger" style="font-size: 0.62rem;">Atrasado</span>`;
                           } else {
-                            badgeHtml = `<span class="badge badge-warning" style="font-size: 0.65rem;">⏳ Pendente</span>`;
+                            badgeHtml = `<span class="badge badge-warning" style="font-size: 0.62rem;">Pendente</span>`;
                           }
 
                           return `
                             <tr>
                               <td style="white-space: nowrap;">
                                 <strong style="color: var(--text-white);">${p.descricao}</strong>
-                                ${p.formaPagamento ? `<span style="font-size: 0.68rem; color: var(--text-muted); margin-left: 6px;">(${p.formaPagamento.toUpperCase()})</span>` : ''}
                               </td>
                               <td class="col-hide-sm">${p.dataVencimento.split('-').reverse().join('/')}</td>
                               <td style="font-weight: 600; color: var(--text-white);">R$ ${p.valor.toFixed(2)}</td>
@@ -717,14 +696,14 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                                 ${
                                   isPago
                                     ? `
-                                      <button type="button" class="btn btn-secondary btn-sm btn-print-receipt" data-id="${p.id}" style="font-size: 0.72rem; padding: 2px 8px;" title="Ver e imprimir recibo">
-                                        🖨️ Recibo
+                                      <button type="button" class="btn btn-secondary btn-sm btn-print-receipt" data-id="${p.id}" style="font-size: 0.7rem; padding: 2px 7px;">
+                                        Recibo
                                       </button>
                                     `
                                     : canEditFinancial
                                       ? `
-                                        <button type="button" class="btn btn-primary btn-sm btn-pay-now" data-id="${p.id}" style="font-size: 0.72rem; padding: 2px 8px; background: #059669; border-color: #059669;" title="Dar baixa no pagamento">
-                                          ✓ Dar Baixa
+                                        <button type="button" class="btn btn-primary btn-sm btn-pay-now" data-id="${p.id}" style="font-size: 0.7rem; padding: 2px 7px;">
+                                          Baixar
                                         </button>
                                       `
                                       : ''
@@ -761,16 +740,14 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       const panelFin = document.getElementById('panel-tab-financeiro');
 
       tabPedBtn?.addEventListener('click', () => {
-        tabPedBtn.className = 'btn btn-sm btn-profile-tab active';
-        tabFinBtn?.classList.add('btn-secondary');
+        tabPedBtn.classList.add('active');
         tabFinBtn?.classList.remove('active');
         if (panelPed) panelPed.style.display = 'flex';
         if (panelFin) panelFin.style.display = 'none';
       });
 
       tabFinBtn?.addEventListener('click', () => {
-        tabFinBtn.className = 'btn btn-sm btn-profile-tab active';
-        tabPedBtn?.classList.add('btn-secondary');
+        tabFinBtn.classList.add('active');
         tabPedBtn?.classList.remove('active');
         if (panelFin) panelFin.style.display = 'flex';
         if (panelPed) panelPed.style.display = 'none';

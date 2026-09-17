@@ -21,38 +21,39 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
       </p>
     </div>
 
-    <!-- Seletor de Abas com Contraste Nítido -->
-    <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
-      <button 
-        type="button" 
-        class="btn-cfg-tab active" 
-        id="btn-tab-instituicao" 
-        data-tab="instituicao" 
-        style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--color-coral); color: #ffffff; border: 1px solid var(--color-coral); cursor: pointer; transition: all 0.15s ease;"
-      >
-        <span>🏢</span> Dados da Instituição
-      </button>
+    <!-- Seletor de Abas Padronizado em Pílulas -->
+    <div class="app-tabs-wrapper" style="margin-bottom: 16px;">
+      <div class="app-tabs-row cols-3">
+        <button 
+          type="button" 
+          class="app-tab-pill active" 
+          id="btn-tab-instituicao" 
+          data-tab="instituicao"
+        >
+          <span class="app-tab-pill-dot"></span>
+          <span>🏢 Dados da Instituição</span>
+        </button>
 
-      <button 
-        type="button" 
-        class="btn-cfg-tab" 
-        id="btn-tab-gerais" 
-        data-tab="gerais" 
-        style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.15s ease;"
-      >
-        <span>⚙️</span> Configurações Gerais
-      </button>
+        <button 
+          type="button" 
+          class="app-tab-pill" 
+          id="btn-tab-gerais" 
+          data-tab="gerais"
+        >
+          <span class="app-tab-pill-dot"></span>
+          <span>⚙️ Configurações Gerais</span>
+        </button>
 
-      <button 
-        type="button" 
-        class="btn-cfg-tab" 
-        id="btn-tab-mongo" 
-        data-tab="mongo" 
-        style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 10px 20px; border-radius: var(--radius-md); background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.15s ease;"
-      >
-        <span>🍃</span> Banco de Dados (MongoDB)
-        <span class="badge badge-success" style="font-size: 0.68rem; padding: 2px 7px;">● Operacional</span>
-      </button>
+        <button 
+          type="button" 
+          class="app-tab-pill" 
+          id="btn-tab-mongo" 
+          data-tab="mongo"
+        >
+          <span class="app-tab-pill-dot"></span>
+          <span>🍃 Banco de Dados (MongoDB)</span>
+        </button>
+      </div>
     </div>
 
     <!-- Painel de Conteúdo das Abas -->
@@ -420,16 +421,11 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
   const contentMongo = container.querySelector('#tab-content-mongo') as HTMLElement;
 
   function styleTabButton(btn: HTMLButtonElement, isActive: boolean): void {
+    if (!btn) return;
     if (isActive) {
-      btn.style.background = 'var(--color-coral)';
-      btn.style.color = '#ffffff';
-      btn.style.borderColor = 'var(--color-coral)';
-      btn.style.fontWeight = '700';
+      btn.classList.add('active');
     } else {
-      btn.style.background = 'var(--bg-surface)';
-      btn.style.color = 'var(--text-secondary)';
-      btn.style.borderColor = 'var(--border-subtle)';
-      btn.style.fontWeight = '600';
+      btn.classList.remove('active');
     }
   }
 

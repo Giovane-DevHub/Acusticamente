@@ -141,31 +141,27 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
         </div>
       </div>
 
-      <!-- Seletor de Abas em Pílula -->
-      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-        <button 
-          type="button" 
-          id="btn-tab-rel-alunos" 
-          style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 9px 20px; border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s ease; ${
-            activeTab === 'alunos'
-              ? 'background: var(--color-coral); color: #ffffff; border: 1px solid var(--color-coral);'
-              : 'background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle);'
-          }"
-        >
-          <span>👥</span> Relatório de Alunos
-        </button>
+      <!-- Seletor de Abas Padronizado em Pílula -->
+      <div class="app-tabs-wrapper" style="margin-bottom: 16px;">
+        <div class="app-tabs-row cols-2">
+          <button 
+            type="button" 
+            class="app-tab-pill ${activeTab === 'alunos' ? 'active' : ''}" 
+            id="btn-tab-rel-alunos"
+          >
+            <span class="app-tab-pill-dot"></span>
+            <span>👥 Relatório de Alunos</span>
+          </button>
 
-        <button 
-          type="button" 
-          id="btn-tab-rel-financeiro" 
-          style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; padding: 9px 20px; border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s ease; ${
-            activeTab === 'financeiro'
-              ? 'background: var(--color-coral); color: #ffffff; border: 1px solid var(--color-coral);'
-              : 'background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle);'
-          }"
-        >
-          <span>💰</span> Relatório Financeiro
-        </button>
+          <button 
+            type="button" 
+            class="app-tab-pill ${activeTab === 'financeiro' ? 'active' : ''}" 
+            id="btn-tab-rel-financeiro"
+          >
+            <span class="app-tab-pill-dot"></span>
+            <span>💰 Relatório Financeiro</span>
+          </button>
+        </div>
       </div>
 
       <!-- ========================================================
