@@ -159,11 +159,11 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width: 170px;">Data &amp; Hora</th>
-                <th style="width: 180px;">Usuário Responsável</th>
-                <th style="width: 150px;">Tela / Módulo</th>
-                <th style="width: 180px;">Ação Executada</th>
-                <th>Detalhes da Alteração</th>
+                <th style="min-width: 120px;">Data &amp; Hora</th>
+                <th class="col-hide-sm" style="width: 180px;">Usuário Responsável</th>
+                <th class="col-hide-md" style="width: 130px;">Tela / Módulo</th>
+                <th>Ação Executada</th>
+                <th class="col-hide-sm">Detalhes da Alteração</th>
               </tr>
             </thead>
             <tbody>
@@ -193,7 +193,7 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
                                 ${log.dataHoraFormatada}
                               </span>
                             </td>
-                            <td>
+                            <td class="col-hide-sm">
                               <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
                                 <div style="width: 24px; height: 24px; border-radius: 50%; background: #2b2e3e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--color-coral); flex-shrink: 0;">
                                   ${log.usuarioNome[0] || 'U'}
@@ -202,17 +202,17 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
                                 <span style="font-size: 0.74rem; color: var(--text-muted);">(${log.usuarioLogin})</span>
                               </div>
                             </td>
-                            <td>
+                            <td class="col-hide-md">
                               <span class="badge" style="background: rgba(255,255,255,0.06); font-size: 0.74rem; white-space: nowrap;">
                                 ${log.tela}
                               </span>
                             </td>
                             <td>
-                              <strong style="font-size: 0.82rem; color: #ff9187; white-space: nowrap;">
+                              <strong style="font-size: 0.82rem; color: #ff9187;">
                                 ${log.acao}
                               </strong>
                             </td>
-                            <td>
+                            <td class="col-hide-sm">
                               <span style="font-size: 0.82rem; color: var(--text-secondary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 480px;" title="${log.detalhes}">
                                 ${log.detalhes}
                               </span>

@@ -196,12 +196,12 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
           <table class="data-table">
             <thead>
               <tr>
-                <th>Nome</th>
-                <th>Login</th>
-                <th>Perfil</th>
-                <th>Permissões Detalhadas</th>
-                <th>Tipo</th>
-                <th style="text-align: right;">Ações</th>
+                <th style="min-width: 140px;">Nome</th>
+                <th class="col-hide-sm">Login</th>
+                <th class="col-hide-xs">Perfil</th>
+                <th class="col-hide-md">Permissões Detalhadas</th>
+                <th class="col-hide-sm">Tipo</th>
+                <th style="width: 110px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -220,31 +220,31 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
           return `
                     <tr>
                       <td>
-                        <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
                           <div style="width: 28px; height: 28px; border-radius: 50%; background: ${user.isSistema ? 'var(--color-coral)' : '#282b3a'}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; color: #ffffff; flex-shrink: 0;">
                             ${user.nome[0] || 'U'}
                           </div>
-                          <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem;">
+                          <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             ${user.nome}
                           </span>
                         </div>
                       </td>
-                      <td>
+                      <td class="col-hide-sm">
                         <code style="background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px; font-size: 0.82rem; color: #ff9187; white-space: nowrap;">
                           ${user.login}
                         </code>
                       </td>
-                      <td>
+                      <td class="col-hide-xs">
                         <span class="badge ${user.papel === 'admin' ? 'badge-coral' : 'badge-info'}" style="font-size: 0.72rem; white-space: nowrap;">
                           ${roleLabel}
                         </span>
                       </td>
-                      <td>
+                      <td class="col-hide-md">
                         <span class="badge ${user.papel === 'admin' ? 'badge-coral' : grantedCount > 0 ? 'badge-success' : 'badge-secondary'}" style="font-size: 0.72rem; white-space: nowrap;" title="Ações permitidas para este perfil">
                           ${user.papel === 'admin' ? `Acesso Total (${TOTAL_SYSTEM_PERMISSIONS})` : `${grantedCount} de ${TOTAL_SYSTEM_PERMISSIONS} ações`}
                         </span>
                       </td>
-                      <td>
+                      <td class="col-hide-sm">
                         ${
                           user.isSistema
                             ? `<span class="badge badge-warning" style="font-size: 0.72rem; white-space: nowrap;">🔒 Sistema</span>`

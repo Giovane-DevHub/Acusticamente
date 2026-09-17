@@ -77,11 +77,11 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width: 260px;">Plano de Ensino</th>
-                <th>Descrição / Objetivo Curricular</th>
-                <th style="width: 140px; text-align: center;">Módulos</th>
-                <th style="width: 130px;">Cadastro</th>
-                <th style="width: 110px; text-align: right;">Ações</th>
+                <th style="min-width: 140px;">Plano de Ensino</th>
+                <th class="col-hide-md">Descrição / Objetivo Curricular</th>
+                <th class="col-hide-sm" style="width: 130px; text-align: center;">Módulos</th>
+                <th class="col-hide-sm" style="width: 120px;">Cadastro</th>
+                <th style="width: 100px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -114,15 +114,15 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
                                 </div>
                               </div>
                             </td>
-                            <td style="color: var(--text-secondary); font-size: 0.82rem;">
+                            <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
                               ${plan.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição cadastrada</span>'}
                             </td>
-                            <td style="text-align: center;">
+                            <td class="col-hide-sm" style="text-align: center;">
                               <span class="badge" style="background: rgba(234, 67, 53, 0.12); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
                                 ${plan.modulos.length} ${plan.modulos.length === 1 ? 'módulo' : 'módulos'}
                               </span>
                             </td>
-                            <td style="font-size: 0.8rem; color: var(--text-muted);">
+                            <td class="col-hide-sm" style="font-size: 0.8rem; color: var(--text-muted);">
                               ${dataFormatada}
                             </td>
                             <td style="text-align: right;">

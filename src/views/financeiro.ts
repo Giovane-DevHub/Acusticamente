@@ -221,12 +221,12 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width: 260px;">Aluno</th>
-                <th>Descrição / Referência</th>
-                <th style="width: 150px;">Vencimento</th>
-                <th style="width: 140px;">Valor</th>
-                <th style="width: 140px;">Status</th>
-                <th style="width: 150px; text-align: right;">Ações</th>
+                <th style="min-width: 140px;">Aluno</th>
+                <th class="col-hide-md">Descrição / Referência</th>
+                <th class="col-hide-sm" style="width: 140px;">Vencimento</th>
+                <th style="width: 110px;">Valor</th>
+                <th class="col-hide-xs" style="width: 110px;">Status</th>
+                <th style="width: 120px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -251,23 +251,23 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
                         return `
                           <tr>
                             <td>
-                              <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                              <div style="display: flex; align-items: center; gap: 8px;">
                                 <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); font-size: 0.8rem; flex-shrink: 0;">
                                   ${student?.nome ? student.nome[0] : '?'}
                                 </div>
-                                <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem;">
+                                <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                   ${student?.nome || 'Aluno não identificado'}
                                 </span>
                               </div>
                             </td>
 
-                            <td>
+                            <td class="col-hide-md">
                               <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; white-space: nowrap;">
                                 ${p.descricao}${p.mesReferencia ? ` / ${p.mesReferencia}` : ''}
                               </span>
                             </td>
 
-                            <td style="white-space: nowrap;">
+                            <td class="col-hide-sm" style="white-space: nowrap;">
                               <span style="font-size: 0.84rem; color: ${isAtrasado ? '#f87171' : 'var(--text-white)'}; font-weight: ${isAtrasado ? '700' : 'normal'};">
                                 ${p.dataVencimento.split('-').reverse().join('/')}
                               </span>
@@ -279,7 +279,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
                               </span>
                             </td>
 
-                            <td style="white-space: nowrap;">${statusBadge}</td>
+                            <td class="col-hide-xs" style="white-space: nowrap;">${statusBadge}</td>
 
                             <td style="text-align: right;">
                               <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">

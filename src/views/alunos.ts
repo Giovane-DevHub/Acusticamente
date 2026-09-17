@@ -229,11 +229,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           <table class="data-table">
             <thead>
               <tr>
-                <th style="min-width: 220px;">Aluno</th>
-                <th style="width: 180px;">Instrumento</th>
-                <th style="width: 160px;">Contato</th>
-                <th style="width: 180px;">Plano de Ensino</th>
-                <th style="width: 120px;">Status</th>
+                <th style="min-width: 160px;">Aluno</th>
+                <th class="col-hide-md" style="width: 180px;">Instrumento</th>
+                <th class="col-hide-sm" style="width: 160px;">Contato</th>
+                <th class="col-hide-sm" style="width: 180px;">Plano de Ensino</th>
+                <th class="col-hide-xs" style="width: 120px;">Status</th>
                 <th style="width: 120px; text-align: right;">Ações</th>
               </tr>
             </thead>
@@ -249,36 +249,36 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                         return `
                           <tr>
                             <td>
-                              <div style="display: flex; align-items: center; gap: 10px; white-space: nowrap;">
+                              <div style="display: flex; align-items: center; gap: 10px;">
                                 <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); flex-shrink: 0; font-size: 0.8rem;">
                                   ${student.nome[0] || 'A'}
                                 </div>
-                                <span style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
+                                <span style="font-weight: 600; color: var(--text-white); font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                   ${student.nome}
                                 </span>
                               </div>
                             </td>
 
-                            <td>
+                            <td class="col-hide-md">
                               <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                                 <span style="font-size: 0.95rem;">${getInstrumentIcon(student.instrumentoPrincipal)}</span>
                                 <span style="font-size: 0.82rem; color: var(--text-white);">${student.instrumentoPrincipal || 'Geral'}</span>
                               </div>
                             </td>
 
-                            <td>
+                            <td class="col-hide-sm">
                               <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
                                 ${student.telefone || '-'}
                               </span>
                             </td>
 
-                            <td>
+                            <td class="col-hide-sm">
                               <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
                                 ${plan?.nome || '<span style="color: var(--text-muted); font-style: italic;">Nenhum</span>'}
                               </span>
                             </td>
 
-                            <td>
+                            <td class="col-hide-xs">
                               <span class="badge ${isAtivo ? 'badge-success' : 'badge-warning'}" style="font-size: 0.72rem; padding: 3px 8px;">
                                 ${isAtivo ? 'Ativo' : 'Inativo'}
                               </span>
@@ -547,9 +547,9 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                         <tr>
                           <th>Data &amp; Hora</th>
                           <th>Título da Aula</th>
-                          <th>Tipo</th>
+                          <th class="col-hide-sm">Tipo</th>
                           <th>Status</th>
-                          <th>Observações / Justificativa</th>
+                          <th class="col-hide-sm">Observações / Justificativa</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -581,9 +581,9 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                               <td>
                                 <div style="font-weight: 600; color: var(--text-white);">${app.titulo}</div>
                               </td>
-                              <td>${tipoBadge}</td>
+                              <td class="col-hide-sm">${tipoBadge}</td>
                               <td>${statusBadge}</td>
-                              <td>
+                              <td class="col-hide-sm">
                                 <span style="color: var(--text-secondary); font-size: 0.75rem;">
                                   ${app.justificativaFalta ? `<em>Motivo: ${app.justificativaFalta}</em>` : app.observacoes || '-'}
                                 </span>
@@ -682,10 +682,10 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                       <thead>
                         <tr>
                           <th>Descrição</th>
-                          <th>Vencimento</th>
+                          <th class="col-hide-sm">Vencimento</th>
                           <th>Valor</th>
                           <th>Status</th>
-                          <th>Data Pagto</th>
+                          <th class="col-hide-sm">Data Pagto</th>
                           <th style="text-align: right;">Ações</th>
                         </tr>
                       </thead>
@@ -709,10 +709,10 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                                 <strong style="color: var(--text-white);">${p.descricao}</strong>
                                 ${p.formaPagamento ? `<span style="font-size: 0.68rem; color: var(--text-muted); margin-left: 6px;">(${p.formaPagamento.toUpperCase()})</span>` : ''}
                               </td>
-                              <td>${p.dataVencimento.split('-').reverse().join('/')}</td>
+                              <td class="col-hide-sm">${p.dataVencimento.split('-').reverse().join('/')}</td>
                               <td style="font-weight: 600; color: var(--text-white);">R$ ${p.valor.toFixed(2)}</td>
                               <td>${badgeHtml}</td>
-                              <td>${p.dataPagamento ? p.dataPagamento.split('-').reverse().join('/') : '-'}</td>
+                              <td class="col-hide-sm">${p.dataPagamento ? p.dataPagamento.split('-').reverse().join('/') : '-'}</td>
                               <td style="text-align: right;">
                                 ${
                                   isPago
@@ -1072,7 +1072,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                         <tr style="background: rgba(0, 0, 0, 0.25); position: sticky; top: 0; z-index: 1;">
                           <th style="padding: 6px 10px;">Valor</th>
                           <th style="padding: 6px 10px;">Data Vencimento</th>
-                          <th style="padding: 6px 10px;">Data Pagamento</th>
+                          <th class="col-hide-sm" style="padding: 6px 10px;">Data Pagamento</th>
                           <th style="padding: 6px 10px; text-align: center;">Situação</th>
                         </tr>
                       </thead>
@@ -1092,7 +1092,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                             <tr>
                               <td style="padding: 6px 10px; font-weight: 600; color: var(--text-white);">R$ ${p.valor.toFixed(2)}</td>
                               <td style="padding: 6px 10px;">${dtVenc}</td>
-                              <td style="padding: 6px 10px; color: ${p.dataPagamento ? 'var(--text-white)' : 'var(--text-muted)'};">${dtPag}</td>
+                              <td class="col-hide-sm" style="padding: 6px 10px; color: ${p.dataPagamento ? 'var(--text-white)' : 'var(--text-muted)'};">${dtPag}</td>
                               <td style="padding: 6px 10px; text-align: center;">${sitBadge}</td>
                             </tr>
                           `;

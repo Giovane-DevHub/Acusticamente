@@ -272,11 +272,11 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Aluno</th>
-                  <th style="width: 170px;">Instrumento</th>
-                  <th style="width: 130px;">Contato</th>
-                  <th style="width: 160px;">Plano</th>
-                  <th style="width: 100px;">Status</th>
+                  <th style="min-width: 140px;">Aluno</th>
+                  <th class="col-hide-md" style="width: 170px;">Instrumento</th>
+                  <th class="col-hide-sm" style="width: 130px;">Contato</th>
+                  <th class="col-hide-sm" style="width: 160px;">Plano</th>
+                  <th class="col-hide-xs" style="width: 100px;">Status</th>
                   <th style="width: 120px;">Mensalidade</th>
                 </tr>
               </thead>
@@ -291,11 +291,11 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
                           const isOverdue = storageService.isStudentOverdue(s.id);
                           return `
                             <tr>
-                              <td style="font-weight: 600;">${s.nome}</td>
-                              <td>${s.instrumentoPrincipal || 'Geral'}</td>
-                              <td style="color: var(--text-secondary);">${s.telefone || '-'}</td>
-                              <td style="color: var(--text-secondary);">${plan?.nome || '-'}</td>
-                              <td>
+                              <td style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.nome}</td>
+                              <td class="col-hide-md">${s.instrumentoPrincipal || 'Geral'}</td>
+                              <td class="col-hide-sm" style="color: var(--text-secondary);">${s.telefone || '-'}</td>
+                              <td class="col-hide-sm" style="color: var(--text-secondary);">${plan?.nome || '-'}</td>
+                              <td class="col-hide-xs">
                                 <span class="badge ${isAtivo ? 'badge-success' : 'badge-warning'}" style="font-size: 0.7rem; padding: 2px 7px;">
                                   ${isAtivo ? 'Ativo' : 'Inativo'}
                                 </span>
@@ -427,11 +427,11 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Aluno</th>
-                  <th style="width: 180px;">Descrição</th>
-                  <th style="width: 130px;">Vencimento</th>
-                  <th style="width: 120px;">Valor</th>
-                  <th style="width: 110px;">Status</th>
+                  <th style="min-width: 140px;">Aluno</th>
+                  <th class="col-hide-md" style="width: 180px;">Descrição</th>
+                  <th class="col-hide-sm" style="width: 130px;">Vencimento</th>
+                  <th style="width: 110px;">Valor</th>
+                  <th class="col-hide-xs" style="width: 100px;">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -444,11 +444,11 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
                           const isAtrasado = !isPago && p.dataVencimento < hojeStr;
                           return `
                             <tr>
-                              <td style="font-weight: 600;">${studentMap.get(p.alunoId) || 'Aluno'}</td>
-                              <td style="color: var(--text-secondary);">${p.descricao}${p.mesReferencia ? ` / ${p.mesReferencia}` : ''}</td>
-                              <td>${p.dataVencimento.split('-').reverse().join('/')}</td>
+                              <td style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${studentMap.get(p.alunoId) || 'Aluno'}</td>
+                              <td class="col-hide-md" style="color: var(--text-secondary);">${p.descricao}${p.mesReferencia ? ` / ${p.mesReferencia}` : ''}</td>
+                              <td class="col-hide-sm">${p.dataVencimento.split('-').reverse().join('/')}</td>
                               <td style="font-weight: 700;">R$ ${p.valor.toFixed(2)}</td>
-                              <td>
+                              <td class="col-hide-xs">
                                 <span class="badge ${isPago ? 'badge-success' : isAtrasado ? 'badge-coral' : 'badge-warning'}" style="font-size: 0.7rem; padding: 2px 7px;">
                                   ${isPago ? 'Pago' : isAtrasado ? 'Atrasado' : 'Pendente'}
                                 </span>

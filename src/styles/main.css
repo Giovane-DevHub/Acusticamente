@@ -33,6 +33,7 @@ html, body {
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background-color: var(--bg-primary);
 }
@@ -41,11 +42,13 @@ html, body {
   width: 260px;
   min-width: 260px;
   height: 100%;
+  height: 100dvh;
   background-color: var(--bg-surface);
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
+  padding-bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 16px)));
   user-select: none;
   z-index: 20;
 }
@@ -184,6 +187,7 @@ html, body {
 
 .sidebar-footer {
   padding-top: 16px;
+  padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
@@ -337,6 +341,7 @@ html, body {
 .content-body {
   flex: 1;
   padding: 22px 28px;
+  padding-bottom: max(36px, calc(20px + env(safe-area-inset-bottom, 20px)));
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
@@ -1034,9 +1039,11 @@ html, body {
     left: -290px;
     width: 275px;
     height: 100vh;
+    height: 100dvh;
     z-index: 1000;
     box-shadow: 12px 0 35px rgba(0, 0, 0, 0.75);
     transition: left var(--transition-normal);
+    padding-bottom: max(36px, calc(20px + env(safe-area-inset-bottom, 24px)));
   }
 
   .sidebar.open {
@@ -1045,6 +1052,7 @@ html, body {
 
   .content-body {
     padding: 16px 14px;
+    padding-bottom: max(96px, calc(50px + env(safe-area-inset-bottom, 32px)));
   }
 
   .top-bar {
@@ -1111,6 +1119,8 @@ html, body {
     flex-direction: column;
     height: auto;
     min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 16px));
   }
 
   .login-branding-side {
@@ -1127,6 +1137,44 @@ html, body {
 
   .login-card {
     padding: 28px 20px;
+  }
+
+  /* Oculta colunas secundárias em telas médias */
+  .col-hide-md {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Oculta colunas menos relevantes em tablets/smartphones */
+  .col-hide-sm {
+    display: none !important;
+  }
+
+  /* Ajuste de tabela no mobile para não gerar scroll horizontal */
+  .data-table {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .data-table th, 
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+    white-space: normal;
+  }
+
+  .data-table th:first-child,
+  .data-table td:first-child {
+    padding-left: 12px;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .data-table th:last-child,
+  .data-table td:last-child {
+    padding-right: 12px;
+    width: auto !important;
   }
 }
 
@@ -1151,9 +1199,18 @@ html, body {
   .modal-card {
     width: 96%;
     max-height: 94vh;
+    max-height: 94dvh;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 12px));
   }
 
-  .data-table th, .data-table td {
-    padding: 10px 12px;
+  .data-table th, 
+  .data-table td {
+    padding: 8px 6px;
+    font-size: 0.76rem;
+  }
+
+  /* Oculta em telas muito pequenas (smartphones pequenos) */
+  .col-hide-xs {
+    display: none !important;
   }
 }

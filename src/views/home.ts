@@ -88,11 +88,11 @@ export function renderHome(onNavigate: (screen: string) => void): HTMLElement {
         <table class="data-table">
           <thead>
             <tr>
-              <th>Horário</th>
+              <th style="min-width: 100px;">Horário</th>
               <th>Aluno</th>
-              <th>Plano de Ensino</th>
-              <th>Status</th>
-              <th style="text-align: right;">Ações</th>
+              <th class="col-hide-md">Plano de Ensino</th>
+              <th class="col-hide-sm">Status</th>
+              <th style="width: 100px; text-align: right;">Ações</th>
             </tr>
           </thead>
           <tbody id="today-classes-tbody">
@@ -128,19 +128,19 @@ export function renderHome(onNavigate: (screen: string) => void): HTMLElement {
                             }
                           </td>
                           <td>
-                            <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
                               <div style="width: 24px; height: 24px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--color-coral); flex-shrink: 0;">
                                 ${(student?.nome || 'A')[0]}
                               </div>
-                              <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem;">
+                              <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 ${student?.nome || 'Aluno não vinculado'}
                               </span>
                             </div>
                           </td>
-                          <td style="white-space: nowrap;">
+                          <td class="col-hide-md" style="white-space: nowrap;">
                             <span style="color: var(--text-secondary); font-size: 0.82rem;">${plan?.nome || 'Plano Personalizado'}</span>
                           </td>
-                          <td style="white-space: nowrap;">
+                          <td class="col-hide-sm" style="white-space: nowrap;">
                             ${statusBadge}
                           </td>
                           <td style="text-align: right; white-space: nowrap;">
