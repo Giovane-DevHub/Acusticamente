@@ -894,23 +894,33 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
     const bodyHtml = `
       <form id="student-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         
-        <!-- Seletor de Abas Fino, Moderno e Sem Barra de Rolagem -->
-        <div class="modal-tabs-nav">
-          <button type="button" class="modal-tab-link btn-form-tab active" data-tab="tab-pessoal">
-            Pessoal
-          </button>
-          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-resp">
-            Responsável
-          </button>
-          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-musica">
-            Pedagógico
-          </button>
-          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-financeiro">
-            Mensalidade
-          </button>
-          <button type="button" class="modal-tab-link btn-form-tab" data-tab="tab-obs">
-            Observações
-          </button>
+        <!-- Seletor de Abas Organizado em 2 Níveis -->
+        <div class="student-modal-tabs-wrapper">
+          <div class="student-modal-tabs-row row-top">
+            <button type="button" class="student-tab-pill btn-form-tab active" data-tab="tab-pessoal">
+              <span class="student-tab-pill-dot"></span>
+              <span>Pessoal</span>
+            </button>
+            <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-resp">
+              <span class="student-tab-pill-dot"></span>
+              <span>Responsável</span>
+            </button>
+            <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-musica">
+              <span class="student-tab-pill-dot"></span>
+              <span>Pedagógico</span>
+            </button>
+          </div>
+
+          <div class="student-modal-tabs-row row-bottom">
+            <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-financeiro">
+              <span class="student-tab-pill-dot"></span>
+              <span>Mensalidades</span>
+            </button>
+            <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-obs">
+              <span class="student-tab-pill-dot"></span>
+              <span>Observações</span>
+            </button>
+          </div>
         </div>
 
         <!-- PAINEL 1: DADOS PESSOAIS -->

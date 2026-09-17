@@ -916,6 +916,83 @@ html, body {
 }
 
 /* ==========================================================================
+   GRID DE ABAS DO ALUNO (2 NÍVEIS COM ESPAÇAMENTO E DESTAQUE MODERNO)
+   ========================================================================== */
+
+.student-modal-tabs-wrapper {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.student-modal-tabs-row {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.student-modal-tabs-row.row-top {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.student-modal-tabs-row.row-bottom {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.student-tab-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+  user-select: none;
+}
+
+.student-tab-pill:hover {
+  color: var(--text-white);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.student-tab-pill.active {
+  color: #ffffff;
+  background: rgba(234, 67, 53, 0.16);
+  border-color: var(--color-coral);
+  box-shadow: 0 2px 8px rgba(234, 67, 53, 0.22);
+}
+
+.student-tab-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 1.5px solid var(--text-muted);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.student-tab-pill.active .student-tab-pill-dot {
+  background-color: var(--color-coral);
+  border-color: var(--color-coral);
+  box-shadow: 0 0 6px var(--color-coral);
+}
+
+/* ==========================================================================
    TELA DE LOGIN (DIVIDIDA / MOCKUP)
    ========================================================================== */
 
