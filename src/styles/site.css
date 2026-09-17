@@ -61,6 +61,7 @@
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #ffffff 40%, rgba(255, 255, 255, 0.7) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -176,6 +177,7 @@
 .site-hero-title span {
   background: linear-gradient(135deg, #ff7b6b 0%, #ea4335 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
