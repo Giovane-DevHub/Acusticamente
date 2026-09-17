@@ -15,5 +15,9 @@
   "dependencies": {
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8"
+  },
+  "allowScripts": {
+    "core-js": true,
+    "esbuild": true
   }
 }
