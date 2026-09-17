@@ -1,7 +1,12 @@
 import { storageService } from '../services/storageService';
 import { authService } from '../services/authService';
 import { renderBrandLogo } from '../assets/logo';
-import { ICONS } from '../utils/ui';
+
+const WA_ICON_SVG = `
+  <svg class="whatsapp-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c4.54 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.27-2.42 5.82a8.188 8.188 0 0 1-5.82 2.42c-1.48 0-2.93-.39-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.25-4.38c0-4.54 3.7-8.24 8.24-8.24zm-4.7 4.23c-.15 0-.39.06-.59.28-.2.22-.78.76-.78 1.86s.8 2.16.91 2.31c.11.15 1.54 2.41 3.79 3.32.53.22.95.35 1.28.45.54.17 1.03.15 1.42.09.43-.06 1.33-.54 1.52-1.07.19-.52.19-.97.13-1.07-.06-.09-.22-.15-.46-.27-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.41-.55-.41z"/>
+  </svg>
+`;
 
 export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -18,16 +23,14 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
 
   const waLink = `https://wa.me/55${phoneClean}?text=${encodeURIComponent('Olá! Gostaria de informações sobre as aulas na Acusticamente.')}`;
 
-  const isUserLogged = authService.isAuthenticated();
-
   container.innerHTML = `
     <!-- Barra Superior de Navegação -->
     <header class="site-header">
       <div class="site-header-container">
         
-        <!-- Canto Superior Esquerdo: Botão Pequeno Entrar conforme solicitado -->
+        <!-- Canto Superior Esquerdo: Botão Pequeno Entrar estritamente conforme solicitado -->
         <div class="site-header-left">
-          <button type="button" class="btn-site-login" id="btn-header-login" title="${isUserLogged ? 'Acessar o Painel de Gestão' : 'Área do Aluno e Equipe'}">
+          <button type="button" class="btn-site-login" id="btn-header-login" title="Acessar Sistema">
             <span class="site-login-icon">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -35,7 +38,7 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
                 <line x1="15" x2="3" y1="12" y2="12"/>
               </svg>
             </span>
-            <span>${isUserLogged ? 'Painel' : 'Entrar'}</span>
+            <span>Entrar</span>
           </button>
         </div>
 
@@ -47,16 +50,11 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
           <span class="site-brand-title">${schoolShortName}</span>
         </div>
 
-        <!-- Canto Direito: Links e CTA WhatsApp -->
+        <!-- Canto Direito: Apenas WhatsApp com logo e texto Entrar em contato -->
         <div class="site-header-right">
-          <nav class="site-nav-links">
-            <a href="#cursos">Cursos</a>
-            <a href="#metodologia">Metodologia</a>
-            <a href="#depoimentos">Depoimentos</a>
-            <a href="#contato">Contato</a>
-          </nav>
-          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-site-cta">
-            <span>Aula Experimental</span>
+          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp">
+            ${WA_ICON_SVG}
+            <span>Entrar em contato</span>
           </a>
         </div>
       </div>
@@ -67,42 +65,20 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
       <div class="site-hero-bg-glow"></div>
       <div class="site-hero-content">
         <div class="site-hero-badge">
-          <span>🎵 Escola de Música &bull; Do Iniciante ao Avançado</span>
+          <span>🎵 Escola de Música</span>
         </div>
         <h1 class="site-hero-title">
           Descubra o prazer de <span>tocar o instrumento</span> dos seus sonhos.
         </h1>
         <p class="site-hero-subtitle">
-          Aulas práticas e envolventes de violão, piano, técnica vocal, bateria e musicalização. 
-          Metodologia personalizada para o seu ritmo e com acompanhamento pedagógico contínuo.
+          Aulas práticas e acolhedoras de violão, piano, técnica vocal, bateria e musicalização. 
+          Aprenda no seu ritmo, com atenção individual e professores dedicados.
         </p>
         <div class="site-hero-actions">
-          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-hero-primary">
-            <span>💬 Agendar Aula Experimental</span>
+          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-hero-whatsapp">
+            ${WA_ICON_SVG}
+            <span>Entrar em contato</span>
           </a>
-          <a href="#cursos" class="btn-hero-secondary">
-            <span>Ver Cursos Disponíveis ↓</span>
-          </a>
-        </div>
-
-        <!-- Selos de Confiança -->
-        <div class="site-stats-row">
-          <div class="site-stat-card">
-            <strong class="stat-number">+500</strong>
-            <span class="stat-label">Alunos Formados</span>
-          </div>
-          <div class="site-stat-card">
-            <strong class="stat-number">100%</strong>
-            <span class="stat-label">Aulas Práticas</span>
-          </div>
-          <div class="site-stat-card">
-            <strong class="stat-number">6+</strong>
-            <span class="stat-label">Instrumentos</span>
-          </div>
-          <div class="site-stat-card">
-            <strong class="stat-number">4.9 ★</strong>
-            <span class="stat-label">Avaliação dos Pais</span>
-          </div>
         </div>
       </div>
     </section>
@@ -111,128 +87,146 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
     <section class="site-section" id="cursos">
       <div class="site-container">
         <div class="site-section-header">
-          <span class="section-tag">NOSSOS CURSOS</span>
-          <h2 class="section-title">Encontre o Instrumento Perfeito para Você</h2>
-          <p class="section-subtitle">Aulas pensadas para todas as faixas etárias, do primeiro acorde aos arranjos avançados.</p>
+          <span class="section-tag">AULAS INDIVIDUAIS E EM GRUPO</span>
+          <h2 class="section-title">Cursos de Música</h2>
+          <p class="section-subtitle">Para todas as idades, desde o primeiro contato até o aperfeiçoamento.</p>
         </div>
 
         <div class="site-courses-grid">
           
-          <!-- Curso 1: Violão e Guitarra -->
+          <!-- Curso 1: Violão -->
           <div class="site-course-card">
             <div class="course-icon-badge">🪕</div>
-            <h3>Violão &amp; Harmonia Prática</h3>
-            <p>Aprenda acordes, batidas rítmicas, dedilhados e o repertório que você mais ama tocar em reuniões de amigos ou no palco.</p>
+            <h3>Violão &amp; Guitarra</h3>
+            <p>Acordes, ritmos, dedilhados e o repertório que você mais gosta de tocar.</p>
             <ul class="course-topics">
-              <li>✓ Postura e transição ágil de acordes</li>
-              <li>✓ Batidas populares, MPB, Pop e Rock</li>
-              <li>✓ Leitura de cifras, tablaturas e levadas</li>
+              <li>✓ Postura e passagens de acordes</li>
+              <li>✓ Batidas populares, Pop, Rock e MPB</li>
+              <li>✓ Leitura facilitada de cifras e tablaturas</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">Saber mais no WhatsApp →</a>
+            <a href="${waLink}" target="_blank" class="course-link-cta">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
           </div>
 
           <!-- Curso 2: Piano & Teclado -->
           <div class="site-course-card">
             <div class="course-icon-badge">🎹</div>
             <h3>Piano &amp; Teclado</h3>
-            <p>Desenvolva independência das mãos, leitura musical fluida e sensibilidade melódica em repertório clássico ou moderno.</p>
+            <p>Independência das mãos, harmonia e sensibilidade ao tocar suas canções preferidas.</p>
             <ul class="course-topics">
-              <li>✓ Digitação e exercícios posturais</li>
-              <li>✓ Teoria aplicada, harmonia e escalas</li>
-              <li>✓ Clássicos, trilhas sonoras e louvor</li>
+              <li>✓ Exercícios de digitação e postura</li>
+              <li>✓ Noções harmônicas e leitura musical</li>
+              <li>✓ Músicas clássicas e populares</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">Saber mais no WhatsApp →</a>
+            <a href="${waLink}" target="_blank" class="course-link-cta">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
           </div>
 
           <!-- Curso 3: Canto & Técnica Vocal -->
           <div class="site-course-card">
             <div class="course-icon-badge">🎤</div>
             <h3>Técnica Vocal &amp; Canto</h3>
-            <p>Libere todo o potencial da sua voz sem esforço, com afinação precisa, respiração diafragmática e projeção sonora.</p>
+            <p>Desenvolva afinação, respiração correta e segurança para cantar sem cansaço vocal.</p>
             <ul class="course-topics">
               <li>✓ Apoio respiratório e ressonância</li>
-              <li>✓ Afinação e extensão vocal sem tensão</li>
-              <li>✓ Interpretação e presença de palco</li>
+              <li>✓ Afinação e alcance vocal natural</li>
+              <li>✓ Repertório de acordo com o seu estilo</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">Saber mais no WhatsApp →</a>
+            <a href="${waLink}" target="_blank" class="course-link-cta">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
           </div>
 
-          <!-- Curso 4: Bateria & Percussão -->
+          <!-- Curso 4: Bateria -->
           <div class="site-course-card">
             <div class="course-icon-badge">🥁</div>
-            <h3>Bateria &amp; Percussão</h3>
-            <p>Domine a pulsação, coordenação motora dos quatro membros e os ritmos mais dinâmicos da música contemporânea.</p>
+            <h3>Bateria &amp; Ritmo</h3>
+            <p>Coordenação motora, pulsação e dinamismo nos ritmos que movem a música.</p>
             <ul class="course-topics">
-              <li>✓ Rudimentos e precisão com metrônomo</li>
-              <li>✓ Levadas de Rock, Funk, Samba e Jazz</li>
-              <li>✓ Dinâmica de conjunto e acompanhamento</li>
+              <li>✓ Coordenação de braços e pernas</li>
+              <li>✓ Levadas e viradas essenciais</li>
+              <li>✓ Prática musical com instrumentos reais</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">Saber mais no WhatsApp →</a>
+            <a href="${waLink}" target="_blank" class="course-link-cta">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
           </div>
 
           <!-- Curso 5: Musicalização Infantil -->
           <div class="site-course-card highlight">
             <div class="course-icon-badge">🎶</div>
             <h3>Musicalização Infantil</h3>
-            <p>Para crianças de 4 a 10 anos. Estímulo à criatividade, percepção auditiva, ritmo e socialização de forma lúdica.</p>
+            <p>Desenvolvimento da criatividade, ritmo e audição para crianças de forma divertida e acolhedora.</p>
             <ul class="course-topics">
-              <li>✓ Jogos sonoros e instrumentos infantis</li>
-              <li>✓ Discriminação de timbres e alturas</li>
-              <li>✓ Base sólida para escolha de instrumento</li>
+              <li>✓ Jogos e brincadeiras sonoras</li>
+              <li>✓ Percepção rítmica e de timbres</li>
+              <li>✓ Primeiro contato carinhoso com instrumentos</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">Saber mais no WhatsApp →</a>
+            <a href="${waLink}" target="_blank" class="course-link-cta">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
           </div>
 
-          <!-- Curso 6: Contrabaixo & Teoria -->
+          <!-- Curso 6: Contrabaixo -->
           <div class="site-course-card">
             <div class="course-icon-badge">🎸</div>
-            <h3>Contrabaixo &amp; Harmonia</h3>
-            <p>A alma do groove! Aprenda condução rítmica, linhas de baixo sólidas e comunicação afinada com a bateria.</p>
+            <h3>Contrabaixo</h3>
+            <p>A base de qualquer som. Domine o tempo, condução rítmica e as notas certas.</p>
             <ul class="course-topics">
-              <li>✓ Técnicas de pizzicato e palheta</li>
-              <li>✓ Escalas pentatônicas e arpejos</li>
-              <li>✓ Criação de grooves marcantes</li>
+              <li>✓ Técnica de mão direita e apoio</li>
+              <li>✓ Linhas de baixo e harmonia</li>
+              <li>✓ Conexão rítmica com a bateria</li>
             </ul>
-            <a href="${waLink}" target="_blank" class="course-link-cta">Saber mais no WhatsApp →</a>
+            <a href="${waLink}" target="_blank" class="course-link-cta">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- Seção Metodologia -->
+    <!-- Seção Metodologia Aconchegante -->
     <section class="site-section bg-darker" id="metodologia">
       <div class="site-container">
         <div class="methodology-split">
           <div class="methodology-text">
-            <span class="section-tag">POR QUE A ACUSTICAMENTE?</span>
-            <h2 class="section-title">Um Método Humano, Descontraído e Eficaz</h2>
+            <span class="section-tag">NOSSA PROPOSTA</span>
+            <h2 class="section-title">Um Espaço Acolhedor Para Você Aprender no Seu Ritmo</h2>
             <p class="section-desc">
-              Acreditamos que aprender música não pode ser uma tarefa engessada. Nosso modelo pedagógico integra técnica de verdade às músicas que você gosta de ouvir.
+              Aqui cada pessoa tem seu tempo e suas preferências. Valorizamos o ensino humano e próximo, sem a frieza de métodos padronizados.
             </p>
 
             <div class="methodology-features">
               <div class="feat-item">
                 <div class="feat-icon">🎯</div>
                 <div>
-                  <h4>Aulas 100% Personalizadas</h4>
-                  <p>Cada aluno tem seu plano de ensino individual, com metas e repertório alinhados ao seu objetivo.</p>
+                  <h4>Atenção Individualizada</h4>
+                  <p>Aulas focadas no que você deseja aprender e tocar, respeitando o seu tempo e objetivos.</p>
                 </div>
               </div>
 
               <div class="feat-item">
-                <div class="feat-icon">📅</div>
+                <div class="feat-icon">🏠</div>
                 <div>
-                  <h4>Flexibilidade com Reposições</h4>
-                  <p>Avisou com antecedência? Você não perde a aula! Nosso sistema garante créditos para repor suas aulas perdidas.</p>
+                  <h4>Ambiente Agradável</h4>
+                  <p>Espaço tranquilo, bem cuidado e com instrumentos prontos para o seu uso nas aulas.</p>
                 </div>
               </div>
 
               <div class="feat-item">
-                <div class="feat-icon">🎙️</div>
+                <div class="feat-icon">🤝</div>
                 <div>
-                  <h4>Salas com Tratamento Acústico</h4>
-                  <p>Ambiente isolado, climatizado e equipado com instrumentos de marcas renomadas para a melhor experiência sonora.</p>
+                  <h4>Professores Atenciosos</h4>
+                  <p>Didática paciente para quem nunca tocou um instrumento ou quer recomeçar a praticar.</p>
                 </div>
               </div>
             </div>
@@ -244,58 +238,13 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
                 <span class="preview-dot red"></span>
                 <span class="preview-dot yellow"></span>
                 <span class="preview-dot green"></span>
-                <span class="preview-title">Acusticamente Experience</span>
+                <span class="preview-title">Acusticamente</span>
               </div>
               <div class="preview-body">
                 <div class="preview-quote">
-                  "A música é a arte de expressar o indizível. Aqui você aprende tocando desde o primeiro dia."
-                </div>
-                <div class="preview-tags">
-                  <span>#PráticaMusical</span>
-                  <span>#SemPressão</span>
-                  <span>#EvoluçãoConstante</span>
+                  "A música é para todos. Nosso compromisso é fazer da sua aula o momento mais agradável da sua semana."
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Depoimentos -->
-    <section class="site-section" id="depoimentos">
-      <div class="site-container">
-        <div class="site-section-header">
-          <span class="section-tag">HISTÓRIAS REAIS</span>
-          <h2 class="section-title">O que Dizem Nossos Alunos e Pais</h2>
-          <p class="section-subtitle">Resultados que transformam vidas através da expressão musical.</p>
-        </div>
-
-        <div class="testimonials-grid">
-          <div class="testimonial-card">
-            <div class="stars">★★★★★</div>
-            <p>"Comecei do zero com 34 anos achando que não conseguiria. Hoje já toco minhas músicas favoritas no violão e me sinto realizado!"</p>
-            <div class="author-info">
-              <strong>Marcelo F.</strong>
-              <span>Aluno de Violão</span>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="stars">★★★★★</div>
-            <p>"A metodologia de musicalização para crianças é sensacional. Minha filha de 6 anos adora as quartas-feiras de aula e desenvolveu muito o foco."</p>
-            <div class="author-info">
-              <strong>Juliana M.</strong>
-              <span>Mãe de aluna</span>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="stars">★★★★★</div>
-            <p>"Professores extremamente atenciosos e didáticos. A técnica vocal mudou minha segurança para cantar em público sem forçar a garganta."</p>
-            <div class="author-info">
-              <strong>Renan B.</strong>
-              <span>Aluno de Canto</span>
             </div>
           </div>
         </div>
@@ -305,10 +254,11 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
     <!-- CTA Final WhatsApp -->
     <section class="site-cta-banner">
       <div class="site-container cta-banner-inner">
-        <h2>Pronto para Começar sua Jornada Musical?</h2>
-        <p>Agende uma aula experimental sem compromisso e venha conhecer nosso espaço.</p>
-        <a href="${waLink}" target="_blank" class="btn-banner-whatsapp">
-          <span>📲 Chamar no WhatsApp: ${phone}</span>
+        <h2>Quer Conhecer Nosso Espaço?</h2>
+        <p>Venha tomar um café conosco e saber mais sobre as aulas e horários disponíveis.</p>
+        <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-banner-whatsapp">
+          ${WA_ICON_SVG}
+          <span>Entrar em contato</span>
         </a>
       </div>
     </section>
@@ -330,23 +280,26 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
           </div>
         </div>
 
-        <div class="footer-col">
-          <h4>Navegação</h4>
-          <ul>
-            <li><a href="#cursos">Cursos</a></li>
-            <li><a href="#metodologia">Metodologia</a></li>
-            <li><a href="#depoimentos">Depoimentos</a></li>
-            <li><a href="#contato">Contato</a></li>
-          </ul>
+        <div class="footer-col" style="display: flex; flex-direction: column; justify-content: center;">
+          <h4>Contato</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+            Fale conosco diretamente pelo WhatsApp para tirar dúvidas sobre turmas e valores.
+          </p>
+          <div>
+            <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-site-whatsapp" style="display: inline-flex;">
+              ${WA_ICON_SVG}
+              <span>Entrar em contato</span>
+            </a>
+          </div>
         </div>
 
-        <div class="footer-col">
-          <h4>Portal Interno</h4>
+        <div class="footer-col" style="display: flex; flex-direction: column; justify-content: center;">
+          <h4>Área Restrita</h4>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
-            Acesso exclusivo para professores, atendentes e administração da escola.
+            Acesso para a equipe e administração da escola.
           </p>
           <button type="button" class="btn-footer-admin" id="btn-footer-login">
-            🔐 Acessar Área de Gestão
+            🔐 Entrar no Sistema
           </button>
         </div>
       </div>
@@ -354,7 +307,6 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
       <div class="footer-bottom">
         <div class="site-container footer-bottom-inner">
           <span>&copy; ${new Date().getFullYear()} ${schoolName}. Todos os direitos reservados.</span>
-          <span>Desenvolvido por <strong>DevHub</strong></span>
         </div>
       </div>
     </footer>
@@ -362,11 +314,13 @@ export function renderSite(onNavigate: (screen: string) => void): HTMLElement {
 
   // Eventos de clique nos botões de login
   container.querySelector('#btn-header-login')?.addEventListener('click', () => {
-    onNavigate(isUserLogged ? 'home' : 'login');
+    const isLogged = authService.isAuthenticated();
+    onNavigate(isLogged ? 'home' : 'login');
   });
 
   container.querySelector('#btn-footer-login')?.addEventListener('click', () => {
-    onNavigate(isUserLogged ? 'home' : 'login');
+    const isLogged = authService.isAuthenticated();
+    onNavigate(isLogged ? 'home' : 'login');
   });
 
   container.querySelector('#site-logo-link')?.addEventListener('click', () => {

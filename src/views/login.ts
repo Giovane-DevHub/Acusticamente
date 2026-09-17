@@ -13,14 +13,14 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
   const settings = storageService.getSettings();
   const brandTitle = settings.nomeMenu || settings.nomeFantasia || 'Acusticamente';
 
-  let savedAuth = { username: '', password: '', remember: false, autoLogin: false };
+  let savedAuth = { username: '', password: '', remember: false };
   try {
     const raw = localStorage.getItem(REMEMBER_KEY);
     if (raw) {
       savedAuth = { ...savedAuth, ...JSON.parse(raw) };
     }
   } catch (e) {
-    savedAuth = { username: '', password: '', remember: false, autoLogin: false };
+    savedAuth = { username: '', password: '', remember: false };
   }
 
   container.innerHTML = `
@@ -93,9 +93,9 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
             />
           </div>
 
-          <!-- Opções de Acesso: Lembrar Senha & Entrar Automaticamente com espaçamento adequado -->
-          <div style="margin: 18px 0 24px 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
-            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.86rem; color: var(--text-secondary); margin: 0;">
+          <!-- Opção de Acesso: Lembrar Senha apenas -->
+          <div style="margin: 16px 0 22px 0; display: flex; align-items: center; padding: 10px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.86rem; color: var(--text-secondary); margin: 0; width: 100%;">
               <input 
                 type="checkbox" 
                 id="login-remember" 
@@ -103,16 +103,6 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
                 style="width: 17px; height: 17px; accent-color: var(--color-coral); cursor: pointer;"
               />
               <span style="color: var(--text-primary); font-weight: 500;">Lembrar senha</span>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.86rem; color: var(--text-secondary); margin: 0;">
-              <input 
-                type="checkbox" 
-                id="login-autologin" 
-                ${savedAuth.autoLogin ? 'checked' : ''} 
-                style="width: 17px; height: 17px; accent-color: var(--color-coral); cursor: pointer;"
-              />
-              <span style="color: var(--text-primary); font-weight: 500;">Entrar automaticamente</span>
             </label>
           </div>
 
@@ -125,7 +115,6 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
   `;
 
   const rememberChk = container.querySelector('#login-remember') as HTMLInputElement;
-  const autologinChk = container.querySelector('#login-autologin') as HTMLInputElement;
   const btnBackToSite = container.querySelector('#btn-back-to-site') as HTMLElement;
 
   btnBackToSite?.addEventListener('click', () => {
@@ -133,20 +122,6 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
       onBackToSite();
     } else {
       window.location.hash = 'site';
-    }
-  });
-
-  // Se marcar entrar automaticamente, força a marcar lembrar senha
-  autologinChk?.addEventListener('change', () => {
-    if (autologinChk.checked && !rememberChk.checked) {
-      rememberChk.checked = true;
-    }
-  });
-
-  // Se desmarcar lembrar senha, desmarca entrar automaticamente
-  rememberChk?.addEventListener('change', () => {
-    if (!rememberChk.checked && autologinChk.checked) {
-      autologinChk.checked = false;
     }
   });
 
@@ -160,7 +135,6 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
     const username = userEl.value.trim();
     const password = passEl.value.trim();
     const remember = rememberChk.checked;
-    const autoLogin = autologinChk.checked;
 
     const result = authService.login(username, password);
 
@@ -168,7 +142,7 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
       if (remember) {
         localStorage.setItem(
           REMEMBER_KEY,
-          JSON.stringify({ username, password, remember: true, autoLogin })
+          JSON.stringify({ username, password, remember: true })
         );
       } else {
         localStorage.removeItem(REMEMBER_KEY);
@@ -181,26 +155,6 @@ export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => voi
       showToast(result.message, 'error');
     }
   };
-
-  // Login automático se configurado e se não tiver sido acionado um logout manual nesta sessão
-  const isManualLogout = sessionStorage.getItem(MANUAL_LOGOUT_KEY) === 'true';
-  if (
-    savedAuth.autoLogin &&
-    savedAuth.remember &&
-    savedAuth.username &&
-    savedAuth.password &&
-    !isManualLogout
-  ) {
-    setTimeout(() => {
-      // Confirma que o container ainda está na tela
-      if (!container.isConnected && !document.body.contains(container)) return;
-      const result = authService.login(savedAuth.username, savedAuth.password);
-      if (result.success) {
-        showToast(`Bem-vindo de volta, ${result.user?.nome}!`, 'success');
-        onLoginSuccess();
-      }
-    }, 100);
-  }
 
   return container;
 }
