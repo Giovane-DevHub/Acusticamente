@@ -4,11 +4,13 @@
 
 1. O QUE É O PROJETO
 --------------------------------------------------------------------------------
-Sistema web completo para gestão de escola de música (alunos, agenda, financeiro e relatórios).
+Sistema web completo para gestão de escola de música (alunos, agenda, financeiro, planos e auditoria).
+Multi-dispositivo com sincronização em tempo real na nuvem via MongoDB Atlas e Vercel.
 
 - Acesso inicial:
   Login : 1
   Senha : 1
+  URL Produção : https://acusticamente.vercel.app
 
 
 2. TELAS DO SISTEMA
@@ -18,24 +20,33 @@ Agenda : Calendário com horários de aulas e controle de reposições
 Alunos : Cadastro de alunos, ficha pedagógica e histórico
 Financeiro : Controle de mensalidades, cobranças e baixas de pagamento
 Planos : Cursos oferecidos, valores e módulos de ensino
-Relatórios : Emissão e impressão de relatórios de alunos e finanças em PDF
-Usuários : Cadastro de professores e atendentes com controle de permissões
-Auditoria : Registro automático de quem fez cada alteração no sistema
-Configurações : Dados da escola (nome, logotipo, contatos e CNPJ)
-Login : Tela de entrada com usuário e senha
+Relatórios : Emissão e exportação corporativa de dados em PDF
+Usuários : Cadastro de operadores com controle fino de permissões
+Auditoria : Rastreabilidade integral (quem fez, quando, tela e alteração)
+Configurações : Dados da escola (nome, logotipo, contatos, CNPJ e status do MongoDB)
+Login : Tela de entrada com autenticação segura
 
 
-3. ESTRUTURA DE ARQUIVOS
+3. ARQUITETURA E BANCO DE DADOS (NUVEM)
 --------------------------------------------------------------------------------
-api/ : Conexão e sincronização direta com o MongoDB Atlas na Vercel
+- Nuvem : Vercel Serverless Functions (`/api/sync`)
+- Banco de Dados : MongoDB Atlas (`acusticamente_db`) integrado à Vercel
+- Variável de Ambiente : `MONGODB_URI`
+- Sincronização : Automática e bidirecional entre computadores e celulares
+- Modo Offline : Fallback transparente caso o dispositivo fique sem internet
+
+
+4. ESTRUTURA DE ARQUIVOS
+--------------------------------------------------------------------------------
+api/ : API Serverless para conexão, leitura e escrita no MongoDB Atlas
 src/views/ : Telas visuais do sistema que o usuário vê e usa
-src/services/ : Regras que salvam dados, calculam valores e controlam acesso
-src/types/ : Definições do que cada cadastro possui (aluno, aula, etc.)
-src/styles/ : Cores, botões, responsividade e visual do sistema
-src/utils/ : Ferramentas auxiliares (avisos, datas e janelas pop-up)
+src/services/ : Serviços de armazenamento (storageService), auth e auditoria
+src/types/ : Tipos TypeScript e esquemas de dados das coleções
+src/styles/ : Sistema de design dark-mode, tipografia e responsividade
+src/utils/ : Ferramentas auxiliares (avisos toast, modais e manipulação de datas)
 
 
-4. CORES PRINCIPAIS
+5. CORES PRINCIPAIS
 --------------------------------------------------------------------------------
 Fundo Escuro (#17181f) : Cor de fundo principal de todas as telas
 Coral Vibrante (#ea4335) : Cor dos botões principais e destaques
@@ -43,7 +54,7 @@ Texto Claro (#ffffff) : Cor dos textos para leitura nítida
 Cartões (#1f212b) : Cor dos painéis e caixas de informação
 
 
-5. COMO RODAR O PROJETO
+6. COMANDOS ÚTEIS
 --------------------------------------------------------------------------------
-npm run dev : Inicia o sistema para testes no computador
-npm run build : Prepara os arquivos finais para publicação na nuvem
+npm run dev : Inicia o sistema para testes locais no computador
+npm run build : Compila o TypeScript e empacota para produção na Vercel
