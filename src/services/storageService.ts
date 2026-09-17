@@ -290,6 +290,14 @@ class StorageService {
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings));
       }
 
+      if (Array.isArray(cloud.audit)) {
+        if (cloud.audit.length === 0) {
+          auditService.clearLocalOnly();
+        } else {
+          auditService.setLogs(cloud.audit);
+        }
+      }
+
       // Notifica o frontend para recarregar com os dados da nuvem
       window.dispatchEvent(new CustomEvent('acusticamente:data-synced'));
       return true;
@@ -309,13 +317,7 @@ class StorageService {
     localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify([]));
 
     await this.pushToCloud('all', 'reset_clean', {});
-
-    auditService.log({
-      tela: 'Configurações',
-      acao: 'Zerar Cadastros de Teste',
-      usuarioNome: currentUserName,
-      detalhes: 'Todos os alunos, aulas e lançamentos financeiros foram zerados para entrega do sistema.'
-    });
+    await auditService.clearLogs();
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('acusticamente:data-synced'));

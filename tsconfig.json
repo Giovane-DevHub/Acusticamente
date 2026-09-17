@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "src",
+    "api"
   ]
 }
 // tsconfig.json é responsável por:

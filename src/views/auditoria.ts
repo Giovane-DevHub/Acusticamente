@@ -79,8 +79,13 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
           </p>
         </div>
 
-        <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px;">
-          <span>Registros de Hoje: <strong style="color: var(--color-coral);">${todayCount}</strong></span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-all-audit" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3); font-size: 0.78rem;" title="Zerar todos os registros de auditoria no sistema e na nuvem">
+            🗑️ Zerar Auditoria
+          </button>
+          <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px;">
+            <span>Registros de Hoje: <strong style="color: var(--color-coral);">${todayCount}</strong></span>
+          </div>
         </div>
       </div>
 
@@ -286,6 +291,13 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
     container.querySelector('#btn-clear-audit-search')?.addEventListener('click', () => {
       searchTerm = '';
       renderTable();
+    });
+
+    container.querySelector('#btn-clear-all-audit')?.addEventListener('click', async () => {
+      if (confirm('Deseja realmente zerar todos os registros de auditoria do sistema e do banco na nuvem (MongoDB/Vercel)? Esta ação é definitiva.')) {
+        await auditService.clearLogs();
+        renderTable();
+      }
     });
   }
 

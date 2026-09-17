@@ -43,6 +43,7 @@ export default async function handler(req: any, res: any) {
       const appointments = await db.collection('appointments').find({}, { projection: { _id: 0 } }).toArray();
       const plans = await db.collection('plans').find({}, { projection: { _id: 0 } }).toArray();
       const users = await db.collection('users').find({}, { projection: { _id: 0 } }).toArray();
+      const audit = await db.collection('auditorias').find({}, { projection: { _id: 0 } }).toArray();
       const settingsDoc = await db.collection('settings').findOne({ id: 'system_settings' }, { projection: { _id: 0 } });
 
       return res.status(200).json({
@@ -54,14 +55,32 @@ export default async function handler(req: any, res: any) {
           appointments,
           plans,
           users,
+          audit,
           settings: settingsDoc || null
         }
       });
     }
 
-    // 2. POST: Salva ou remove alterações de alunos, pagamentos, etc.
+    // 2. POST: Salva ou remove alterações de alunos, pagamentos, auditoria, etc.
     if (req.method === 'POST') {
       const { collection, action, data } = req.body || {};
+
+      // Ação: Zerar auditoria
+      if (action === 'clear_audit' || ((collection === 'auditorias' || collection === 'audit') && action === 'clear')) {
+        await db.collection('auditorias').deleteMany({});
+        await db.collection('audit').deleteMany({});
+        return res.status(200).json({ success: true, message: 'Auditoria zerada com sucesso no MongoDB.' });
+      }
+
+      // Ação: Zerar cadastros para entrega limpa do sistema
+      if (action === 'reset_clean') {
+        await db.collection('students').deleteMany({});
+        await db.collection('payments').deleteMany({});
+        await db.collection('appointments').deleteMany({});
+        await db.collection('auditorias').deleteMany({});
+        await db.collection('audit').deleteMany({});
+        return res.status(200).json({ success: true, message: 'Sistema e auditorias zerados com sucesso para entrega.' });
+      }
 
       if (!collection) {
         return res.status(400).json({ success: false, message: 'Coleção não informada.' });
@@ -85,14 +104,6 @@ export default async function handler(req: any, res: any) {
       if (collection === 'settings' && data) {
         await col.replaceOne({ id: 'system_settings' }, { id: 'system_settings', ...data }, { upsert: true });
         return res.status(200).json({ success: true, message: 'Configurações salvas no MongoDB.' });
-      }
-
-      // Ação: Zerar cadastros para entrega limpa do sistema
-      if (action === 'reset_clean') {
-        await db.collection('students').deleteMany({});
-        await db.collection('payments').deleteMany({});
-        await db.collection('appointments').deleteMany({});
-        return res.status(200).json({ success: true, message: 'Sistema zerado com sucesso para entrega.' });
       }
 
       // Ação: Substituir lote completo

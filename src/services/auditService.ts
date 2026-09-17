@@ -60,6 +60,15 @@ class AuditService {
     this.logs.unshift(newLog);
     this.saveLogs();
 
+    // Replica log em segundo plano para o MongoDB Atlas se disponível
+    if (typeof window !== 'undefined') {
+      fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collection: 'auditorias', action: 'upsert', data: newLog })
+      }).catch(() => {});
+    }
+
     // Notifica ouvintes caso a tela de auditoria esteja aberta
     window.dispatchEvent(new CustomEvent('audit_updated', { detail: newLog }));
     return newLog;
@@ -69,9 +78,41 @@ class AuditService {
     return [...this.logs];
   }
 
-  public clearLogs(): void {
+  public setLogs(logs: AuditLog[]): void {
+    this.logs = logs;
+    this.saveLogs();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('audit_updated'));
+    }
+  }
+
+  public clearLocalOnly(): void {
     this.logs = [];
     this.saveLogs();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('audit_updated'));
+    }
+  }
+
+  public async clearLogs(): Promise<void> {
+    this.logs = [];
+    this.saveLogs();
+
+    try {
+      if (typeof window !== 'undefined') {
+        await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection: 'auditorias', action: 'clear_audit' })
+        });
+      }
+    } catch {
+      // Ignora erro em offline
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('audit_updated'));
+    }
   }
 }
 
