@@ -1,5 +1,5 @@
-var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):$[e]=t;var ie=($,e,t)=>Ve($,typeof e!="symbol"?e+"":e,t);import{E as Te,a as De}from"./pdf-D4_PdGrn.js";(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))o(s);new MutationObserver(s=>{for(const l of s)if(l.type==="childList")for(const E of l.addedNodes)E.tagName==="LINK"&&E.rel==="modulepreload"&&o(E)}).observe(document,{childList:!0,subtree:!0});function t(s){const l={};return s.integrity&&(l.integrity=s.integrity),s.referrerPolicy&&(l.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?l.credentials="include":s.crossOrigin==="anonymous"?l.credentials="omit":l.credentials="same-origin",l}function o(s){if(s.ep)return;s.ep=!0;const l=t(s);fetch(s.href,l)}})();const Be="acusticamente_audit_logs";class He{constructor(){ie(this,"logs",[]);this.loadLogs()}loadLogs(){try{const e=localStorage.getItem(Be);e?this.logs=JSON.parse(e):this.log({usuarioId:"1",usuarioLogin:"1",usuarioNome:"Administrador",tela:"Sistema",acao:"Inicialização do Sistema",detalhes:"Base de dados inicializada com usuário administrador padrão (1)."})}catch{this.logs=[]}}saveLogs(){try{localStorage.setItem(Be,JSON.stringify(this.logs))}catch(e){console.error("Erro ao salvar auditoria no storage:",e)}}log(e){const t=new Date,o=E=>E.toString().padStart(2,"0"),s=`${o(t.getDate())}/${o(t.getMonth()+1)}/${t.getFullYear()} ${o(t.getHours())}:${o(t.getMinutes())}:${o(t.getSeconds())}`,l={id:"audit_"+Date.now()+"_"+Math.random().toString(36).substring(2,7),dataHora:t.toISOString(),dataHoraFormatada:s,usuarioId:e.usuarioId||"1",usuarioLogin:e.usuarioLogin||"1",usuarioNome:e.usuarioNome||"Administrador",tela:e.tela,acao:e.acao,detalhes:e.detalhes};return this.logs.unshift(l),this.saveLogs(),window.dispatchEvent(new CustomEvent("audit_updated",{detail:l})),l}getLogs(){return[...this.logs]}clearLogs(){this.logs=[],this.saveLogs()}}const U=new He,Ce="acusticamente_users",we="acusticamente_students",Ie="acusticamente_plans",$e="acusticamente_appointments",ze="acusticamente_settings",Ee="acusticamente_payments";class Ue{constructor(){ie(this,"users",[]);ie(this,"students",[]);ie(this,"plans",[]);ie(this,"appointments",[]);ie(this,"payments",[]);ie(this,"settings",{nomeEscola:"Acusticamente - Escola de Música",nomeClinica:"Acusticamente - Escola de Música",razaoSocial:"Acusticamente Ensino Musical Ltda",nomeFantasia:"Acusticamente Escola de Música",cnpj:"12.345.678/0001-90",inscricaoEstadual:"123.456.789.110",telefoneContato:"(11) 98765-4321",emailContato:"contato@acusticamente.com.br",website:"www.acusticamente.com.br",cep:"01310-100",logradouro:"Avenida Paulista",numero:"1000",complemento:"Conjunto 42",bairro:"Bela Vista",cidade:"São Paulo",estado:"SP",mongoUri:"mongodb://localhost:27017",mongoDatabase:"acusticamente_db",mongoStatus:"simulado",notificacoesAtivas:!0,nomeMenu:"Acusticamente",logotipoCustomizado:""});this.initData()}initData(){const e=localStorage.getItem(Ce);e?this.users=JSON.parse(e).map(a=>{var M,g;return{...a,permissoes:{...a.permissoes,financeiro:((M=a.permissoes)==null?void 0:M.financeiro)||(a.papel==="admin"?{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0}:a.papel==="atendente"?{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1}:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1}),relatorios:((g=a.permissoes)==null?void 0:g.relatorios)||{acesso:!0,gerar:!0}}}}):(this.users=[{id:"user_1",nome:"Administrador",login:"1",senha:"1",papel:"admin",permissoes:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},planos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},financeiro:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},relatorios:{acesso:!0,gerar:!0},home:{acesso:!0},auditoria:{acesso:!0},configuracoes:{acesso:!0,alterar:!0}},isSistema:!0,criadoEm:new Date().toISOString()},{id:"user_2",nome:"Prof. Carlos Eduardo",login:"carlos",senha:"123",papel:"professor",permissoes:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},planos:{acesso:!0,cadastrar:!1,alterar:!1,excluir:!1},financeiro:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},relatorios:{acesso:!0,gerar:!0},home:{acesso:!0},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}},isSistema:!1,criadoEm:new Date().toISOString()}],this.saveUsers());const t=localStorage.getItem(Ie);t?this.plans=JSON.parse(t):(this.plans=[{id:"plano_1",nome:"Percepção e Musicalização",descricao:"Desenvolvimento do ouvido musical, ritmo e afinação básica.",criadoEm:new Date().toISOString(),modulos:[{id:"mod_1_1",ordem:1,titulo:"Módulo 1: Consciência Sonora e Pulsação"},{id:"mod_1_2",ordem:2,titulo:"Módulo 2: Discriminação de Timbres e Alturas"},{id:"mod_1_3",ordem:3,titulo:"Módulo 3: Harmonia Básica e Canto"}]},{id:"plano_2",nome:"Violão e Harmonia Prática",descricao:"Estudo de acordes, levadas rítmicas, dedilhados e repertório no violão.",criadoEm:new Date().toISOString(),modulos:[{id:"mod_2_1",ordem:1,titulo:"Módulo 1: Primeiros Acordes e Levadas"},{id:"mod_2_2",ordem:2,titulo:"Módulo 2: Dedilhados e Transição de Acordes"},{id:"mod_2_3",ordem:3,titulo:"Módulo 3: Escalas e Harmonia Prática"}]},{id:"plano_3",nome:"Prática de Instrumento - Piano & Teclado",descricao:"Estudo prático postural, leitura de partituras e repertório.",criadoEm:new Date().toISOString(),modulos:[{id:"mod_3_1",ordem:1,titulo:"Módulo 1: Digitação e Postura"},{id:"mod_3_2",ordem:2,titulo:"Módulo 2: Leitura Rítmica e Clave de Sol"},{id:"mod_3_3",ordem:3,titulo:"Módulo 3: Repertório Clássico e Popular"}]}],this.savePlans());const o=localStorage.getItem(we);o?this.students=JSON.parse(o).map(a=>({...a,saldoReposicoes:typeof a.saldoReposicoes=="number"?a.saldoReposicoes:0,instrumentoPrincipal:a.instrumentoPrincipal||"Violão",nivelMusical:a.nivelMusical||"iniciante",valorMensalidade:typeof a.valorMensalidade=="number"?a.valorMensalidade:280,diaVencimento:typeof a.diaVencimento=="number"?a.diaVencimento:10})):(this.students=[{id:"aluno_1",nome:"Lucas Silveira",email:"lucas@email.com",telefone:"(11) 98231-1122",dataNascimento:"2014-05-14",instrumentoPrincipal:"Bateria",nivelMusical:"iniciante",responsavelNome:"Cláudia Silveira",responsavelTelefone:"(11) 98111-2233",responsavelParentesco:"Mãe",planoId:"plano_1",moduloAtual:"Módulo 2: Discriminação de Timbres",saldoReposicoes:1,valorMensalidade:280,diaVencimento:10,status:"ativo",observacoes:"Apresenta grande facilidade com ritmo.",criadoEm:new Date().toISOString()},{id:"aluno_2",nome:"Mariana Duarte",email:"mariana.duarte@email.com",telefone:"(11) 97123-4567",dataNascimento:"2008-09-21",instrumentoPrincipal:"Violão",nivelMusical:"basico",responsavelNome:"Roberto Duarte",responsavelTelefone:"(11) 97111-0000",responsavelParentesco:"Pai",planoId:"plano_2",moduloAtual:"Módulo 1: Primeiros Acordes e Levadas",saldoReposicoes:0,valorMensalidade:260,diaVencimento:20,status:"ativo",observacoes:"Iniciando estudos no violão popular.",criadoEm:new Date().toISOString()},{id:"aluno_3",nome:"Gabriel Santos",email:"gabriel.s@email.com",telefone:"(11) 99345-6789",dataNascimento:"1998-03-10",instrumentoPrincipal:"Piano & Teclado",nivelMusical:"intermediario",planoId:"plano_3",moduloAtual:"Módulo 1: Digitação e Postura",saldoReposicoes:0,valorMensalidade:320,diaVencimento:10,status:"ativo",observacoes:"Excelente dedicação nas aulas de piano.",criadoEm:new Date().toISOString()},{id:"aluno_4",nome:"Beatriz Costa",email:"beatriz.costa@email.com",telefone:"(11) 96543-2109",dataNascimento:"2015-11-05",instrumentoPrincipal:"Técnica Vocal / Canto",nivelMusical:"iniciante",responsavelNome:"Ana Costa",responsavelTelefone:"(11) 96500-1122",responsavelParentesco:"Mãe",planoId:"plano_1",moduloAtual:"Módulo 3: Harmonia Básica e Canto",saldoReposicoes:2,valorMensalidade:250,diaVencimento:5,status:"ativo",observacoes:"Foco no canto coral.",criadoEm:new Date().toISOString()}],this.saveStudents());const s=localStorage.getItem($e);if(s)this.appointments=JSON.parse(s);else{const a=this.getTodayDateString();this.appointments=[{id:"app_1",titulo:"Aula de Percepção Sonora",alunoId:"aluno_1",planoId:"plano_1",data:a,horaInicio:"08:30",horaFim:"09:30",status:"concluido",observacoes:"Exercícios rítmicos concluídos.",criadoEm:new Date().toISOString()},{id:"app_2",titulo:"Aula Prática de Violão",alunoId:"aluno_2",planoId:"plano_2",data:a,horaInicio:"10:00",horaFim:"11:00",status:"agendado",observacoes:"Praticar transição entre acordes maiores.",criadoEm:new Date().toISOString()},{id:"app_3",titulo:"Prática de Piano Módulo 1",alunoId:"aluno_3",planoId:"plano_3",data:a,horaInicio:"14:00",horaFim:"15:00",status:"agendado",observacoes:"Início da escala de Dó Maior.",criadoEm:new Date().toISOString()},{id:"app_4",titulo:"Percepção e Harmonia",alunoId:"aluno_4",planoId:"plano_1",data:a,horaInicio:"16:30",horaFim:"17:30",status:"agendado",observacoes:"Preparação para apresentação musical.",criadoEm:new Date().toISOString()}],this.saveAppointments()}const l=localStorage.getItem(ze);l&&(this.settings=JSON.parse(l));const E=localStorage.getItem(Ee);E?this.payments=JSON.parse(E):(this.payments=[{id:"pag_1",alunoId:"aluno_1",descricao:"Mensalidade Agosto/2026",mesReferencia:"2026-08",valor:280,dataVencimento:"2026-08-10",dataPagamento:"2026-08-08",formaPagamento:"pix",status:"pago",observacoes:"Pago pontualmente via Chave Pix",criadoEm:"2026-08-01T10:00:00.000Z"},{id:"pag_2",alunoId:"aluno_1",descricao:"Mensalidade Setembro/2026",mesReferencia:"2026-09",valor:280,dataVencimento:"2026-09-10",status:"atrasado",observacoes:"Venceu dia 10 e aguarda regularização",criadoEm:"2026-09-01T10:00:00.000Z"},{id:"pag_3",alunoId:"aluno_2",descricao:"Mensalidade Setembro/2026",mesReferencia:"2026-09",valor:260,dataVencimento:"2026-09-20",status:"pendente",observacoes:"A vencer no dia 20",criadoEm:"2026-09-01T10:00:00.000Z"},{id:"pag_4",alunoId:"aluno_3",descricao:"Mensalidade Setembro/2026",mesReferencia:"2026-09",valor:320,dataVencimento:"2026-09-10",dataPagamento:"2026-09-10",formaPagamento:"cartao_credito",status:"pago",observacoes:"Pago no balcão da escola",criadoEm:"2026-09-01T10:00:00.000Z"},{id:"pag_5",alunoId:"aluno_4",descricao:"Mensalidade Agosto/2026",mesReferencia:"2026-08",valor:250,dataVencimento:"2026-08-05",dataPagamento:"2026-08-05",formaPagamento:"dinheiro",status:"pago",observacoes:"Comprovante emitido",criadoEm:"2026-08-01T10:00:00.000Z"},{id:"pag_6",alunoId:"aluno_4",descricao:"Mensalidade Setembro/2026",mesReferencia:"2026-09",valor:250,dataVencimento:"2026-09-05",status:"atrasado",observacoes:"Mensalidade vencida dia 05",criadoEm:"2026-09-01T10:00:00.000Z"}],this.savePayments()),this.settings.nomeClinica&&this.settings.nomeClinica.includes("Terapêutico")&&(this.settings.nomeEscola="Acusticamente - Escola de Música",this.settings.nomeClinica="Acusticamente - Escola de Música",this.saveSettings()),this.settings.nomeEscola||(this.settings.nomeEscola=this.settings.nomeClinica||"Acusticamente - Escola de Música",this.saveSettings()),this.plans.forEach(a=>{a.nome.includes("Reabilitação")&&(a.nome="Violão e Harmonia Prática",a.descricao="Estudo de acordes, levadas rítmicas, dedilhados e repertório no violão.",a.modulos=[{id:"mod_2_1",ordem:1,titulo:"Módulo 1: Primeiros Acordes e Levadas"},{id:"mod_2_2",ordem:2,titulo:"Módulo 2: Dedilhados e Transição de Acordes"},{id:"mod_2_3",ordem:3,titulo:"Módulo 3: Escalas e Harmonia Prática"}])}),this.savePlans(),this.students.forEach(a=>{var M;(M=a.observacoes)!=null&&M.includes("implante")&&(a.moduloAtual="Módulo 1: Primeiros Acordes e Levadas",a.observacoes="Iniciando estudos no violão popular.")}),this.saveStudents(),this.appointments.forEach(a=>{var M;(M=a.titulo)!=null&&M.includes("Auditivo")&&(a.titulo="Aula Prática de Violão",a.observacoes="Praticar transição entre acordes maiores.")}),this.saveAppointments()}getTodayDateString(){const e=new Date,t=o=>o.toString().padStart(2,"0");return`${e.getFullYear()}-${t(e.getMonth()+1)}-${t(e.getDate())}`}async pushToCloud(e,t,o){try{if(typeof window>"u")return;await fetch("/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({collection:e,action:t,data:o})})}catch{}}async syncWithCloud(){try{if(typeof window>"u")return!1;const e=await fetch("/api/sync");if(!e.ok)return!1;const t=await e.json();if(!t.success||!t.data)return!1;const o=t.data;return Array.isArray(o.students)&&o.students.length>0&&(this.students=o.students,localStorage.setItem(we,JSON.stringify(this.students))),Array.isArray(o.payments)&&o.payments.length>0&&(this.payments=o.payments,localStorage.setItem(Ee,JSON.stringify(this.payments))),Array.isArray(o.appointments)&&o.appointments.length>0&&(this.appointments=o.appointments,localStorage.setItem($e,JSON.stringify(this.appointments))),Array.isArray(o.plans)&&o.plans.length>0&&(this.plans=o.plans,localStorage.setItem(Ie,JSON.stringify(this.plans))),Array.isArray(o.users)&&o.users.length>0&&(this.users=o.users,localStorage.setItem(Ce,JSON.stringify(this.users))),o.settings&&(this.settings={...this.settings,...o.settings},localStorage.setItem(ze,JSON.stringify(this.settings))),window.dispatchEvent(new CustomEvent("acusticamente:data-synced")),!0}catch{return!1}}async resetCleanDatabase(e){this.students=[],this.payments=[],this.appointments=[],localStorage.setItem(we,JSON.stringify([])),localStorage.setItem(Ee,JSON.stringify([])),localStorage.setItem($e,JSON.stringify([])),await this.pushToCloud("all","reset_clean",{}),U.log({tela:"Configurações",acao:"Zerar Cadastros de Teste",usuarioNome:e,detalhes:"Todos os alunos, aulas e lançamentos financeiros foram zerados para entrega do sistema."}),typeof window<"u"&&window.dispatchEvent(new CustomEvent("acusticamente:data-synced"))}saveUsers(){localStorage.setItem(Ce,JSON.stringify(this.users)),this.pushToCloud("users","replace_all",this.users)}saveStudents(){localStorage.setItem(we,JSON.stringify(this.students)),this.pushToCloud("students","replace_all",this.students)}savePlans(){localStorage.setItem(Ie,JSON.stringify(this.plans)),this.pushToCloud("plans","replace_all",this.plans)}saveAppointments(){localStorage.setItem($e,JSON.stringify(this.appointments)),this.pushToCloud("appointments","replace_all",this.appointments)}savePayments(){localStorage.setItem(Ee,JSON.stringify(this.payments)),this.pushToCloud("payments","replace_all",this.payments)}saveSettings(){localStorage.setItem(ze,JSON.stringify(this.settings)),this.pushToCloud("settings","upsert",this.settings)}getUsers(){return[...this.users]}getUserById(e){return this.users.find(t=>t.id===e)}addUser(e,t){const o={...e,id:"user_"+Date.now(),isSistema:!1,criadoEm:new Date().toISOString()};return this.users.push(o),this.saveUsers(),U.log({tela:"Cadastro de Usuários",acao:"Criação de Usuário",usuarioNome:t,detalhes:`Criado usuário "${o.nome}" (login: ${o.login}, papel: ${o.papel})`}),o}updateUser(e,t,o){const s=this.users.findIndex(a=>a.id===e);if(s===-1)throw new Error("Usuário não encontrado.");const l=this.users[s],E=l.isSistema;return this.users[s]={...l,...t,isSistema:E,atualizadoEm:new Date().toISOString()},this.saveUsers(),U.log({tela:"Cadastro de Usuários",acao:"Atualização de Usuário",usuarioNome:o,detalhes:`Usuário "${l.nome}" atualizado. Alterações no login/senha ou dados cadastrais.`}),this.users[s]}deleteUser(e,t){const o=this.users.find(s=>s.id===e);if(!o)throw new Error("Usuário não encontrado.");if(o.isSistema)throw new Error("O usuário administrador do sistema (login 1) não pode ser excluído.");this.users=this.users.filter(s=>s.id!==e),this.saveUsers(),U.log({tela:"Cadastro de Usuários",acao:"Exclusão de Usuário",usuarioNome:t,detalhes:`Usuário "${o.nome}" (login: ${o.login}) foi removido.`})}getStudents(){return[...this.students]}addStudent(e,t){const o={...e,id:"aluno_"+Date.now(),criadoEm:new Date().toISOString()};return this.students.push(o),this.saveStudents(),U.log({tela:"Cadastro de Alunos",acao:"Criação de Aluno",usuarioNome:t,detalhes:`Aluno "${o.nome}" cadastrado com status ${o.status}.`}),o}updateStudent(e,t,o){const s=this.students.findIndex(E=>E.id===e);if(s===-1)throw new Error("Aluno não encontrado.");const l=this.students[s];return this.students[s]={...l,...t},this.saveStudents(),U.log({tela:"Cadastro de Alunos",acao:"Atualização de Aluno",usuarioNome:o,detalhes:`Aluno "${l.nome}" atualizado.`}),this.students[s]}deleteStudent(e,t){const o=this.students.find(s=>s.id===e);o&&(this.students=this.students.filter(s=>s.id!==e),this.saveStudents(),U.log({tela:"Cadastro de Alunos",acao:"Exclusão de Aluno",usuarioNome:t,detalhes:`Aluno "${o.nome}" foi removido do sistema.`}))}getPlans(){return[...this.plans]}addPlan(e,t){const o={...e,id:"plano_"+Date.now(),criadoEm:new Date().toISOString()};return this.plans.push(o),this.savePlans(),U.log({tela:"Plano de Ensino",acao:"Criação de Plano",usuarioNome:t,detalhes:`Plano "${o.nome}" criado com ${o.modulos.length} módulos.`}),o}updatePlan(e,t,o){const s=this.plans.findIndex(E=>E.id===e);if(s===-1)throw new Error("Plano não encontrado.");const l=this.plans[s];return this.plans[s]={...l,...t},this.savePlans(),U.log({tela:"Plano de Ensino",acao:"Atualização de Plano",usuarioNome:o,detalhes:`Plano "${l.nome}" atualizado.`}),this.plans[s]}deletePlan(e,t){const o=this.plans.find(s=>s.id===e);o&&(this.plans=this.plans.filter(s=>s.id!==e),this.savePlans(),U.log({tela:"Plano de Ensino",acao:"Exclusão de Plano",usuarioNome:t,detalhes:`Plano "${o.nome}" foi excluído.`}))}getAppointments(){return[...this.appointments]}addAppointment(e,t){const o={...e,id:"app_"+Date.now(),criadoEm:new Date().toISOString()};this.appointments.push(o),this.saveAppointments();const s=this.students.find(l=>l.id===o.alunoId);return U.log({tela:"Agenda",acao:"Novo Compromisso",usuarioNome:t,detalhes:`Agendado compromisso "${o.titulo}" para aluno ${(s==null?void 0:s.nome)||"N/A"} em ${o.data} às ${o.horaInicio}.`}),o}updateAppointment(e,t,o){const s=this.appointments.findIndex(E=>E.id===e);if(s===-1)throw new Error("Compromisso não encontrado.");const l=this.appointments[s];return this.appointments[s]={...l,...t},this.saveAppointments(),U.log({tela:"Agenda",acao:"Atualização de Compromisso",usuarioNome:o,detalhes:`Compromisso "${l.titulo}" atualizado (status: ${this.appointments[s].status}).`}),this.appointments[s]}deleteAppointment(e,t){const o=this.appointments.find(s=>s.id===e);o&&(this.appointments=this.appointments.filter(s=>s.id!==e),this.saveAppointments(),U.log({tela:"Agenda",acao:"Cancelamento/Exclusão de Compromisso",usuarioNome:t,detalhes:`Compromisso "${o.titulo}" removido da agenda.`}))}marcarPresenca(e,t){const o=this.updateAppointment(e,{status:"concluido"},t),s=this.students.find(l=>l.id===o.alunoId);return U.log({tela:"Agenda",acao:"Presença Confirmada",usuarioNome:t,detalhes:`Presença confirmada para o aluno "${(s==null?void 0:s.nome)||"N/A"}" na aula "${o.titulo}".`}),o}registrarFalta(e,t,o,s){const l=t?"falta_justificada":"falta_injustificada",E=this.updateAppointment(e,{status:l,justificativaFalta:(o==null?void 0:o.trim())||void 0},s),a=this.students.find(g=>g.id===E.alunoId);let M=(a==null?void 0:a.saldoReposicoes)||0;return t&&a?(M=(a.saldoReposicoes||0)+1,a.saldoReposicoes=M,this.saveStudents(),U.log({tela:"Agenda",acao:"Falta Justificada Registrada",usuarioNome:s,detalhes:`Falta justificada para o aluno "${a.nome}" na aula "${E.titulo}". Crédito de reposição gerado (+1). Saldo atual: ${M}. Motivo: ${o||"Não especificado"}`})):!t&&a&&U.log({tela:"Agenda",acao:"Falta Injustificada Registrada",usuarioNome:s,detalhes:`Falta sem aviso/injustificada para o aluno "${a.nome}" na aula "${E.titulo}". Nenhum crédito de reposição gerado.`}),{appointment:E,saldoReposicoes:M}}agendarReposicao(e,t,o){const s=this.addAppointment({...e,tipoAula:"reposicao",aulaOriginalId:t,status:"agendado"},o);if(t){const E=this.appointments.findIndex(a=>a.id===t);E!==-1&&(this.appointments[E].aulaReposicaoId=s.id,this.saveAppointments())}const l=this.students.find(E=>E.id===s.alunoId);return l&&typeof l.saldoReposicoes=="number"&&l.saldoReposicoes>0&&(l.saldoReposicoes-=1,this.saveStudents(),U.log({tela:"Agenda",acao:"Aula de Reposição Agendada",usuarioNome:o,detalhes:`Reposição agendada para "${l.nome}". 1 crédito abatido. Saldo restante: ${l.saldoReposicoes}.`})),s}getStudentAppointments(e){return this.appointments.filter(t=>t.alunoId===e).sort((t,o)=>{const s=`${t.data}T${t.horaInicio}`;return`${o.data}T${o.horaInicio}`.localeCompare(s)})}getPayments(){const e=this.getTodayDateString();let t=!1;return this.payments.forEach(o=>{o.status==="pendente"&&o.dataVencimento<e&&(o.status="atrasado",t=!0)}),t&&this.savePayments(),[...this.payments].sort((o,s)=>s.dataVencimento.localeCompare(o.dataVencimento))}getStudentPayments(e){return this.getPayments().filter(t=>t.alunoId===e)}isStudentOverdue(e){const t=this.getTodayDateString();return this.payments.some(o=>o.alunoId===e&&(o.status==="atrasado"||o.status==="pendente"&&o.dataVencimento<t))}addPayment(e,t){const o=this.getTodayDateString();let s=e.status;s==="pendente"&&e.dataVencimento<o&&(s="atrasado");const l={...e,status:s,id:`pag_${Date.now()}_${Math.random().toString(36).substr(2,5)}`,criadoEm:new Date().toISOString()};this.payments.push(l),this.savePayments();const E=this.students.find(a=>a.id===l.alunoId);return U.log({tela:"Financeiro",acao:"Cadastro de Pagamento/Mensalidade",usuarioNome:t,detalhes:`Lançamento "${l.descricao}" (R$ ${l.valor.toFixed(2)}) cadastrado para o aluno "${(E==null?void 0:E.nome)||"N/A"}" com vencimento em ${l.dataVencimento}.`}),l}darBaixaPayment(e,t,o,s,l){const E=this.payments.findIndex(c=>c.id===e);if(E===-1)throw new Error("Lançamento financeiro não encontrado");const a=this.payments[E],M=a.status;a.status="pago",a.dataPagamento=t,a.formaPagamento=o,l!==void 0&&(a.observacoes=l.trim()?l.trim():a.observacoes),this.savePayments();const g=this.students.find(c=>c.id===a.alunoId);return U.log({tela:"Financeiro",acao:"Baixa de Mensalidade",usuarioNome:s,detalhes:`Baixa efetuada para "${a.descricao}" de "${(g==null?void 0:g.nome)||"N/A"}". Valor R$ ${a.valor.toFixed(2)} recebido via ${o.toUpperCase()} em ${t} (Status anterior: ${M}).`}),a}updatePayment(e,t,o){const s=this.payments.findIndex(c=>c.id===e);if(s===-1)throw new Error("Lançamento financeiro não encontrado");const l=this.getTodayDateString();let E=t.status||this.payments[s].status;const a=t.dataVencimento||this.payments[s].dataVencimento;E==="pendente"&&a<l&&(E="atrasado"),this.payments[s]={...this.payments[s],...t,status:E},this.savePayments();const M=this.payments[s],g=this.students.find(c=>c.id===M.alunoId);return U.log({tela:"Financeiro",acao:"Alteração de Lançamento",usuarioNome:o,detalhes:`Lançamento financeiro "${M.descricao}" do aluno "${(g==null?void 0:g.nome)||"N/A"}" atualizado.`}),this.payments[s]}deletePayment(e,t){const o=this.payments.find(l=>l.id===e);if(!o)return;this.payments=this.payments.filter(l=>l.id!==e),this.savePayments();const s=this.students.find(l=>l.id===o.alunoId);U.log({tela:"Financeiro",acao:"Exclusão de Lançamento",usuarioNome:t,detalhes:`Lançamento "${o.descricao}" no valor de R$ ${o.valor.toFixed(2)} do aluno "${(s==null?void 0:s.nome)||"N/A"}" foi excluído.`})}gerarMensalidadesMes(e,t,o){const s=A=>A.toString().padStart(2,"0"),l=`${e}-${s(t)}`,a=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][t-1]||l,M=this.students.filter(A=>A.status==="ativo");let g=0,c=0;return M.forEach(A=>{if(this.payments.some(f=>f.alunoId===A.id&&(f.mesReferencia===l||f.dataVencimento.startsWith(l)))){c++;return}const r=A.diaVencimento||10,p=new Date(e,t,0).getDate(),x=Math.min(r,p),b=`${e}-${s(t)}-${s(x)}`,i=typeof A.valorMensalidade=="number"&&A.valorMensalidade>0?A.valorMensalidade:280;this.addPayment({alunoId:A.id,descricao:`Mensalidade ${a}/${e}`,mesReferencia:l,valor:i,dataVencimento:b,status:"pendente",observacoes:`Gerado automaticamente para o plano ${A.moduloAtual||A.instrumentoPrincipal||"Música"}`},o),g++}),U.log({tela:"Financeiro",acao:"Geração de Mensalidades em Lote",usuarioNome:o,detalhes:`Geração em lote para ${a}/${e}: ${g} mensalidade(s) criada(s) e ${c} já existente(s) pulada(s).`}),{criadas:g,puladas:c}}getSettings(){return{...this.settings}}updateSettings(e,t){return this.settings={...this.settings,...e},this.saveSettings(),typeof window<"u"&&window.dispatchEvent(new CustomEvent("app-settings-updated",{detail:this.getSettings()})),U.log({tela:"Configurações",acao:"Alteração de Configurações",usuarioNome:t,detalhes:`Parâmetros do sistema atualizados (Menu: ${this.settings.nomeMenu||"Padrão"}, Logo: ${this.settings.logotipoCustomizado?"Personalizado":"Padrão"}).`}),this.settings}}const k=new Ue,ge={admin:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},planos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},home:{acesso:!0},financeiro:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},relatorios:{acesso:!0,gerar:!0},auditoria:{acesso:!0},configuracoes:{acesso:!0,alterar:!0}},professor:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},planos:{acesso:!0,cadastrar:!1,alterar:!1,excluir:!1},home:{acesso:!0},financeiro:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},relatorios:{acesso:!0,gerar:!0},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}},atendente:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},planos:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},home:{acesso:!0},financeiro:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},relatorios:{acesso:!0,gerar:!0},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}}};function Se($){var s,l,E,a,M,g,c,A,P,r,p,x,b,i,f,v,I,u,S,L,n,m,w,d,h,z,T,_;if(!$)return{alunos:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},agenda:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},planos:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},home:{acesso:!1},financeiro:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},relatorios:{acesso:!1,gerar:!1},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}};if($.papel==="admin")return JSON.parse(JSON.stringify(ge.admin));const e=ge[$.papel]||ge.professor,t=$.permissoes;if(!t)return JSON.parse(JSON.stringify(e));const o=N=>typeof N=="boolean";return{alunos:{acesso:o(t.alunos)?t.alunos:((s=t.alunos)==null?void 0:s.acesso)??e.alunos.acesso,cadastrar:o(t.alunos)?t.alunos:((l=t.alunos)==null?void 0:l.cadastrar)??e.alunos.cadastrar,alterar:o(t.alunos)?t.alunos:((E=t.alunos)==null?void 0:E.alterar)??e.alunos.alterar,excluir:o(t.alunos)?!1:((a=t.alunos)==null?void 0:a.excluir)??e.alunos.excluir},agenda:{acesso:o(t.agenda)?t.agenda:((M=t.agenda)==null?void 0:M.acesso)??e.agenda.acesso,cadastrar:o(t.agenda)?t.agenda:((g=t.agenda)==null?void 0:g.cadastrar)??e.agenda.cadastrar,alterar:o(t.agenda)?t.agenda:((c=t.agenda)==null?void 0:c.alterar)??e.agenda.alterar,excluir:o(t.agenda)?!1:((A=t.agenda)==null?void 0:A.excluir)??e.agenda.excluir},planos:{acesso:o(t.planos)?t.planos:((P=t.planos)==null?void 0:P.acesso)??e.planos.acesso,cadastrar:o(t.planos)?t.planos:((r=t.planos)==null?void 0:r.cadastrar)??e.planos.cadastrar,alterar:o(t.planos)?t.planos:((p=t.planos)==null?void 0:p.alterar)??e.planos.alterar,excluir:o(t.planos)?!1:((x=t.planos)==null?void 0:x.excluir)??e.planos.excluir},home:{acesso:o(t.home)?t.home:((b=t.home)==null?void 0:b.acesso)??e.home.acesso},financeiro:{acesso:o(t.financeiro)?t.financeiro:((i=t.financeiro)==null?void 0:i.acesso)??((f=e.financeiro)==null?void 0:f.acesso)??!1,cadastrar:o(t.financeiro)?t.financeiro:((v=t.financeiro)==null?void 0:v.cadastrar)??((I=e.financeiro)==null?void 0:I.cadastrar)??!1,alterar:o(t.financeiro)?t.financeiro:((u=t.financeiro)==null?void 0:u.alterar)??((S=e.financeiro)==null?void 0:S.alterar)??!1,excluir:o(t.financeiro)?!1:((L=t.financeiro)==null?void 0:L.excluir)??((n=e.financeiro)==null?void 0:n.excluir)??!1},relatorios:{acesso:o(t.relatorios)?t.relatorios:((m=t.relatorios)==null?void 0:m.acesso)??((w=e.relatorios)==null?void 0:w.acesso)??!0,gerar:o(t.relatorios)?t.relatorios:((d=t.relatorios)==null?void 0:d.gerar)??((h=e.relatorios)==null?void 0:h.gerar)??!0},auditoria:{acesso:o(t.auditoria)?t.auditoria:((z=t.auditoria)==null?void 0:z.acesso)??e.auditoria.acesso},configuracoes:{acesso:o(t.configuracoes)?t.configuracoes:((T=t.configuracoes)==null?void 0:T.acesso)??e.configuracoes.acesso,alterar:o(t.configuracoes)?t.configuracoes:((_=t.configuracoes)==null?void 0:_.alterar)??e.configuracoes.alterar}}}function le($,e){if(!$)return!1;if(e==="login")return!0;if(e==="user")return $.papel==="admin";if($.papel==="admin"||$.isSistema)return!0;const o=Se($)[e];return o&&typeof o=="object"&&"acesso"in o?!!o.acesso:!1}function Z($,e,t){if(!$)return!1;if($.papel==="admin")return!0;const s=Se($)[e];return s?!!s[t]:!1}const Ae="acusticamente_active_session";class Je{constructor(){ie(this,"currentUser",null);this.restoreSession()}restoreSession(){try{const e=localStorage.getItem(Ae);e&&(this.currentUser=JSON.parse(e))}catch{this.currentUser=null}}getCurrentUser(){if(this.currentUser){const e=k.getUserById(this.currentUser.id);e&&(this.currentUser=e,localStorage.setItem(Ae,JSON.stringify(e)))}return this.currentUser}isAuthenticated(){return this.currentUser!==null}login(e,t){const s=k.getUsers().find(l=>l.login===e.trim());return s?s.senha!==t.trim()?(U.log({tela:"Login",acao:"Tentativa de Login Falha",usuarioId:s.id,usuarioLogin:s.login,usuarioNome:s.nome,detalhes:`Senha incorreta informada para o usuário "${s.login}".`}),{success:!1,message:"Usuário ou senha incorretos."}):(this.currentUser=s,localStorage.setItem(Ae,JSON.stringify(s)),U.log({tela:"Login",acao:"Autenticação com Sucesso",usuarioId:s.id,usuarioLogin:s.login,usuarioNome:s.nome,detalhes:`Usuário "${s.nome}" realizou login no sistema.`}),{success:!0,message:"Login realizado com sucesso!",user:s}):(U.log({tela:"Login",acao:"Tentativa de Login Falha",usuarioLogin:e,usuarioNome:"Desconhecido",detalhes:`Tentativa de login frustrada com o usuário "${e}" (usuário não encontrado).`}),{success:!1,message:"Usuário ou senha incorretos."})}logout(){this.currentUser&&U.log({tela:"Sistema",acao:"Logout",usuarioId:this.currentUser.id,usuarioLogin:this.currentUser.login,usuarioNome:this.currentUser.nome,detalhes:`Usuário "${this.currentUser.nome}" encerrou a sessão.`}),this.currentUser=null,localStorage.removeItem(Ae),sessionStorage.setItem("acusticamente_manual_logout","true"),window.location.reload()}}const Y=new Je;function Ge($=40){return`
-    <svg width="${$}" height="${$}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="acusticamente-logo-svg">
+var _e=Object.defineProperty;var Ve=(w,e,t)=>e in w?_e(w,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):w[e]=t;var re=(w,e,t)=>Ve(w,typeof e!="symbol"?e+"":e,t);import{E as Te,a as De}from"./pdf-D4_PdGrn.js";(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))o(s);new MutationObserver(s=>{for(const d of s)if(d.type==="childList")for(const S of d.addedNodes)S.tagName==="LINK"&&S.rel==="modulepreload"&&o(S)}).observe(document,{childList:!0,subtree:!0});function t(s){const d={};return s.integrity&&(d.integrity=s.integrity),s.referrerPolicy&&(d.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?d.credentials="include":s.crossOrigin==="anonymous"?d.credentials="omit":d.credentials="same-origin",d}function o(s){if(s.ep)return;s.ep=!0;const d=t(s);fetch(s.href,d)}})();const Be="acusticamente_audit_logs";class He{constructor(){re(this,"logs",[]);this.loadLogs()}loadLogs(){try{const e=localStorage.getItem(Be);e?this.logs=JSON.parse(e):this.logs=[]}catch{this.logs=[]}}saveLogs(){try{localStorage.setItem(Be,JSON.stringify(this.logs))}catch(e){console.error("Erro ao salvar auditoria no storage:",e)}}log(e){const t=new Date,o=S=>S.toString().padStart(2,"0"),s=`${o(t.getDate())}/${o(t.getMonth()+1)}/${t.getFullYear()} ${o(t.getHours())}:${o(t.getMinutes())}:${o(t.getSeconds())}`,d={id:"audit_"+Date.now()+"_"+Math.random().toString(36).substring(2,7),dataHora:t.toISOString(),dataHoraFormatada:s,usuarioId:e.usuarioId||"1",usuarioLogin:e.usuarioLogin||"1",usuarioNome:e.usuarioNome||"Administrador",tela:e.tela,acao:e.acao,detalhes:e.detalhes};return this.logs.unshift(d),this.saveLogs(),window.dispatchEvent(new CustomEvent("audit_updated",{detail:d})),d}getLogs(){return[...this.logs]}clearLogs(){this.logs=[],this.saveLogs()}}const U=new He,Ce="acusticamente_users",$e="acusticamente_students",Ie="acusticamente_plans",we="acusticamente_appointments",ze="acusticamente_settings",Ee="acusticamente_payments";class Ue{constructor(){re(this,"users",[]);re(this,"students",[]);re(this,"plans",[]);re(this,"appointments",[]);re(this,"payments",[]);re(this,"settings",{nomeEscola:"Acusticamente - Escola de Música",nomeClinica:"Acusticamente - Escola de Música",razaoSocial:"Acusticamente Ensino Musical Ltda",nomeFantasia:"Acusticamente Escola de Música",cnpj:"12.345.678/0001-90",inscricaoEstadual:"123.456.789.110",telefoneContato:"(11) 98765-4321",emailContato:"contato@acusticamente.com.br",website:"www.acusticamente.com.br",cep:"01310-100",logradouro:"Avenida Paulista",numero:"1000",complemento:"Conjunto 42",bairro:"Bela Vista",cidade:"São Paulo",estado:"SP",mongoUri:"mongodb://localhost:27017",mongoDatabase:"acusticamente_db",mongoStatus:"simulado",notificacoesAtivas:!0,nomeMenu:"Acusticamente",logotipoCustomizado:""});this.initData()}initData(){const e=localStorage.getItem(Ce);e?this.users=JSON.parse(e).map(a=>{var M,f;return{...a,permissoes:{...a.permissoes,financeiro:((M=a.permissoes)==null?void 0:M.financeiro)||(a.papel==="admin"?{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0}:a.papel==="atendente"?{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1}:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1}),relatorios:((f=a.permissoes)==null?void 0:f.relatorios)||{acesso:!0,gerar:!0}}}}):(this.users=[{id:"user_1",nome:"Administrador",login:"1",senha:"1",papel:"admin",permissoes:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},planos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},financeiro:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},relatorios:{acesso:!0,gerar:!0},home:{acesso:!0},auditoria:{acesso:!0},configuracoes:{acesso:!0,alterar:!0}},isSistema:!0,criadoEm:new Date().toISOString()},{id:"user_2",nome:"Prof. Carlos Eduardo",login:"carlos",senha:"123",papel:"professor",permissoes:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},planos:{acesso:!0,cadastrar:!1,alterar:!1,excluir:!1},financeiro:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},relatorios:{acesso:!0,gerar:!0},home:{acesso:!0},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}},isSistema:!1,criadoEm:new Date().toISOString()}],this.saveUsers());const t=localStorage.getItem(Ie);t?this.plans=JSON.parse(t):(this.plans=[{id:"plano_1",nome:"Percepção e Musicalização",descricao:"Desenvolvimento do ouvido musical, ritmo e afinação básica.",criadoEm:new Date().toISOString(),modulos:[{id:"mod_1_1",ordem:1,titulo:"Módulo 1: Consciência Sonora e Pulsação"},{id:"mod_1_2",ordem:2,titulo:"Módulo 2: Discriminação de Timbres e Alturas"},{id:"mod_1_3",ordem:3,titulo:"Módulo 3: Harmonia Básica e Canto"}]},{id:"plano_2",nome:"Violão e Harmonia Prática",descricao:"Estudo de acordes, levadas rítmicas, dedilhados e repertório no violão.",criadoEm:new Date().toISOString(),modulos:[{id:"mod_2_1",ordem:1,titulo:"Módulo 1: Primeiros Acordes e Levadas"},{id:"mod_2_2",ordem:2,titulo:"Módulo 2: Dedilhados e Transição de Acordes"},{id:"mod_2_3",ordem:3,titulo:"Módulo 3: Escalas e Harmonia Prática"}]},{id:"plano_3",nome:"Prática de Instrumento - Piano & Teclado",descricao:"Estudo prático postural, leitura de partituras e repertório.",criadoEm:new Date().toISOString(),modulos:[{id:"mod_3_1",ordem:1,titulo:"Módulo 1: Digitação e Postura"},{id:"mod_3_2",ordem:2,titulo:"Módulo 2: Leitura Rítmica e Clave de Sol"},{id:"mod_3_3",ordem:3,titulo:"Módulo 3: Repertório Clássico e Popular"}]}],this.savePlans());const o=localStorage.getItem($e);o?this.students=JSON.parse(o).map(a=>({...a,saldoReposicoes:typeof a.saldoReposicoes=="number"?a.saldoReposicoes:0,instrumentoPrincipal:a.instrumentoPrincipal||"Violão",nivelMusical:a.nivelMusical||"iniciante",valorMensalidade:typeof a.valorMensalidade=="number"?a.valorMensalidade:280,diaVencimento:typeof a.diaVencimento=="number"?a.diaVencimento:10})):(this.students=[],this.saveStudents());const s=localStorage.getItem(we);s?this.appointments=JSON.parse(s):(this.appointments=[],this.saveAppointments());const d=localStorage.getItem(ze);d&&(this.settings=JSON.parse(d));const S=localStorage.getItem(Ee);S?this.payments=JSON.parse(S):(this.payments=[],this.savePayments()),this.settings.nomeClinica&&this.settings.nomeClinica.includes("Terapêutico")&&(this.settings.nomeEscola="Acusticamente - Escola de Música",this.settings.nomeClinica="Acusticamente - Escola de Música",this.saveSettings()),this.settings.nomeEscola||(this.settings.nomeEscola=this.settings.nomeClinica||"Acusticamente - Escola de Música",this.saveSettings()),this.plans.forEach(a=>{a.nome.includes("Reabilitação")&&(a.nome="Violão e Harmonia Prática",a.descricao="Estudo de acordes, levadas rítmicas, dedilhados e repertório no violão.",a.modulos=[{id:"mod_2_1",ordem:1,titulo:"Módulo 1: Primeiros Acordes e Levadas"},{id:"mod_2_2",ordem:2,titulo:"Módulo 2: Dedilhados e Transição de Acordes"},{id:"mod_2_3",ordem:3,titulo:"Módulo 3: Escalas e Harmonia Prática"}])}),this.savePlans(),this.students.forEach(a=>{var M;(M=a.observacoes)!=null&&M.includes("implante")&&(a.moduloAtual="Módulo 1: Primeiros Acordes e Levadas",a.observacoes="Iniciando estudos no violão popular.")}),this.saveStudents(),this.appointments.forEach(a=>{var M;(M=a.titulo)!=null&&M.includes("Auditivo")&&(a.titulo="Aula Prática de Violão",a.observacoes="Praticar transição entre acordes maiores.")}),this.saveAppointments()}getTodayDateString(){const e=new Date,t=o=>o.toString().padStart(2,"0");return`${e.getFullYear()}-${t(e.getMonth()+1)}-${t(e.getDate())}`}async pushToCloud(e,t,o){try{if(typeof window>"u")return;await fetch("/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({collection:e,action:t,data:o})})}catch{}}async syncWithCloud(){try{if(typeof window>"u")return!1;const e=await fetch("/api/sync");if(!e.ok)return!1;const t=await e.json();if(!t.success||!t.data)return!1;const o=t.data;return Array.isArray(o.students)&&o.students.length>0&&(this.students=o.students,localStorage.setItem($e,JSON.stringify(this.students))),Array.isArray(o.payments)&&o.payments.length>0&&(this.payments=o.payments,localStorage.setItem(Ee,JSON.stringify(this.payments))),Array.isArray(o.appointments)&&o.appointments.length>0&&(this.appointments=o.appointments,localStorage.setItem(we,JSON.stringify(this.appointments))),Array.isArray(o.plans)&&o.plans.length>0&&(this.plans=o.plans,localStorage.setItem(Ie,JSON.stringify(this.plans))),Array.isArray(o.users)&&o.users.length>0&&(this.users=o.users,localStorage.setItem(Ce,JSON.stringify(this.users))),o.settings&&(this.settings={...this.settings,...o.settings},localStorage.setItem(ze,JSON.stringify(this.settings))),window.dispatchEvent(new CustomEvent("acusticamente:data-synced")),!0}catch{return!1}}async resetCleanDatabase(e){this.students=[],this.payments=[],this.appointments=[],localStorage.setItem($e,JSON.stringify([])),localStorage.setItem(Ee,JSON.stringify([])),localStorage.setItem(we,JSON.stringify([])),await this.pushToCloud("all","reset_clean",{}),U.log({tela:"Configurações",acao:"Zerar Cadastros de Teste",usuarioNome:e,detalhes:"Todos os alunos, aulas e lançamentos financeiros foram zerados para entrega do sistema."}),typeof window<"u"&&window.dispatchEvent(new CustomEvent("acusticamente:data-synced"))}saveUsers(){localStorage.setItem(Ce,JSON.stringify(this.users)),this.pushToCloud("users","replace_all",this.users)}saveStudents(){localStorage.setItem($e,JSON.stringify(this.students)),this.pushToCloud("students","replace_all",this.students)}savePlans(){localStorage.setItem(Ie,JSON.stringify(this.plans)),this.pushToCloud("plans","replace_all",this.plans)}saveAppointments(){localStorage.setItem(we,JSON.stringify(this.appointments)),this.pushToCloud("appointments","replace_all",this.appointments)}savePayments(){localStorage.setItem(Ee,JSON.stringify(this.payments)),this.pushToCloud("payments","replace_all",this.payments)}saveSettings(){localStorage.setItem(ze,JSON.stringify(this.settings)),this.pushToCloud("settings","upsert",this.settings)}getUsers(){return[...this.users]}getUserById(e){return this.users.find(t=>t.id===e)}addUser(e,t){const o={...e,id:"user_"+Date.now(),isSistema:!1,criadoEm:new Date().toISOString()};return this.users.push(o),this.saveUsers(),U.log({tela:"Cadastro de Usuários",acao:"Criação de Usuário",usuarioNome:t,detalhes:`Criado usuário "${o.nome}" (login: ${o.login}, papel: ${o.papel})`}),o}updateUser(e,t,o){const s=this.users.findIndex(a=>a.id===e);if(s===-1)throw new Error("Usuário não encontrado.");const d=this.users[s],S=d.isSistema;return this.users[s]={...d,...t,isSistema:S,atualizadoEm:new Date().toISOString()},this.saveUsers(),U.log({tela:"Cadastro de Usuários",acao:"Atualização de Usuário",usuarioNome:o,detalhes:`Usuário "${d.nome}" atualizado. Alterações no login/senha ou dados cadastrais.`}),this.users[s]}deleteUser(e,t){const o=this.users.find(s=>s.id===e);if(!o)throw new Error("Usuário não encontrado.");if(o.isSistema)throw new Error("O usuário administrador do sistema (login 1) não pode ser excluído.");this.users=this.users.filter(s=>s.id!==e),this.saveUsers(),U.log({tela:"Cadastro de Usuários",acao:"Exclusão de Usuário",usuarioNome:t,detalhes:`Usuário "${o.nome}" (login: ${o.login}) foi removido.`})}getStudents(){return[...this.students]}addStudent(e,t){const o={...e,id:"aluno_"+Date.now(),criadoEm:new Date().toISOString()};return this.students.push(o),this.saveStudents(),U.log({tela:"Cadastro de Alunos",acao:"Criação de Aluno",usuarioNome:t,detalhes:`Aluno "${o.nome}" cadastrado com status ${o.status}.`}),o}updateStudent(e,t,o){const s=this.students.findIndex(S=>S.id===e);if(s===-1)throw new Error("Aluno não encontrado.");const d=this.students[s];return this.students[s]={...d,...t},this.saveStudents(),U.log({tela:"Cadastro de Alunos",acao:"Atualização de Aluno",usuarioNome:o,detalhes:`Aluno "${d.nome}" atualizado.`}),this.students[s]}deleteStudent(e,t){const o=this.students.find(s=>s.id===e);o&&(this.students=this.students.filter(s=>s.id!==e),this.saveStudents(),U.log({tela:"Cadastro de Alunos",acao:"Exclusão de Aluno",usuarioNome:t,detalhes:`Aluno "${o.nome}" foi removido do sistema.`}))}getPlans(){return[...this.plans]}addPlan(e,t){const o={...e,id:"plano_"+Date.now(),criadoEm:new Date().toISOString()};return this.plans.push(o),this.savePlans(),U.log({tela:"Plano de Ensino",acao:"Criação de Plano",usuarioNome:t,detalhes:`Plano "${o.nome}" criado com ${o.modulos.length} módulos.`}),o}updatePlan(e,t,o){const s=this.plans.findIndex(S=>S.id===e);if(s===-1)throw new Error("Plano não encontrado.");const d=this.plans[s];return this.plans[s]={...d,...t},this.savePlans(),U.log({tela:"Plano de Ensino",acao:"Atualização de Plano",usuarioNome:o,detalhes:`Plano "${d.nome}" atualizado.`}),this.plans[s]}deletePlan(e,t){const o=this.plans.find(s=>s.id===e);o&&(this.plans=this.plans.filter(s=>s.id!==e),this.savePlans(),U.log({tela:"Plano de Ensino",acao:"Exclusão de Plano",usuarioNome:t,detalhes:`Plano "${o.nome}" foi excluído.`}))}getAppointments(){return[...this.appointments]}addAppointment(e,t){const o={...e,id:"app_"+Date.now(),criadoEm:new Date().toISOString()};this.appointments.push(o),this.saveAppointments();const s=this.students.find(d=>d.id===o.alunoId);return U.log({tela:"Agenda",acao:"Novo Compromisso",usuarioNome:t,detalhes:`Agendado compromisso "${o.titulo}" para aluno ${(s==null?void 0:s.nome)||"N/A"} em ${o.data} às ${o.horaInicio}.`}),o}updateAppointment(e,t,o){const s=this.appointments.findIndex(S=>S.id===e);if(s===-1)throw new Error("Compromisso não encontrado.");const d=this.appointments[s];return this.appointments[s]={...d,...t},this.saveAppointments(),U.log({tela:"Agenda",acao:"Atualização de Compromisso",usuarioNome:o,detalhes:`Compromisso "${d.titulo}" atualizado (status: ${this.appointments[s].status}).`}),this.appointments[s]}deleteAppointment(e,t){const o=this.appointments.find(s=>s.id===e);o&&(this.appointments=this.appointments.filter(s=>s.id!==e),this.saveAppointments(),U.log({tela:"Agenda",acao:"Cancelamento/Exclusão de Compromisso",usuarioNome:t,detalhes:`Compromisso "${o.titulo}" removido da agenda.`}))}marcarPresenca(e,t){const o=this.updateAppointment(e,{status:"concluido"},t),s=this.students.find(d=>d.id===o.alunoId);return U.log({tela:"Agenda",acao:"Presença Confirmada",usuarioNome:t,detalhes:`Presença confirmada para o aluno "${(s==null?void 0:s.nome)||"N/A"}" na aula "${o.titulo}".`}),o}registrarFalta(e,t,o,s){const d=t?"falta_justificada":"falta_injustificada",S=this.updateAppointment(e,{status:d,justificativaFalta:(o==null?void 0:o.trim())||void 0},s),a=this.students.find(f=>f.id===S.alunoId);let M=(a==null?void 0:a.saldoReposicoes)||0;return t&&a?(M=(a.saldoReposicoes||0)+1,a.saldoReposicoes=M,this.saveStudents(),U.log({tela:"Agenda",acao:"Falta Justificada Registrada",usuarioNome:s,detalhes:`Falta justificada para o aluno "${a.nome}" na aula "${S.titulo}". Crédito de reposição gerado (+1). Saldo atual: ${M}. Motivo: ${o||"Não especificado"}`})):!t&&a&&U.log({tela:"Agenda",acao:"Falta Injustificada Registrada",usuarioNome:s,detalhes:`Falta sem aviso/injustificada para o aluno "${a.nome}" na aula "${S.titulo}". Nenhum crédito de reposição gerado.`}),{appointment:S,saldoReposicoes:M}}agendarReposicao(e,t,o){const s=this.addAppointment({...e,tipoAula:"reposicao",aulaOriginalId:t,status:"agendado"},o);if(t){const S=this.appointments.findIndex(a=>a.id===t);S!==-1&&(this.appointments[S].aulaReposicaoId=s.id,this.saveAppointments())}const d=this.students.find(S=>S.id===s.alunoId);return d&&typeof d.saldoReposicoes=="number"&&d.saldoReposicoes>0&&(d.saldoReposicoes-=1,this.saveStudents(),U.log({tela:"Agenda",acao:"Aula de Reposição Agendada",usuarioNome:o,detalhes:`Reposição agendada para "${d.nome}". 1 crédito abatido. Saldo restante: ${d.saldoReposicoes}.`})),s}getStudentAppointments(e){return this.appointments.filter(t=>t.alunoId===e).sort((t,o)=>{const s=`${t.data}T${t.horaInicio}`;return`${o.data}T${o.horaInicio}`.localeCompare(s)})}getPayments(){const e=this.getTodayDateString();let t=!1;return this.payments.forEach(o=>{o.status==="pendente"&&o.dataVencimento<e&&(o.status="atrasado",t=!0)}),t&&this.savePayments(),[...this.payments].sort((o,s)=>s.dataVencimento.localeCompare(o.dataVencimento))}getStudentPayments(e){return this.getPayments().filter(t=>t.alunoId===e)}isStudentOverdue(e){const t=this.getTodayDateString();return this.payments.some(o=>o.alunoId===e&&(o.status==="atrasado"||o.status==="pendente"&&o.dataVencimento<t))}addPayment(e,t){const o=this.getTodayDateString();let s=e.status;s==="pendente"&&e.dataVencimento<o&&(s="atrasado");const d={...e,status:s,id:`pag_${Date.now()}_${Math.random().toString(36).substr(2,5)}`,criadoEm:new Date().toISOString()};this.payments.push(d),this.savePayments();const S=this.students.find(a=>a.id===d.alunoId);return U.log({tela:"Financeiro",acao:"Cadastro de Pagamento/Mensalidade",usuarioNome:t,detalhes:`Lançamento "${d.descricao}" (R$ ${d.valor.toFixed(2)}) cadastrado para o aluno "${(S==null?void 0:S.nome)||"N/A"}" com vencimento em ${d.dataVencimento}.`}),d}darBaixaPayment(e,t,o,s,d){const S=this.payments.findIndex(c=>c.id===e);if(S===-1)throw new Error("Lançamento financeiro não encontrado");const a=this.payments[S],M=a.status;a.status="pago",a.dataPagamento=t,a.formaPagamento=o,d!==void 0&&(a.observacoes=d.trim()?d.trim():a.observacoes),this.savePayments();const f=this.students.find(c=>c.id===a.alunoId);return U.log({tela:"Financeiro",acao:"Baixa de Mensalidade",usuarioNome:s,detalhes:`Baixa efetuada para "${a.descricao}" de "${(f==null?void 0:f.nome)||"N/A"}". Valor R$ ${a.valor.toFixed(2)} recebido via ${o.toUpperCase()} em ${t} (Status anterior: ${M}).`}),a}updatePayment(e,t,o){const s=this.payments.findIndex(c=>c.id===e);if(s===-1)throw new Error("Lançamento financeiro não encontrado");const d=this.getTodayDateString();let S=t.status||this.payments[s].status;const a=t.dataVencimento||this.payments[s].dataVencimento;S==="pendente"&&a<d&&(S="atrasado"),this.payments[s]={...this.payments[s],...t,status:S},this.savePayments();const M=this.payments[s],f=this.students.find(c=>c.id===M.alunoId);return U.log({tela:"Financeiro",acao:"Alteração de Lançamento",usuarioNome:o,detalhes:`Lançamento financeiro "${M.descricao}" do aluno "${(f==null?void 0:f.nome)||"N/A"}" atualizado.`}),this.payments[s]}deletePayment(e,t){const o=this.payments.find(d=>d.id===e);if(!o)return;this.payments=this.payments.filter(d=>d.id!==e),this.savePayments();const s=this.students.find(d=>d.id===o.alunoId);U.log({tela:"Financeiro",acao:"Exclusão de Lançamento",usuarioNome:t,detalhes:`Lançamento "${o.descricao}" no valor de R$ ${o.valor.toFixed(2)} do aluno "${(s==null?void 0:s.nome)||"N/A"}" foi excluído.`})}gerarMensalidadesMes(e,t,o){const s=A=>A.toString().padStart(2,"0"),d=`${e}-${s(t)}`,a=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][t-1]||d,M=this.students.filter(A=>A.status==="ativo");let f=0,c=0;return M.forEach(A=>{if(this.payments.some(v=>v.alunoId===A.id&&(v.mesReferencia===d||v.dataVencimento.startsWith(d)))){c++;return}const i=A.diaVencimento||10,p=new Date(e,t,0).getDate(),x=Math.min(i,p),g=`${e}-${s(t)}-${s(x)}`,l=typeof A.valorMensalidade=="number"&&A.valorMensalidade>0?A.valorMensalidade:280;this.addPayment({alunoId:A.id,descricao:`Mensalidade ${a}/${e}`,mesReferencia:d,valor:l,dataVencimento:g,status:"pendente",observacoes:`Gerado automaticamente para o plano ${A.moduloAtual||A.instrumentoPrincipal||"Música"}`},o),f++}),U.log({tela:"Financeiro",acao:"Geração de Mensalidades em Lote",usuarioNome:o,detalhes:`Geração em lote para ${a}/${e}: ${f} mensalidade(s) criada(s) e ${c} já existente(s) pulada(s).`}),{criadas:f,puladas:c}}getSettings(){return{...this.settings}}updateSettings(e,t){return this.settings={...this.settings,...e},this.saveSettings(),typeof window<"u"&&window.dispatchEvent(new CustomEvent("app-settings-updated",{detail:this.getSettings()})),U.log({tela:"Configurações",acao:"Alteração de Configurações",usuarioNome:t,detalhes:`Parâmetros do sistema atualizados (Menu: ${this.settings.nomeMenu||"Padrão"}, Logo: ${this.settings.logotipoCustomizado?"Personalizado":"Padrão"}).`}),this.settings}}const k=new Ue,ge={admin:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},planos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},home:{acesso:!0},financeiro:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!0},relatorios:{acesso:!0,gerar:!0},auditoria:{acesso:!0},configuracoes:{acesso:!0,alterar:!0}},professor:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},planos:{acesso:!0,cadastrar:!1,alterar:!1,excluir:!1},home:{acesso:!0},financeiro:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},relatorios:{acesso:!0,gerar:!0},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}},atendente:{alunos:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},agenda:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},planos:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},home:{acesso:!0},financeiro:{acesso:!0,cadastrar:!0,alterar:!0,excluir:!1},relatorios:{acesso:!0,gerar:!0},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}}};function Se(w){var s,d,S,a,M,f,c,A,L,i,p,x,g,l,v,b,E,h,I,z,n,m,u,r,y,P,_,O;if(!w)return{alunos:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},agenda:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},planos:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},home:{acesso:!1},financeiro:{acesso:!1,cadastrar:!1,alterar:!1,excluir:!1},relatorios:{acesso:!1,gerar:!1},auditoria:{acesso:!1},configuracoes:{acesso:!1,alterar:!1}};if(w.papel==="admin")return JSON.parse(JSON.stringify(ge.admin));const e=ge[w.papel]||ge.professor,t=w.permissoes;if(!t)return JSON.parse(JSON.stringify(e));const o=N=>typeof N=="boolean";return{alunos:{acesso:o(t.alunos)?t.alunos:((s=t.alunos)==null?void 0:s.acesso)??e.alunos.acesso,cadastrar:o(t.alunos)?t.alunos:((d=t.alunos)==null?void 0:d.cadastrar)??e.alunos.cadastrar,alterar:o(t.alunos)?t.alunos:((S=t.alunos)==null?void 0:S.alterar)??e.alunos.alterar,excluir:o(t.alunos)?!1:((a=t.alunos)==null?void 0:a.excluir)??e.alunos.excluir},agenda:{acesso:o(t.agenda)?t.agenda:((M=t.agenda)==null?void 0:M.acesso)??e.agenda.acesso,cadastrar:o(t.agenda)?t.agenda:((f=t.agenda)==null?void 0:f.cadastrar)??e.agenda.cadastrar,alterar:o(t.agenda)?t.agenda:((c=t.agenda)==null?void 0:c.alterar)??e.agenda.alterar,excluir:o(t.agenda)?!1:((A=t.agenda)==null?void 0:A.excluir)??e.agenda.excluir},planos:{acesso:o(t.planos)?t.planos:((L=t.planos)==null?void 0:L.acesso)??e.planos.acesso,cadastrar:o(t.planos)?t.planos:((i=t.planos)==null?void 0:i.cadastrar)??e.planos.cadastrar,alterar:o(t.planos)?t.planos:((p=t.planos)==null?void 0:p.alterar)??e.planos.alterar,excluir:o(t.planos)?!1:((x=t.planos)==null?void 0:x.excluir)??e.planos.excluir},home:{acesso:o(t.home)?t.home:((g=t.home)==null?void 0:g.acesso)??e.home.acesso},financeiro:{acesso:o(t.financeiro)?t.financeiro:((l=t.financeiro)==null?void 0:l.acesso)??((v=e.financeiro)==null?void 0:v.acesso)??!1,cadastrar:o(t.financeiro)?t.financeiro:((b=t.financeiro)==null?void 0:b.cadastrar)??((E=e.financeiro)==null?void 0:E.cadastrar)??!1,alterar:o(t.financeiro)?t.financeiro:((h=t.financeiro)==null?void 0:h.alterar)??((I=e.financeiro)==null?void 0:I.alterar)??!1,excluir:o(t.financeiro)?!1:((z=t.financeiro)==null?void 0:z.excluir)??((n=e.financeiro)==null?void 0:n.excluir)??!1},relatorios:{acesso:o(t.relatorios)?t.relatorios:((m=t.relatorios)==null?void 0:m.acesso)??((u=e.relatorios)==null?void 0:u.acesso)??!0,gerar:o(t.relatorios)?t.relatorios:((r=t.relatorios)==null?void 0:r.gerar)??((y=e.relatorios)==null?void 0:y.gerar)??!0},auditoria:{acesso:o(t.auditoria)?t.auditoria:((P=t.auditoria)==null?void 0:P.acesso)??e.auditoria.acesso},configuracoes:{acesso:o(t.configuracoes)?t.configuracoes:((_=t.configuracoes)==null?void 0:_.acesso)??e.configuracoes.acesso,alterar:o(t.configuracoes)?t.configuracoes:((O=t.configuracoes)==null?void 0:O.alterar)??e.configuracoes.alterar}}}function ie(w,e){if(!w)return!1;if(e==="login")return!0;if(e==="user")return w.papel==="admin";if(w.papel==="admin"||w.isSistema)return!0;const o=Se(w)[e];return o&&typeof o=="object"&&"acesso"in o?!!o.acesso:!1}function W(w,e,t){if(!w)return!1;if(w.papel==="admin")return!0;const s=Se(w)[e];return s?!!s[t]:!1}const Ae="acusticamente_active_session";class Je{constructor(){re(this,"currentUser",null);this.restoreSession()}restoreSession(){try{const e=localStorage.getItem(Ae);e&&(this.currentUser=JSON.parse(e))}catch{this.currentUser=null}}getCurrentUser(){if(this.currentUser){const e=k.getUserById(this.currentUser.id);e&&(this.currentUser=e,localStorage.setItem(Ae,JSON.stringify(e)))}return this.currentUser}isAuthenticated(){return this.currentUser!==null}login(e,t){const s=k.getUsers().find(d=>d.login===e.trim());return s?s.senha!==t.trim()?(U.log({tela:"Login",acao:"Tentativa de Login Falha",usuarioId:s.id,usuarioLogin:s.login,usuarioNome:s.nome,detalhes:`Senha incorreta informada para o usuário "${s.login}".`}),{success:!1,message:"Usuário ou senha incorretos."}):(this.currentUser=s,localStorage.setItem(Ae,JSON.stringify(s)),U.log({tela:"Login",acao:"Autenticação com Sucesso",usuarioId:s.id,usuarioLogin:s.login,usuarioNome:s.nome,detalhes:`Usuário "${s.nome}" realizou login no sistema.`}),{success:!0,message:"Login realizado com sucesso!",user:s}):(U.log({tela:"Login",acao:"Tentativa de Login Falha",usuarioLogin:e,usuarioNome:"Desconhecido",detalhes:`Tentativa de login frustrada com o usuário "${e}" (usuário não encontrado).`}),{success:!1,message:"Usuário ou senha incorretos."})}logout(){this.currentUser&&U.log({tela:"Sistema",acao:"Logout",usuarioId:this.currentUser.id,usuarioLogin:this.currentUser.login,usuarioNome:this.currentUser.nome,detalhes:`Usuário "${this.currentUser.nome}" encerrou a sessão.`}),this.currentUser=null,localStorage.removeItem(Ae),sessionStorage.setItem("acusticamente_manual_logout","true"),window.location.reload()}}const Y=new Je;function Ge(w=40){return`
+    <svg width="${w}" height="${w}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="acusticamente-logo-svg">
       <defs>
         <filter id="glow-coral" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#ea4335" flood-opacity="0.35"/>
@@ -50,40 +50,40 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <!-- Ponto 8 Branco -->
       <circle cx="80" cy="54" r="3" fill="#ffffff" />
     </svg>
-  `}function ue($,e=40){return $&&$.trim()!==""?`<img src="${$}" alt="Logotipo" class="brand-logo-custom" style="width: ${e}px; height: ${e}px; object-fit: contain; border-radius: 6px; display: block;" />`:Ge(e)}function F($,e="success"){const t=document.getElementById("toast-container");if(!t)return;const o=document.createElement("div");o.className=`toast toast-${e}`,o.innerHTML=`
+  `}function ue(w,e=40){return w&&w.trim()!==""?`<img src="${w}" alt="Logotipo" class="brand-logo-custom" style="width: ${e}px; height: ${e}px; object-fit: contain; border-radius: 6px; display: block;" />`:Ge(e)}function B(w,e="success"){const t=document.getElementById("toast-container");if(!t)return;const o=document.createElement("div");o.className=`toast toast-${e}`,o.innerHTML=`
     <span class="toast-icon">${e==="success"?"✓":e==="error"?"✕":"ℹ"}</span>
-    <span class="toast-text">${$}</span>
-  `,t.appendChild(o),setTimeout(()=>{o.style.opacity="0",o.style.transform="translateX(20px)",o.style.transition="all 200ms ease",setTimeout(()=>o.remove(),200)},3500)}function re($){const e=document.getElementById("modal-container");if(!e)return;e.innerHTML=`
+    <span class="toast-text">${w}</span>
+  `,t.appendChild(o),setTimeout(()=>{o.style.opacity="0",o.style.transform="translateX(20px)",o.style.transition="all 200ms ease",setTimeout(()=>o.remove(),200)},3500)}function ne(w){const e=document.getElementById("modal-container");if(!e)return;e.innerHTML=`
     <div class="modal-backdrop" id="active-modal-backdrop">
-      <div class="modal-card ${$.modalClass||""}">
+      <div class="modal-card ${w.modalClass||""}">
         <div class="modal-header">
-          <h3>${$.title}</h3>
+          <h3>${w.title}</h3>
           <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
         </div>
         <div class="modal-body" id="active-modal-body">
-          ${$.bodyHtml}
+          ${w.bodyHtml}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="modal-cancel-btn">${$.cancelText||"Cancelar"}</button>
-          ${$.confirmText?`<button type="button" class="btn ${$.confirmBtnClass||"btn-primary"}" id="modal-confirm-btn">${$.confirmText}</button>`:""}
+          <button type="button" class="btn btn-secondary" id="modal-cancel-btn">${w.cancelText||"Cancelar"}</button>
+          ${w.confirmText?`<button type="button" class="btn ${w.confirmBtnClass||"btn-primary"}" id="modal-confirm-btn">${w.confirmText}</button>`:""}
         </div>
       </div>
     </div>
-  `;const t=document.getElementById("active-modal-backdrop"),o=document.getElementById("modal-close-btn"),s=document.getElementById("modal-cancel-btn"),l=document.getElementById("modal-confirm-btn"),E=()=>{e.innerHTML="",$.onCancel&&$.onCancel()};o.onclick=E,s.onclick=E,t.onclick=a=>{a.target===t&&E()},l&&$.onConfirm&&(l.onclick=async()=>{const a=document.querySelector(".modal-card");await $.onConfirm(a)!==!1&&(e.innerHTML="")})}function ve(){const $=document.getElementById("modal-container");$&&($.innerHTML="")}function fe($){re({title:$.title||"Confirmar Exclusão",bodyHtml:`
+  `;const t=document.getElementById("active-modal-backdrop"),o=document.getElementById("modal-close-btn"),s=document.getElementById("modal-cancel-btn"),d=document.getElementById("modal-confirm-btn"),S=()=>{e.innerHTML="",w.onCancel&&w.onCancel()};o.onclick=S,s.onclick=S,t.onclick=a=>{a.target===t&&S()},d&&w.onConfirm&&(d.onclick=async()=>{const a=document.querySelector(".modal-card");await w.onConfirm(a)!==!1&&(e.innerHTML="")})}function ve(){const w=document.getElementById("modal-container");w&&(w.innerHTML="")}function fe(w){ne({title:w.title||"Confirmar Exclusão",bodyHtml:`
       <div style="display: flex; gap: 16px; align-items: flex-start; padding: 6px 0;">
         <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); color: #f87171; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid rgba(239, 68, 68, 0.3);">
           ⚠️
         </div>
         <div style="flex: 1;">
           <div style="font-size: 0.92rem; color: var(--text-white); font-weight: 500; line-height: 1.5;">
-            ${$.message}
+            ${w.message}
           </div>
           <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
             Esta operação não poderá ser desfeita.
           </div>
         </div>
       </div>
-    `,confirmText:$.confirmText||"Excluir Definitivamente",confirmBtnClass:$.confirmBtnClass||"btn-danger",onConfirm:()=>($.onConfirm(),!0)})}const j={home:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',agenda:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>',alunos:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',user:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',planos:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',financeiro:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',auditoria:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>',configuracoes:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',logout:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>',plus:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>',trash:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',edit:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',search:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>',menu:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>',close:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',whatsapp:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',profile:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',check:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',relatorios:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'},Le="acusticamente_auth_remember",Fe="acusticamente_manual_logout";function Ye($){const e=document.createElement("div");e.className="login-page";const t=k.getSettings(),o=t.nomeMenu||t.nomeFantasia||"Acusticamente";let s={username:"",password:"",remember:!1,autoLogin:!1};try{const g=localStorage.getItem(Le);g&&(s={...s,...JSON.parse(g)})}catch{s={username:"",password:"",remember:!1,autoLogin:!1}}e.innerHTML=`
+    `,confirmText:w.confirmText||"Excluir Definitivamente",confirmBtnClass:w.confirmBtnClass||"btn-danger",onConfirm:()=>(w.onConfirm(),!0)})}const R={home:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',agenda:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>',alunos:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',user:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',planos:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',financeiro:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',auditoria:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>',configuracoes:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',logout:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>',plus:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>',trash:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',edit:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',search:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>',menu:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>',close:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',whatsapp:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',profile:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',check:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',relatorios:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'},Le="acusticamente_auth_remember",Fe="acusticamente_manual_logout";function Ye(w){const e=document.createElement("div");e.className="login-page";const t=k.getSettings(),o=t.nomeMenu||t.nomeFantasia||"Acusticamente";let s={username:"",password:"",remember:!1,autoLogin:!1};try{const f=localStorage.getItem(Le);f&&(s={...s,...JSON.parse(f)})}catch{s={username:"",password:"",remember:!1,autoLogin:!1}}e.innerHTML=`
     <!-- Lado Esquerdo Institucional / Pitch -->
     <div class="login-branding-side">
       <div class="login-brand-header">
@@ -175,7 +175,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </form>
       </div>
     </div>
-  `;const l=e.querySelector("#login-remember"),E=e.querySelector("#login-autologin");E==null||E.addEventListener("change",()=>{E.checked&&!l.checked&&(l.checked=!0)}),l==null||l.addEventListener("change",()=>{!l.checked&&E.checked&&(E.checked=!1)});const a=e.querySelector("#login-form");a.onsubmit=g=>{var i;g.preventDefault();const c=e.querySelector("#login-username"),A=e.querySelector("#login-password"),P=c.value.trim(),r=A.value.trim(),p=l.checked,x=E.checked,b=Y.login(P,r);b.success?(p?localStorage.setItem(Le,JSON.stringify({username:P,password:r,remember:!0,autoLogin:x})):localStorage.removeItem(Le),sessionStorage.removeItem(Fe),F(`Bem-vindo, ${(i=b.user)==null?void 0:i.nome}!`,"success"),$()):F(b.message,"error")};const M=sessionStorage.getItem(Fe)==="true";return s.autoLogin&&s.remember&&s.username&&s.password&&!M&&setTimeout(()=>{var c;if(!e.isConnected&&!document.body.contains(e))return;const g=Y.login(s.username,s.password);g.success&&(F(`Bem-vindo de volta, ${(c=g.user)==null?void 0:c.nome}!`,"success"),$())},100),e}function Ne($){var c,A;const e=document.createElement("div"),t=Y.getCurrentUser(),o=k.getStudents(),s=k.getPlans(),l=k.getAppointments(),E=k.getTodayDateString(),a=l.filter(P=>P.data===E),M=o.filter(P=>P.status==="ativo").length,g=a.find(P=>P.status==="agendado");return e.innerHTML=`
+  `;const d=e.querySelector("#login-remember"),S=e.querySelector("#login-autologin");S==null||S.addEventListener("change",()=>{S.checked&&!d.checked&&(d.checked=!0)}),d==null||d.addEventListener("change",()=>{!d.checked&&S.checked&&(S.checked=!1)});const a=e.querySelector("#login-form");a.onsubmit=f=>{var l;f.preventDefault();const c=e.querySelector("#login-username"),A=e.querySelector("#login-password"),L=c.value.trim(),i=A.value.trim(),p=d.checked,x=S.checked,g=Y.login(L,i);g.success?(p?localStorage.setItem(Le,JSON.stringify({username:L,password:i,remember:!0,autoLogin:x})):localStorage.removeItem(Le),sessionStorage.removeItem(Fe),B(`Bem-vindo, ${(l=g.user)==null?void 0:l.nome}!`,"success"),w()):B(g.message,"error")};const M=sessionStorage.getItem(Fe)==="true";return s.autoLogin&&s.remember&&s.username&&s.password&&!M&&setTimeout(()=>{var c;if(!e.isConnected&&!document.body.contains(e))return;const f=Y.login(s.username,s.password);f.success&&(B(`Bem-vindo de volta, ${(c=f.user)==null?void 0:c.nome}!`,"success"),w())},100),e}function Ne(w){var c,A;const e=document.createElement("div"),t=Y.getCurrentUser(),o=k.getStudents(),s=k.getPlans(),d=k.getAppointments(),S=k.getTodayDateString(),a=d.filter(L=>L.data===S),M=o.filter(L=>L.status==="ativo").length,f=a.find(L=>L.status==="agendado");return e.innerHTML=`
     <!-- Cabeçalho de Boas-vindas -->
     <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
       <div>
@@ -188,7 +188,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       </div>
 
       <button class="btn btn-primary" id="home-btn-new-appointment">
-        ${j.plus} Novo Agendamento
+        ${R.plus} Novo Agendamento
       </button>
     </div>
 
@@ -196,7 +196,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-icon-box">
-          ${j.agenda}
+          ${R.agenda}
         </div>
         <div class="metric-data">
           <span class="metric-value">${a.length}</span>
@@ -206,7 +206,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
       <div class="metric-card">
         <div class="metric-icon-box">
-          ${j.alunos}
+          ${R.alunos}
         </div>
         <div class="metric-data">
           <span class="metric-value">${M}</span>
@@ -216,17 +216,17 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
       <div class="metric-card">
         <div class="metric-icon-box">
-          ${j.home}
+          ${R.home}
         </div>
         <div class="metric-data">
-          <span class="metric-value">${g?g.horaInicio:"--:--"}</span>
-          <span class="metric-label">${g?"Próxima aula":"Nenhuma pendente"}</span>
+          <span class="metric-value">${f?f.horaInicio:"--:--"}</span>
+          <span class="metric-label">${f?"Próxima aula":"Nenhuma pendente"}</span>
         </div>
       </div>
 
       <div class="metric-card">
         <div class="metric-icon-box">
-          ${j.planos}
+          ${R.planos}
         </div>
         <div class="metric-data">
           <span class="metric-value">${s.length}</span>
@@ -256,19 +256,19 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             </tr>
           </thead>
           <tbody id="today-classes-tbody">
-            ${a.length===0?'<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Nenhuma aula agendada para hoje.</td></tr>':a.map(P=>{const r=o.find(f=>f.id===P.alunoId),p=s.find(f=>f.id===P.planoId),x=P.status==="concluido",b=P.status==="agendado";let i='<span class="badge badge-warning">⏳ Agendado</span>';return x?i='<span class="badge badge-success">✓ Concluído</span>':P.status==="falta_justificada"?i='<span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">⚠️ Falta Justificada</span>':P.status==="falta_injustificada"?i='<span class="badge badge-danger">✕ Falta Injustificada</span>':P.status==="cancelado"&&(i='<span class="badge badge-secondary">🚫 Cancelado</span>'),`
-                        <tr data-app-id="${P.id}">
+            ${a.length===0?'<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Nenhuma aula agendada para hoje.</td></tr>':a.map(L=>{const i=o.find(v=>v.id===L.alunoId),p=s.find(v=>v.id===L.planoId),x=L.status==="concluido",g=L.status==="agendado";let l='<span class="badge badge-warning">⏳ Agendado</span>';return x?l='<span class="badge badge-success">✓ Concluído</span>':L.status==="falta_justificada"?l='<span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">⚠️ Falta Justificada</span>':L.status==="falta_injustificada"?l='<span class="badge badge-danger">✕ Falta Injustificada</span>':L.status==="cancelado"&&(l='<span class="badge badge-secondary">🚫 Cancelado</span>'),`
+                        <tr data-app-id="${L.id}">
                           <td style="white-space: nowrap;">
-                            <strong style="color: var(--text-white); font-size: 0.84rem;">${P.horaInicio} - ${P.horaFim}</strong>
-                            ${P.tipoAula==="reposicao"?'<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.68rem; margin-left: 4px;">🔄 Reposição</span>':""}
+                            <strong style="color: var(--text-white); font-size: 0.84rem;">${L.horaInicio} - ${L.horaFim}</strong>
+                            ${L.tipoAula==="reposicao"?'<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.68rem; margin-left: 4px;">🔄 Reposição</span>':""}
                           </td>
                           <td>
                             <div style="display: flex; align-items: center; gap: 8px;">
                               <div style="width: 24px; height: 24px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--color-coral); flex-shrink: 0;">
-                                ${((r==null?void 0:r.nome)||"A")[0]}
+                                ${((i==null?void 0:i.nome)||"A")[0]}
                               </div>
                               <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                ${(r==null?void 0:r.nome)||"Aluno não vinculado"}
+                                ${(i==null?void 0:i.nome)||"Aluno não vinculado"}
                               </span>
                             </div>
                           </td>
@@ -276,10 +276,10 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                             <span style="color: var(--text-secondary); font-size: 0.82rem;">${(p==null?void 0:p.nome)||"Plano Personalizado"}</span>
                           </td>
                           <td class="col-hide-sm" style="white-space: nowrap;">
-                            ${i}
+                            ${l}
                           </td>
                           <td style="text-align: right; white-space: nowrap;">
-                            ${b?`<button class="btn btn-secondary btn-complete-class" data-id="${P.id}" style="padding: 4px 10px; font-size: 0.76rem; color: var(--status-success);">
+                            ${g?`<button class="btn btn-secondary btn-complete-class" data-id="${L.id}" style="padding: 4px 10px; font-size: 0.76rem; color: var(--status-success);">
                                      ✓ Concluir
                                    </button>`:`<span style="font-size: 0.76rem; color: var(--text-muted);">${x?"Finalizada":"Registrada"}</span>`}
                           </td>
@@ -289,30 +289,30 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </table>
       </div>
     </div>
-  `,(c=e.querySelector("#home-btn-new-appointment"))==null||c.addEventListener("click",()=>{$("agenda")}),(A=e.querySelector("#home-btn-view-all-agenda"))==null||A.addEventListener("click",()=>{$("agenda")}),e.querySelectorAll(".btn-complete-class").forEach(P=>{P.addEventListener("click",r=>{const p=r.currentTarget.dataset.id;p&&(k.updateAppointment(p,{status:"concluido"},(t==null?void 0:t.nome)||"Administrador"),F("Aula concluída com sucesso!","success"),$("home"))})}),e}function We($){const e=document.createElement("div"),t=Y.getCurrentUser();let o=new Date;function s(){var I,u,S,L;const a=k.getStudents();k.getPlans();const M=k.getAppointments(),g=o.getFullYear(),c=o.getMonth(),A=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],P=new Date(g,c,1).getDay(),r=new Date(g,c+1,0).getDate(),p=new Date(g,c,0).getDate(),x=new Date,b=x.getFullYear()===g&&x.getMonth()===c,i=[];for(let n=P;n>0;n--){const m=p-n+1;i.push(`
+  `,(c=e.querySelector("#home-btn-new-appointment"))==null||c.addEventListener("click",()=>{w("agenda")}),(A=e.querySelector("#home-btn-view-all-agenda"))==null||A.addEventListener("click",()=>{w("agenda")}),e.querySelectorAll(".btn-complete-class").forEach(L=>{L.addEventListener("click",i=>{const p=i.currentTarget.dataset.id;p&&(k.updateAppointment(p,{status:"concluido"},(t==null?void 0:t.nome)||"Administrador"),B("Aula concluída com sucesso!","success"),w("home"))})}),e}function We(w){const e=document.createElement("div"),t=Y.getCurrentUser();let o=new Date;function s(){var E,h,I,z;const a=k.getStudents();k.getPlans();const M=k.getAppointments(),f=o.getFullYear(),c=o.getMonth(),A=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],L=new Date(f,c,1).getDay(),i=new Date(f,c+1,0).getDate(),p=new Date(f,c,0).getDate(),x=new Date,g=x.getFullYear()===f&&x.getMonth()===c,l=[];for(let n=L;n>0;n--){const m=p-n+1;l.push(`
         <div class="calendar-day-cell other-month">
           <div class="day-cell-header">
             <span class="day-number">${m}</span>
           </div>
         </div>
-      `)}for(let n=1;n<=r;n++){const m=N=>N.toString().padStart(2,"0"),w=`${g}-${m(c+1)}-${m(n)}`,d=b&&x.getDate()===n,h=M.filter(N=>N.data===w),z=h.slice(0,3).map(N=>{const C=a.find(V=>V.id===N.alunoId),D=C?C.nome.split(" ")[0]:"Aula";let B="",O="";return N.status==="concluido"?(B="concluido",O="✓ "):N.status==="falta_justificada"?(B="falta-justificada",O="⚠️ "):N.status==="falta_injustificada"?(B="falta-injustificada",O="✕ "):N.tipoAula==="reposicao"&&(B="reposicao",O="🔄 "),`
-            <div class="calendar-appointment-badge ${B}" 
+      `)}for(let n=1;n<=i;n++){const m=N=>N.toString().padStart(2,"0"),u=`${f}-${m(c+1)}-${m(n)}`,r=g&&x.getDate()===n,y=M.filter(N=>N.data===u),P=y.slice(0,3).map(N=>{const C=a.find(V=>V.id===N.alunoId),T=C?C.nome.split(" ")[0]:"Aula";let D="",q="";return N.status==="concluido"?(D="concluido",q="✓ "):N.status==="falta_justificada"?(D="falta-justificada",q="⚠️ "):N.status==="falta_injustificada"?(D="falta-injustificada",q="✕ "):N.tipoAula==="reposicao"&&(D="reposicao",q="🔄 "),`
+            <div class="calendar-appointment-badge ${D}" 
                  data-app-id="${N.id}" 
                  title="${N.horaInicio} - ${(C==null?void 0:C.nome)||"Aluno"} (${N.status}${N.tipoAula==="reposicao"?" - Reposição":""})">
-              <strong>${O}${N.horaInicio}</strong> ${D}
+              <strong>${q}${N.horaInicio}</strong> ${T}
             </div>
-          `}).join(""),T=h.length>3?h.length-3:0,_=T>0?`<div style="font-size: 0.68rem; color: var(--text-secondary); text-align: center;">+${T} mais</div>`:"";i.push(`
-        <div class="calendar-day-cell ${d?"today":""}" data-date="${w}">
+          `}).join(""),_=y.length>3?y.length-3:0,O=_>0?`<div style="font-size: 0.68rem; color: var(--text-secondary); text-align: center;">+${_} mais</div>`:"";l.push(`
+        <div class="calendar-day-cell ${r?"today":""}" data-date="${u}">
           <div class="day-cell-header">
             <span class="day-number">${n}</span>
-            ${h.length>0?`<span style="font-size: 0.65rem; color: var(--color-coral); font-weight: 700;">● ${h.length}</span>`:""}
+            ${y.length>0?`<span style="font-size: 0.65rem; color: var(--color-coral); font-weight: 700;">● ${y.length}</span>`:""}
           </div>
           <div class="day-appointments-list">
-            ${z}
-            ${_}
+            ${P}
+            ${O}
           </div>
         </div>
-      `)}const f=i.length,v=f>35?42-f:35-f;for(let n=1;n<=v;n++)i.push(`
+      `)}const v=l.length,b=v>35?42-v:35-v;for(let n=1;n<=b;n++)l.push(`
         <div class="calendar-day-cell other-month">
           <div class="day-cell-header">
             <span class="day-number">${n}</span>
@@ -323,13 +323,13 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <!-- Topo da Agenda -->
         <div class="calendar-header">
           <div class="calendar-title-group">
-            <h2 class="calendar-month-title">${A[c]} de ${g}</h2>
+            <h2 class="calendar-month-title">${A[c]} de ${f}</h2>
             
             <div class="calendar-nav-buttons">
               <button class="btn btn-secondary btn-icon-only" id="agenda-btn-prev" title="Mês anterior">
                 ◀
               </button>
-              <button class="btn ${b?"btn-primary":"btn-secondary"}" id="agenda-btn-today" style="padding: 6px 14px; font-size: 0.8rem;">
+              <button class="btn ${g?"btn-primary":"btn-secondary"}" id="agenda-btn-today" style="padding: 6px 14px; font-size: 0.8rem;">
                 Hoje
               </button>
               <button class="btn btn-secondary btn-icon-only" id="agenda-btn-next" title="Próximo mês">
@@ -339,9 +339,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
 
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            ${Z(t,"agenda","cadastrar")?`
+            ${W(t,"agenda","cadastrar")?`
                   <button class="btn btn-primary" id="agenda-btn-new-app">
-                    ${j.plus} Nova Aula / Compromisso
+                    ${R.plus} Nova Aula / Compromisso
                   </button>
                 `:""}
           </div>
@@ -357,7 +357,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <div class="calendar-day-name">SEX</div>
           <div class="calendar-day-name">SÁB</div>
 
-          ${i.join("")}
+          ${l.join("")}
         </div>
 
         <!-- Legenda de Status de Aulas -->
@@ -380,72 +380,72 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </span>
         </div>
       </div>
-    `,(I=e.querySelector("#agenda-btn-prev"))==null||I.addEventListener("click",()=>{o.setMonth(o.getMonth()-1),s()}),(u=e.querySelector("#agenda-btn-next"))==null||u.addEventListener("click",()=>{o.setMonth(o.getMonth()+1),s()}),(S=e.querySelector("#agenda-btn-today"))==null||S.addEventListener("click",()=>{o=new Date,s()}),(L=e.querySelector("#agenda-btn-new-app"))==null||L.addEventListener("click",()=>{E()}),e.querySelectorAll(".calendar-day-cell:not(.other-month)").forEach(n=>{n.addEventListener("click",m=>{const w=n.dataset.date;w&&l(w)})}),e.querySelectorAll(".calendar-appointment-badge").forEach(n=>{n.addEventListener("click",m=>{m.stopPropagation();const w=n.dataset.appId,d=M.find(h=>h.id===w);d&&l(d.data)})})}function l(a){const M=k.getStudents(),g=k.getPlans(),c=k.getAppointments().filter(i=>i.data===a),[A,P,r]=a.split("-"),p=`${r}/${P}/${A}`,x=c.length===0?`<div style="text-align: center; color: var(--text-muted); padding: 30px; font-size: 0.88rem;">
+    `,(E=e.querySelector("#agenda-btn-prev"))==null||E.addEventListener("click",()=>{o.setMonth(o.getMonth()-1),s()}),(h=e.querySelector("#agenda-btn-next"))==null||h.addEventListener("click",()=>{o.setMonth(o.getMonth()+1),s()}),(I=e.querySelector("#agenda-btn-today"))==null||I.addEventListener("click",()=>{o=new Date,s()}),(z=e.querySelector("#agenda-btn-new-app"))==null||z.addEventListener("click",()=>{S()}),e.querySelectorAll(".calendar-day-cell:not(.other-month)").forEach(n=>{n.addEventListener("click",m=>{const u=n.dataset.date;u&&d(u)})}),e.querySelectorAll(".calendar-appointment-badge").forEach(n=>{n.addEventListener("click",m=>{m.stopPropagation();const u=n.dataset.appId,r=M.find(y=>y.id===u);r&&d(r.data)})})}function d(a){const M=k.getStudents(),f=k.getPlans(),c=k.getAppointments().filter(l=>l.data===a),[A,L,i]=a.split("-"),p=`${i}/${L}/${A}`,x=c.length===0?`<div style="text-align: center; color: var(--text-muted); padding: 30px; font-size: 0.88rem;">
            Nenhum compromisso para este dia.
          </div>`:`
         <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; max-height: 420px; overflow-y: auto; padding-right: 4px;">
-          ${c.map(i=>{const f=M.find(h=>h.id===i.alunoId),v=g.find(h=>h.id===i.planoId),I=i.status==="concluido",u=i.status==="falta_justificada",S=i.status==="falta_injustificada",L=i.status==="cancelado",n=i.status==="agendado",m=i.tipoAula==="reposicao";let w="var(--color-coral)",d='<span class="badge badge-warning" style="font-size: 0.68rem; padding: 2px 7px;">⏳ Agendado</span>';return I?(w="var(--status-success)",d='<span class="badge badge-success" style="font-size: 0.68rem; padding: 2px 7px;">✓ Concluído</span>'):u?(w="#f59e0b",d='<span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.68rem; padding: 2px 7px;">⚠️ Falta Justificada</span>'):S?(w="var(--status-danger)",d='<span class="badge badge-danger" style="font-size: 0.68rem; padding: 2px 7px;">✕ Falta Injustificada</span>'):L&&(w="var(--border-subtle)",d='<span class="badge badge-secondary" style="font-size: 0.68rem; padding: 2px 7px;">🚫 Cancelado</span>'),`
-                <div style="background-color: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; border-left: 4px solid ${w};">
+          ${c.map(l=>{const v=M.find(y=>y.id===l.alunoId),b=f.find(y=>y.id===l.planoId),E=l.status==="concluido",h=l.status==="falta_justificada",I=l.status==="falta_injustificada",z=l.status==="cancelado",n=l.status==="agendado",m=l.tipoAula==="reposicao";let u="var(--color-coral)",r='<span class="badge badge-warning" style="font-size: 0.68rem; padding: 2px 7px;">⏳ Agendado</span>';return E?(u="var(--status-success)",r='<span class="badge badge-success" style="font-size: 0.68rem; padding: 2px 7px;">✓ Concluído</span>'):h?(u="#f59e0b",r='<span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.68rem; padding: 2px 7px;">⚠️ Falta Justificada</span>'):I?(u="var(--status-danger)",r='<span class="badge badge-danger" style="font-size: 0.68rem; padding: 2px 7px;">✕ Falta Injustificada</span>'):z&&(u="var(--border-subtle)",r='<span class="badge badge-secondary" style="font-size: 0.68rem; padding: 2px 7px;">🚫 Cancelado</span>'),`
+                <div style="background-color: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; border-left: 4px solid ${u};">
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
                     <div>
                       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <strong style="font-size: 0.9rem; color: var(--text-white);">${i.horaInicio} - ${i.horaFim}</strong>
-                        ${d}
+                        <strong style="font-size: 0.9rem; color: var(--text-white);">${l.horaInicio} - ${l.horaFim}</strong>
+                        ${r}
                         ${m?'<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.65rem;">🔄 Aula de Reposição</span>':""}
                       </div>
 
                       <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-white); margin-top: 4px;">
-                        ${i.titulo}
+                        ${l.titulo}
                       </div>
 
                       <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 3px;">
-                        Aluno: <strong style="color: var(--text-white);">${(f==null?void 0:f.nome)||"Não vinculado"}</strong>
-                        ${f!=null&&f.instrumentoPrincipal?` &bull; <span style="color: #60a5fa;">${f.instrumentoPrincipal}</span>`:""}
-                        ${v?` &bull; Plano: <span style="color: #ff9187;">${v.nome}</span>`:""}
+                        Aluno: <strong style="color: var(--text-white);">${(v==null?void 0:v.nome)||"Não vinculado"}</strong>
+                        ${v!=null&&v.instrumentoPrincipal?` &bull; <span style="color: #60a5fa;">${v.instrumentoPrincipal}</span>`:""}
+                        ${b?` &bull; Plano: <span style="color: #ff9187;">${b.nome}</span>`:""}
                       </div>
 
-                      ${i.justificativaFalta?`<div style="font-size: 0.78rem; color: #f59e0b; margin-top: 4px; background: rgba(245, 158, 11, 0.08); padding: 4px 8px; border-radius: 4px;">
-                               <strong>Justificativa da falta:</strong> ${i.justificativaFalta}
+                      ${l.justificativaFalta?`<div style="font-size: 0.78rem; color: #f59e0b; margin-top: 4px; background: rgba(245, 158, 11, 0.08); padding: 4px 8px; border-radius: 4px;">
+                               <strong>Justificativa da falta:</strong> ${l.justificativaFalta}
                              </div>`:""}
 
-                      ${i.aulaReposicaoId?`<div style="font-size: 0.74rem; color: #4ade80; margin-top: 4px;">
+                      ${l.aulaReposicaoId?`<div style="font-size: 0.74rem; color: #4ade80; margin-top: 4px;">
                                ✓ Reposição já foi agendada para esta falta.
                              </div>`:""}
 
-                      ${i.observacoes?`<div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px; font-style: italic;">Obs: ${i.observacoes}</div>`:""}
+                      ${l.observacoes?`<div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px; font-style: italic;">Obs: ${l.observacoes}</div>`:""}
                     </div>
 
                     <div style="display: flex; gap: 4px; align-items: center; flex-shrink: 0;">
-                      ${Z(t,"agenda","alterar")?`
-                            <button type="button" class="btn btn-secondary btn-icon-only btn-edit-app-day" data-id="${i.id}" title="Editar Detalhes">
-                              ${j.edit}
+                      ${W(t,"agenda","alterar")?`
+                            <button type="button" class="btn btn-secondary btn-icon-only btn-edit-app-day" data-id="${l.id}" title="Editar Detalhes">
+                              ${R.edit}
                             </button>
                           `:""}
-                      ${Z(t,"agenda","excluir")?`
-                            <button type="button" class="btn btn-danger btn-icon-only btn-delete-app-day" data-id="${i.id}" title="Excluir">
-                              ${j.trash}
+                      ${W(t,"agenda","excluir")?`
+                            <button type="button" class="btn btn-danger btn-icon-only btn-delete-app-day" data-id="${l.id}" title="Excluir">
+                              ${R.trash}
                             </button>
                           `:""}
                     </div>
                   </div>
 
                   <!-- Linha de Ações Rápidas de Presença e Falta -->
-                  ${Z(t,"agenda","alterar")?`
+                  ${W(t,"agenda","alterar")?`
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.06);">
                           ${n?`
-                                <button type="button" class="btn btn-secondary btn-sm btn-mark-presence" data-id="${i.id}" style="font-size: 0.75rem; color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
+                                <button type="button" class="btn btn-secondary btn-sm btn-mark-presence" data-id="${l.id}" style="font-size: 0.75rem; color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
                                   ✓ Presença
                                 </button>
-                                <button type="button" class="btn btn-secondary btn-sm btn-mark-absence-just" data-id="${i.id}" data-name="${(f==null?void 0:f.nome)||""}" style="font-size: 0.75rem; color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">
+                                <button type="button" class="btn btn-secondary btn-sm btn-mark-absence-just" data-id="${l.id}" data-name="${(v==null?void 0:v.nome)||""}" style="font-size: 0.75rem; color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">
                                   ⚠️ Falta Justificada (+1 Reposição)
                                 </button>
-                                <button type="button" class="btn btn-secondary btn-sm btn-mark-absence-injust" data-id="${i.id}" style="font-size: 0.75rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                                <button type="button" class="btn btn-secondary btn-sm btn-mark-absence-injust" data-id="${l.id}" style="font-size: 0.75rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
                                   ✕ Falta Injustificada
                                 </button>
                               `:""}
 
-                          ${u&&!i.aulaReposicaoId?`
-                                <button type="button" class="btn btn-primary btn-sm btn-schedule-reposicao" data-id="${i.id}" data-student-id="${i.alunoId}" data-title="${i.titulo}" style="font-size: 0.75rem; padding: 4px 10px;">
+                          ${h&&!l.aulaReposicaoId?`
+                                <button type="button" class="btn btn-primary btn-sm btn-schedule-reposicao" data-id="${l.id}" data-student-id="${l.alunoId}" data-title="${l.titulo}" style="font-size: 0.75rem; padding: 4px 10px;">
                                   🔄 Remarcar / Agendar Reposição
                                 </button>
                               `:""}
@@ -454,22 +454,22 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 </div>
               `}).join("")}
         </div>
-      `,b=`
+      `,g=`
       <div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-subtle);">
           <span style="font-size: 0.82rem; color: var(--text-secondary);">
             Compromissos agendados: <strong style="color: var(--text-white);">${c.length}</strong>
           </span>
-          ${Z(t,"agenda","cadastrar")?`
+          ${W(t,"agenda","cadastrar")?`
                 <button type="button" class="btn btn-primary" id="btn-modal-new-appointment" style="padding: 6px 14px; font-size: 0.8rem;">
-                  ${j.plus} Novo Compromisso
+                  ${R.plus} Novo Compromisso
                 </button>
               `:""}
         </div>
 
         ${x}
       </div>
-    `;re({title:`Aulas do Dia: ${p}`,bodyHtml:b,modalClass:"modal-lg",cancelText:"Fechar",confirmText:""}),setTimeout(()=>{var i;(i=document.getElementById("btn-modal-new-appointment"))==null||i.addEventListener("click",()=>{ve(),E({defaultDate:a})}),document.querySelectorAll(".btn-mark-presence").forEach(f=>{f.addEventListener("click",v=>{const I=v.currentTarget.dataset.id;I&&(k.marcarPresenca(I,(t==null?void 0:t.nome)||"Administrador"),F("Presença confirmada e aula concluída!","success"),s(),l(a))})}),document.querySelectorAll(".btn-mark-absence-just").forEach(f=>{f.addEventListener("click",v=>{const I=v.currentTarget.dataset.id,u=v.currentTarget.dataset.name;if(!I)return;const S=prompt(`Informe o motivo da falta justificada de ${u} (Ex: Atestado médico, Viagem em família):`);if(S===null)return;const L=k.registrarFalta(I,!0,S,(t==null?void 0:t.nome)||"Administrador");F(`Falta justificada registrada! +1 crédito de reposição gerado (Saldo: ${L.saldoReposicoes}).`,"success"),s(),l(a)})}),document.querySelectorAll(".btn-mark-absence-injust").forEach(f=>{f.addEventListener("click",v=>{const I=v.currentTarget.dataset.id;I&&fe({title:"Falta Injustificada",message:"Deseja registrar falta sem aviso prévio / injustificada? <strong>Não será gerado crédito de reposição</strong> para o aluno.",confirmText:"Registrar Falta",confirmBtnClass:"btn-danger",onConfirm:()=>{k.registrarFalta(I,!1,void 0,(t==null?void 0:t.nome)||"Administrador"),F("Falta injustificada registrada.","info"),s(),l(a)}})})}),document.querySelectorAll(".btn-schedule-reposicao").forEach(f=>{f.addEventListener("click",v=>{const I=v.currentTarget,u=I.dataset.id,S=I.dataset.studentId,L=I.dataset.title;ve(),E({studentId:S,aulaOriginalId:u,tipoAula:"reposicao",titulo:L?`Reposição: ${L}`:"Aula de Reposição"})})}),document.querySelectorAll(".btn-edit-app-day").forEach(f=>{f.addEventListener("click",v=>{const I=v.currentTarget.dataset.id,u=k.getAppointments().find(S=>S.id===I);u&&(ve(),E({existingApp:u}))})}),document.querySelectorAll(".btn-delete-app-day").forEach(f=>{f.addEventListener("click",v=>{const I=v.currentTarget.dataset.id,u=k.getAppointments().find(S=>S.id===I);u&&fe({title:"Excluir Compromisso",message:`Deseja realmente excluir o compromisso "<strong>${u.titulo}</strong>"?`,onConfirm:()=>{k.deleteAppointment(u.id,(t==null?void 0:t.nome)||"Administrador"),F("Compromisso removido.","info"),s(),l(a)}})})})},50)}function E(a){const M=k.getStudents(),g=k.getPlans(),c=a==null?void 0:a.existingApp,A=!!c,P=(c==null?void 0:c.alunoId)||(a==null?void 0:a.studentId)||"",r=(c==null?void 0:c.data)||(a==null?void 0:a.defaultDate)||k.getTodayDateString(),p=((c==null?void 0:c.tipoAula)||(a==null?void 0:a.tipoAula))==="reposicao",x=M.map(f=>`<option value="${f.id}" ${P===f.id?"selected":""}>${f.nome} (${f.instrumentoPrincipal||"Geral"}) - Saldo: ${f.saldoReposicoes||0} rep.</option>`).join(""),b=g.map(f=>`<option value="${f.id}" ${(c==null?void 0:c.planoId)===f.id?"selected":""}>${f.nome}</option>`).join(""),i=`
+    `;ne({title:`Aulas do Dia: ${p}`,bodyHtml:g,modalClass:"modal-lg",cancelText:"Fechar",confirmText:""}),setTimeout(()=>{var l;(l=document.getElementById("btn-modal-new-appointment"))==null||l.addEventListener("click",()=>{ve(),S({defaultDate:a})}),document.querySelectorAll(".btn-mark-presence").forEach(v=>{v.addEventListener("click",b=>{const E=b.currentTarget.dataset.id;E&&(k.marcarPresenca(E,(t==null?void 0:t.nome)||"Administrador"),B("Presença confirmada e aula concluída!","success"),s(),d(a))})}),document.querySelectorAll(".btn-mark-absence-just").forEach(v=>{v.addEventListener("click",b=>{const E=b.currentTarget.dataset.id,h=b.currentTarget.dataset.name;if(!E)return;const I=prompt(`Informe o motivo da falta justificada de ${h} (Ex: Atestado médico, Viagem em família):`);if(I===null)return;const z=k.registrarFalta(E,!0,I,(t==null?void 0:t.nome)||"Administrador");B(`Falta justificada registrada! +1 crédito de reposição gerado (Saldo: ${z.saldoReposicoes}).`,"success"),s(),d(a)})}),document.querySelectorAll(".btn-mark-absence-injust").forEach(v=>{v.addEventListener("click",b=>{const E=b.currentTarget.dataset.id;E&&fe({title:"Falta Injustificada",message:"Deseja registrar falta sem aviso prévio / injustificada? <strong>Não será gerado crédito de reposição</strong> para o aluno.",confirmText:"Registrar Falta",confirmBtnClass:"btn-danger",onConfirm:()=>{k.registrarFalta(E,!1,void 0,(t==null?void 0:t.nome)||"Administrador"),B("Falta injustificada registrada.","info"),s(),d(a)}})})}),document.querySelectorAll(".btn-schedule-reposicao").forEach(v=>{v.addEventListener("click",b=>{const E=b.currentTarget,h=E.dataset.id,I=E.dataset.studentId,z=E.dataset.title;ve(),S({studentId:I,aulaOriginalId:h,tipoAula:"reposicao",titulo:z?`Reposição: ${z}`:"Aula de Reposição"})})}),document.querySelectorAll(".btn-edit-app-day").forEach(v=>{v.addEventListener("click",b=>{const E=b.currentTarget.dataset.id,h=k.getAppointments().find(I=>I.id===E);h&&(ve(),S({existingApp:h}))})}),document.querySelectorAll(".btn-delete-app-day").forEach(v=>{v.addEventListener("click",b=>{const E=b.currentTarget.dataset.id,h=k.getAppointments().find(I=>I.id===E);h&&fe({title:"Excluir Compromisso",message:`Deseja realmente excluir o compromisso "<strong>${h.titulo}</strong>"?`,onConfirm:()=>{k.deleteAppointment(h.id,(t==null?void 0:t.nome)||"Administrador"),B("Compromisso removido.","info"),s(),d(a)}})})})},50)}function S(a){const M=k.getStudents(),f=k.getPlans(),c=a==null?void 0:a.existingApp,A=!!c,L=(c==null?void 0:c.alunoId)||(a==null?void 0:a.studentId)||"",i=(c==null?void 0:c.data)||(a==null?void 0:a.defaultDate)||k.getTodayDateString(),p=((c==null?void 0:c.tipoAula)||(a==null?void 0:a.tipoAula))==="reposicao",x=M.map(v=>`<option value="${v.id}" ${L===v.id?"selected":""}>${v.nome} (${v.instrumentoPrincipal||"Geral"}) - Saldo: ${v.saldoReposicoes||0} rep.</option>`).join(""),g=f.map(v=>`<option value="${v.id}" ${(c==null?void 0:c.planoId)===v.id?"selected":""}>${v.nome}</option>`).join(""),l=`
       <form id="app-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         
         <!-- Tipo de Aula -->
@@ -504,14 +504,14 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <label class="form-label" for="app-plan">Plano de Ensino (Opcional)</label>
           <select id="app-plan" class="form-select">
             <option value="">Selecione o Plano...</option>
-            ${b}
+            ${g}
           </select>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="app-date">Data</label>
-            <input type="date" id="app-date" class="form-input" value="${r}" required />
+            <input type="date" id="app-date" class="form-input" value="${i}" required />
           </div>
 
           <div class="form-group" style="margin: 0;">
@@ -550,11 +550,11 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
         ${A?`<div style="padding-top: 10px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between;">
                  <button type="button" class="btn btn-danger" id="btn-delete-app" style="padding: 6px 14px; font-size: 0.8rem;">
-                   ${j.trash} Excluir Compromisso
+                   ${R.trash} Excluir Compromisso
                  </button>
                </div>`:""}
       </form>
-    `;re({title:A?"Editar Aula / Compromisso":p?"🔄 Agendar Aula de Reposição":"Cadastrar Nova Aula",bodyHtml:i,confirmText:A?"Salvar Alterações":"Confirmar Agendamento",onConfirm:()=>{const f=document.getElementById("app-title").value.trim(),v=document.getElementById("app-student").value,I=document.getElementById("app-plan").value,u=document.getElementById("app-date").value,S=document.getElementById("app-time-start").value,L=document.getElementById("app-time-end").value,n=document.getElementById("app-status").value,m=document.getElementById("app-justificativa").value.trim(),w=document.getElementById("app-obs").value.trim(),d=document.querySelector('input[name="app-tipo-aula"]:checked'),h=(d==null?void 0:d.value)||"regular";if(!f||!v||!u||!S)return F("Preencha os campos obrigatórios (Título, Aluno, Data e Início).","error"),!1;const z=(t==null?void 0:t.nome)||"Administrador";return A&&c?(k.updateAppointment(c.id,{titulo:f,alunoId:v,planoId:I||void 0,data:u,horaInicio:S,horaFim:L,status:n,tipoAula:h,justificativaFalta:m||void 0,observacoes:w},z),F("Aula atualizada com sucesso!","success")):h==="reposicao"?(k.agendarReposicao({titulo:f,alunoId:v,planoId:I||void 0,data:u,horaInicio:S,horaFim:L,status:n,justificativaFalta:m||void 0,observacoes:w},a==null?void 0:a.aulaOriginalId,z),F("Aula de reposição agendada com sucesso (1 crédito abatido)!","success")):(k.addAppointment({titulo:f,alunoId:v,planoId:I||void 0,data:u,horaInicio:S,horaFim:L,status:n,tipoAula:h,justificativaFalta:m||void 0,observacoes:w},z),F("Aula agendada com sucesso!","success")),s(),!0}}),A&&c&&setTimeout(()=>{var f;(f=document.getElementById("btn-delete-app"))==null||f.addEventListener("click",()=>{fe({title:"Excluir Compromisso",message:`Deseja realmente excluir o compromisso "<strong>${c.titulo}</strong>"?`,onConfirm:()=>{k.deleteAppointment(c.id,(t==null?void 0:t.nome)||"Administrador"),F("Compromisso removido.","info"),ve(),s()}})})},50)}return s(),e}const Ze=["Violão","Piano & Teclado","Guitarra","Bateria & Percussão","Técnica Vocal / Canto","Baixo","Violino","Flauta","Saxofone","Musicalização Infantil","Outro"];function Re($){const e=($||"").toLowerCase();return e.includes("bateria")||e.includes("percuss")?"🥁":e.includes("piano")||e.includes("teclado")?"🎹":e.includes("guitarra")?"🎸":e.includes("violão")||e.includes("violao")?"🪕":e.includes("canto")||e.includes("vocal")?"🎤":e.includes("baixo")?"🎸":e.includes("violino")?"🎻":e.includes("flauta")||e.includes("sax")?"🎷":"🎵"}function Xe($){if(!$)return"";const e=new Date($+"T00:00:00");if(isNaN(e.getTime()))return"";const t=new Date;let o=t.getFullYear()-e.getFullYear();const s=t.getMonth()-e.getMonth();return(s<0||s===0&&t.getDate()<e.getDate())&&o--,`${o} anos`}function Qe($,e){const t=$.replace(/\D/g,"");if(!t)return"";const o=t.length<=11?`55${t}`:t,s=encodeURIComponent(`Olá, ${e}! Aqui é da escola de música Acusticamente.`);return`https://wa.me/${o}?text=${s}`}function qe($,e){const t={pix:"PIX Instantâneo",dinheiro:"Dinheiro em Espécie",cartao_credito:"Cartão de Crédito",cartao_debito:"Cartão de Débito",boleto:"Boleto Bancário",transferencia:"Transferência Bancária"},o=`
+    `;ne({title:A?"Editar Aula / Compromisso":p?"🔄 Agendar Aula de Reposição":"Cadastrar Nova Aula",bodyHtml:l,confirmText:A?"Salvar Alterações":"Confirmar Agendamento",onConfirm:()=>{const v=document.getElementById("app-title").value.trim(),b=document.getElementById("app-student").value,E=document.getElementById("app-plan").value,h=document.getElementById("app-date").value,I=document.getElementById("app-time-start").value,z=document.getElementById("app-time-end").value,n=document.getElementById("app-status").value,m=document.getElementById("app-justificativa").value.trim(),u=document.getElementById("app-obs").value.trim(),r=document.querySelector('input[name="app-tipo-aula"]:checked'),y=(r==null?void 0:r.value)||"regular";if(!v||!b||!h||!I)return B("Preencha os campos obrigatórios (Título, Aluno, Data e Início).","error"),!1;const P=(t==null?void 0:t.nome)||"Administrador";return A&&c?(k.updateAppointment(c.id,{titulo:v,alunoId:b,planoId:E||void 0,data:h,horaInicio:I,horaFim:z,status:n,tipoAula:y,justificativaFalta:m||void 0,observacoes:u},P),B("Aula atualizada com sucesso!","success")):y==="reposicao"?(k.agendarReposicao({titulo:v,alunoId:b,planoId:E||void 0,data:h,horaInicio:I,horaFim:z,status:n,justificativaFalta:m||void 0,observacoes:u},a==null?void 0:a.aulaOriginalId,P),B("Aula de reposição agendada com sucesso (1 crédito abatido)!","success")):(k.addAppointment({titulo:v,alunoId:b,planoId:E||void 0,data:h,horaInicio:I,horaFim:z,status:n,tipoAula:y,justificativaFalta:m||void 0,observacoes:u},P),B("Aula agendada com sucesso!","success")),s(),!0}}),A&&c&&setTimeout(()=>{var v;(v=document.getElementById("btn-delete-app"))==null||v.addEventListener("click",()=>{fe({title:"Excluir Compromisso",message:`Deseja realmente excluir o compromisso "<strong>${c.titulo}</strong>"?`,onConfirm:()=>{k.deleteAppointment(c.id,(t==null?void 0:t.nome)||"Administrador"),B("Compromisso removido.","info"),ve(),s()}})})},50)}return s(),e}const Xe=["Violão","Piano & Teclado","Guitarra","Bateria & Percussão","Técnica Vocal / Canto","Baixo","Violino","Flauta","Saxofone","Musicalização Infantil","Outro"];function Re(w){const e=(w||"").toLowerCase();return e.includes("bateria")||e.includes("percuss")?"🥁":e.includes("piano")||e.includes("teclado")?"🎹":e.includes("guitarra")?"🎸":e.includes("violão")||e.includes("violao")?"🪕":e.includes("canto")||e.includes("vocal")?"🎤":e.includes("baixo")?"🎸":e.includes("violino")?"🎻":e.includes("flauta")||e.includes("sax")?"🎷":"🎵"}function Qe(w){if(!w)return"";const e=new Date(w+"T00:00:00");if(isNaN(e.getTime()))return"";const t=new Date;let o=t.getFullYear()-e.getFullYear();const s=t.getMonth()-e.getMonth();return(s<0||s===0&&t.getDate()<e.getDate())&&o--,`${o} anos`}function Ke(w,e){const t=w.replace(/\D/g,"");if(!t)return"";const o=t.length<=11?`55${t}`:t,s=encodeURIComponent(`Olá, ${e}! Aqui é da escola de música Acusticamente.`);return`https://wa.me/${o}?text=${s}`}function qe(w,e){const t={pix:"PIX Instantâneo",dinheiro:"Dinheiro em Espécie",cartao_credito:"Cartão de Crédito",cartao_debito:"Cartão de Débito",boleto:"Boleto Bancário",transferencia:"Transferência Bancária"},o=`
     <div id="receipt-print-area" style="background: #ffffff; color: #111827; padding: 24px; border-radius: 8px; font-family: 'Segoe UI', system-ui, sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 14px; margin-bottom: 16px;">
         <div>
@@ -565,7 +565,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div style="text-align: right;">
           <div style="font-size: 0.72rem; font-weight: 700; color: #4b5563; text-transform: uppercase;">Comprovante de Pagamento</div>
           <div style="font-size: 1.15rem; font-weight: 800; color: #059669; margin-top: 2px;">QUITADO ✓</div>
-          <div style="font-size: 0.7rem; color: #6b7280;">Lançamento Nº: ${$.id.toUpperCase()}</div>
+          <div style="font-size: 0.7rem; color: #6b7280;">Lançamento Nº: ${w.id.toUpperCase()}</div>
         </div>
       </div>
 
@@ -590,13 +590,13 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <tbody>
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
-              <strong>${$.descricao}</strong>
-              ${$.observacoes?`<br><small style="color: #6b7280;">${$.observacoes}</small>`:""}
+              <strong>${w.descricao}</strong>
+              ${w.observacoes?`<br><small style="color: #6b7280;">${w.observacoes}</small>`:""}
             </td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${$.dataVencimento.split("-").reverse().join("/")}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${$.dataPagamento?$.dataPagamento.split("-").reverse().join("/"):"-"}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${w.dataVencimento.split("-").reverse().join("/")}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${w.dataPagamento?w.dataPagamento.split("-").reverse().join("/"):"-"}</td>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 700; color: #111827;">
-              R$ ${$.valor.toFixed(2)}
+              R$ ${w.valor.toFixed(2)}
             </td>
           </tr>
         </tbody>
@@ -605,10 +605,10 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 12px; font-size: 0.85rem;">
         <div>
           <span style="color: #6b7280;">Forma de Liquidação:</span> 
-          <strong>${$.formaPagamento?t[$.formaPagamento]||$.formaPagamento.toUpperCase():"Não informada"}</strong>
+          <strong>${w.formaPagamento?t[w.formaPagamento]||w.formaPagamento.toUpperCase():"Não informada"}</strong>
         </div>
         <div style="font-size: 1.15rem; font-weight: 800; color: #111827;">
-          Total: R$ ${$.valor.toFixed(2)}
+          Total: R$ ${w.valor.toFixed(2)}
         </div>
       </div>
 
@@ -616,7 +616,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         Documento emitido para controle interno pedagógico &bull; Acusticamente Escola de Música
       </div>
     </div>
-  `;re({title:`Recibo de Pagamento: ${$.descricao}`,bodyHtml:o,modalClass:"modal-md",confirmText:"🖨️ Imprimir Recibo",cancelText:"Fechar",onConfirm:()=>(window.print(),!1)})}function Ke($){const e=document.createElement("div"),t=Y.getCurrentUser();let o="";function s(){var p,x;const a=k.getStudents(),M=k.getPlans(),g=Z(t,"alunos","cadastrar"),c=Z(t,"alunos","alterar"),A=Z(t,"alunos","excluir"),P=a.filter(b=>b.nome.toLowerCase().includes(o.toLowerCase())||b.email.toLowerCase().includes(o.toLowerCase())||b.telefone.includes(o)||b.instrumentoPrincipal&&b.instrumentoPrincipal.toLowerCase().includes(o.toLowerCase())||b.responsavelNome&&b.responsavelNome.toLowerCase().includes(o.toLowerCase()));e.innerHTML=`
+  `;ne({title:`Recibo de Pagamento: ${w.descricao}`,bodyHtml:o,modalClass:"modal-md",confirmText:"🖨️ Imprimir Recibo",cancelText:"Fechar",onConfirm:()=>(window.print(),!1)})}function Ze(w){const e=document.createElement("div"),t=Y.getCurrentUser();let o="";function s(){var p,x;const a=k.getStudents(),M=k.getPlans(),f=W(t,"alunos","cadastrar"),c=W(t,"alunos","alterar"),A=W(t,"alunos","excluir"),L=a.filter(g=>g.nome.toLowerCase().includes(o.toLowerCase())||g.email.toLowerCase().includes(o.toLowerCase())||g.telefone.includes(o)||g.instrumentoPrincipal&&g.instrumentoPrincipal.toLowerCase().includes(o.toLowerCase())||g.responsavelNome&&g.responsavelNome.toLowerCase().includes(o.toLowerCase()));e.innerHTML=`
       <!-- Cabeçalho da Tela -->
       <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
@@ -628,9 +628,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </p>
         </div>
 
-        ${g?`
+        ${f?`
               <button class="btn btn-primary" id="btn-new-student">
-                ${j.plus} Cadastrar Novo Aluno
+                ${R.plus} Cadastrar Novo Aluno
               </button>
             `:""}
       </div>
@@ -647,7 +647,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             style="padding-left: 36px;"
           />
           <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
-            ${j.search}
+            ${R.search}
           </div>
         </div>
         ${o?'<button class="btn btn-secondary btn-sm" id="btn-clear-search">Limpar</button>':""}
@@ -656,7 +656,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <!-- Painel e Tabela de Alunos -->
       <div class="panel-card">
         <div class="panel-card-header">
-          <h3 class="panel-card-title">Alunos Matriculados (${P.length})</h3>
+          <h3 class="panel-card-title">Alunos Matriculados (${L.length})</h3>
         </div>
 
         <div class="table-responsive">
@@ -672,57 +672,57 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
               </tr>
             </thead>
             <tbody>
-              ${P.length===0?'<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum aluno encontrado.</td></tr>':P.map(b=>{const i=M.find(v=>v.id===b.planoId),f=b.status==="ativo";return`
+              ${L.length===0?'<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum aluno encontrado.</td></tr>':L.map(g=>{const l=M.find(b=>b.id===g.planoId),v=g.status==="ativo";return`
                           <tr>
                             <td>
                               <div style="display: flex; align-items: center; gap: 10px;">
                                 <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); flex-shrink: 0; font-size: 0.8rem;">
-                                  ${b.nome[0]||"A"}
+                                  ${g.nome[0]||"A"}
                                 </div>
                                 <span style="font-weight: 600; color: var(--text-white); font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                  ${b.nome}
+                                  ${g.nome}
                                 </span>
                               </div>
                             </td>
 
                             <td class="col-hide-md">
                               <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
-                                <span style="font-size: 0.95rem;">${Re(b.instrumentoPrincipal)}</span>
-                                <span style="font-size: 0.82rem; color: var(--text-white);">${b.instrumentoPrincipal||"Geral"}</span>
+                                <span style="font-size: 0.95rem;">${Re(g.instrumentoPrincipal)}</span>
+                                <span style="font-size: 0.82rem; color: var(--text-white);">${g.instrumentoPrincipal||"Geral"}</span>
                               </div>
                             </td>
 
                             <td class="col-hide-sm">
                               <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
-                                ${b.telefone||"-"}
+                                ${g.telefone||"-"}
                               </span>
                             </td>
 
                             <td class="col-hide-sm">
                               <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
-                                ${(i==null?void 0:i.nome)||'<span style="color: var(--text-muted); font-style: italic;">Nenhum</span>'}
+                                ${(l==null?void 0:l.nome)||'<span style="color: var(--text-muted); font-style: italic;">Nenhum</span>'}
                               </span>
                             </td>
 
                             <td class="col-hide-xs">
-                              <span class="badge ${f?"badge-success":"badge-warning"}" style="font-size: 0.72rem; padding: 3px 8px;">
-                                ${f?"Ativo":"Inativo"}
+                              <span class="badge ${v?"badge-success":"badge-warning"}" style="font-size: 0.72rem; padding: 3px 8px;">
+                                ${v?"Ativo":"Inativo"}
                               </span>
                             </td>
 
                             <td style="text-align: right;">
                               <div style="display: flex; gap: 5px; justify-content: flex-end; align-items: center;">
-                                <button class="btn btn-secondary btn-icon-only btn-view-student" data-id="${b.id}" title="Ficha 360° do Aluno" style="width: 28px; height: 28px; padding: 0; color: #60a5fa;">
-                                  ${j.profile}
+                                <button class="btn btn-secondary btn-icon-only btn-view-student" data-id="${g.id}" title="Ficha 360° do Aluno" style="width: 28px; height: 28px; padding: 0; color: #60a5fa;">
+                                  ${R.profile}
                                 </button>
                                 ${c?`
-                                      <button class="btn btn-secondary btn-icon-only btn-edit-student" data-id="${b.id}" title="Editar Dados do Aluno" style="width: 28px; height: 28px; padding: 0;">
-                                        ${j.edit}
+                                      <button class="btn btn-secondary btn-icon-only btn-edit-student" data-id="${g.id}" title="Editar Dados do Aluno" style="width: 28px; height: 28px; padding: 0;">
+                                        ${R.edit}
                                       </button>
                                     `:""}
                                 ${A?`
-                                      <button class="btn btn-danger btn-icon-only btn-delete-student" data-id="${b.id}" title="Excluir Aluno" style="width: 28px; height: 28px; padding: 0;">
-                                        ${j.trash}
+                                      <button class="btn btn-danger btn-icon-only btn-delete-student" data-id="${g.id}" title="Excluir Aluno" style="width: 28px; height: 28px; padding: 0;">
+                                        ${R.trash}
                                       </button>
                                     `:""}
                               </div>
@@ -733,7 +733,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </table>
         </div>
       </div>
-    `;const r=e.querySelector("#student-search-input");r==null||r.addEventListener("input",b=>{o=b.target.value,s();const i=e.querySelector("#student-search-input");i&&(i.focus(),i.selectionStart=i.selectionEnd=i.value.length)}),(p=e.querySelector("#btn-clear-search"))==null||p.addEventListener("click",()=>{o="",s()}),(x=e.querySelector("#btn-new-student"))==null||x.addEventListener("click",()=>{E()}),e.querySelectorAll(".btn-view-student").forEach(b=>{b.addEventListener("click",i=>{const f=i.currentTarget.dataset.id,v=k.getStudents().find(I=>I.id===f);v&&l(v)})}),e.querySelectorAll(".btn-edit-student").forEach(b=>{b.addEventListener("click",i=>{const f=i.currentTarget.dataset.id,v=k.getStudents().find(I=>I.id===f);v&&E(v)})}),e.querySelectorAll(".btn-delete-student").forEach(b=>{b.addEventListener("click",i=>{const f=i.currentTarget.dataset.id,v=k.getStudents().find(I=>I.id===f);v&&fe({title:"Excluir Aluno",message:`Tem certeza que deseja excluir o cadastro do aluno "<strong>${v.nome}</strong>"? Esta ação removerá também seus registros e agendamentos associados.`,onConfirm:()=>{k.deleteStudent(v.id,(t==null?void 0:t.nome)||"Administrador"),F(`Aluno "${v.nome}" excluído.`,"info"),s()}})})})}function l(a){k.getPlans().find(n=>n.id===a.planoId);const g=k.getStudentAppointments(a.id),c=k.getStudentPayments(a.id),A=Xe(a.dataNascimento),P=Qe(a.telefone,a.nome),r=a.saldoReposicoes||0,p=k.isStudentOverdue(a.id),x=a.status==="ativo",b=Z(t,"financeiro","alterar"),i=g.length,f=g.filter(n=>n.status==="concluido").length,v=g.filter(n=>n.status==="falta_justificada").length,I=g.filter(n=>n.status==="falta_injustificada").length,u=c.filter(n=>n.status==="pago").reduce((n,m)=>n+m.valor,0),S=c.filter(n=>n.status!=="pago").reduce((n,m)=>n+m.valor,0),L=`
+    `;const i=e.querySelector("#student-search-input");i==null||i.addEventListener("input",g=>{o=g.target.value,s();const l=e.querySelector("#student-search-input");l&&(l.focus(),l.selectionStart=l.selectionEnd=l.value.length)}),(p=e.querySelector("#btn-clear-search"))==null||p.addEventListener("click",()=>{o="",s()}),(x=e.querySelector("#btn-new-student"))==null||x.addEventListener("click",()=>{S()}),e.querySelectorAll(".btn-view-student").forEach(g=>{g.addEventListener("click",l=>{const v=l.currentTarget.dataset.id,b=k.getStudents().find(E=>E.id===v);b&&d(b)})}),e.querySelectorAll(".btn-edit-student").forEach(g=>{g.addEventListener("click",l=>{const v=l.currentTarget.dataset.id,b=k.getStudents().find(E=>E.id===v);b&&S(b)})}),e.querySelectorAll(".btn-delete-student").forEach(g=>{g.addEventListener("click",l=>{const v=l.currentTarget.dataset.id,b=k.getStudents().find(E=>E.id===v);b&&fe({title:"Excluir Aluno",message:`Tem certeza que deseja excluir o cadastro do aluno "<strong>${b.nome}</strong>"? Esta ação removerá também seus registros e agendamentos associados.`,onConfirm:()=>{k.deleteStudent(b.id,(t==null?void 0:t.nome)||"Administrador"),B(`Aluno "${b.nome}" excluído.`,"info"),s()}})})})}function d(a){k.getPlans().find(n=>n.id===a.planoId);const f=k.getStudentAppointments(a.id),c=k.getStudentPayments(a.id),A=Qe(a.dataNascimento),L=Ke(a.telefone,a.nome),i=a.saldoReposicoes||0,p=k.isStudentOverdue(a.id),x=a.status==="ativo",g=W(t,"financeiro","alterar"),l=f.length,v=f.filter(n=>n.status==="concluido").length,b=f.filter(n=>n.status==="falta_justificada").length,E=f.filter(n=>n.status==="falta_injustificada").length,h=c.filter(n=>n.status==="pago").reduce((n,m)=>n+m.valor,0),I=c.filter(n=>n.status!=="pago").reduce((n,m)=>n+m.valor,0),z=`
       <div style="display: flex; flex-direction: column; gap: 14px;">
         
         <!-- Cartão Superior do Aluno (Visual Clean & Organizado) -->
@@ -759,9 +759,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
 
           <div style="display: flex; gap: 8px; align-items: center;">
-            ${P?`
-                  <a href="${P}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; padding: 5px 10px;">
-                    ${j.whatsapp} WhatsApp
+            ${L?`
+                  <a href="${L}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; padding: 5px 10px;">
+                    ${R.whatsapp} WhatsApp
                   </a>
                 `:""}
           </div>
@@ -813,22 +813,22 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <!-- Métricas Pedagógicas em Barra Sóbria -->
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-white);">${i}</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-white);">${l}</div>
               <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Agendadas</div>
             </div>
 
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.05rem; font-weight: 700; color: #4ade80;">${f}</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: #4ade80;">${v}</div>
               <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Presenças</div>
             </div>
 
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-secondary);">${v+I}</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-secondary);">${b+E}</div>
               <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Faltas</div>
             </div>
 
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
-              <div style="font-size: 1.05rem; font-weight: 700; color: var(--color-coral);">${r}</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--color-coral);">${i}</div>
               <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Reposições</div>
             </div>
           </div>
@@ -837,17 +837,17 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-white);">
-                Aulas Recentes (${g.length})
+                Aulas Recentes (${f.length})
               </span>
-              ${r>0?`
+              ${i>0?`
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-schedule-reposicao" style="font-size: 0.7rem; padding: 2px 8px;">
-                      Agendar Reposição (${r})
+                      Agendar Reposição (${i})
                     </button>
                   `:""}
             </div>
 
             <div style="max-height: 190px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface);">
-              ${g.length===0?'<div style="padding: 18px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">Nenhuma aula registrada.</div>':`
+              ${f.length===0?'<div style="padding: 18px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">Nenhuma aula registrada.</div>':`
                     <table class="data-table" style="margin: 0; font-size: 0.78rem;">
                       <thead>
                         <tr>
@@ -859,15 +859,15 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                         </tr>
                       </thead>
                       <tbody>
-                        ${g.map(n=>{const m=n.data.split("-").reverse().join("/");let w="";n.status==="concluido"?w='<span class="badge badge-success" style="font-size: 0.62rem;">Presente</span>':n.status==="falta_justificada"?w='<span class="badge badge-warning" style="font-size: 0.62rem;">Falta Just.</span>':n.status==="falta_injustificada"?w='<span class="badge badge-danger" style="font-size: 0.62rem;">Falta</span>':n.status==="cancelado"?w='<span class="badge badge-secondary" style="font-size: 0.62rem;">Cancelado</span>':w='<span class="badge badge-secondary" style="font-size: 0.62rem;">Agendado</span>';const d=n.tipoAula==="reposicao"?'<span class="badge" style="background: rgba(255, 255, 255, 0.08); font-size: 0.62rem;">Reposição</span>':'<span style="color: var(--text-muted); font-size: 0.7rem;">Regular</span>';return`
+                        ${f.map(n=>{const m=n.data.split("-").reverse().join("/");let u="";n.status==="concluido"?u='<span class="badge badge-success" style="font-size: 0.62rem;">Presente</span>':n.status==="falta_justificada"?u='<span class="badge badge-warning" style="font-size: 0.62rem;">Falta Just.</span>':n.status==="falta_injustificada"?u='<span class="badge badge-danger" style="font-size: 0.62rem;">Falta</span>':n.status==="cancelado"?u='<span class="badge badge-secondary" style="font-size: 0.62rem;">Cancelado</span>':u='<span class="badge badge-secondary" style="font-size: 0.62rem;">Agendado</span>';const r=n.tipoAula==="reposicao"?'<span class="badge" style="background: rgba(255, 255, 255, 0.08); font-size: 0.62rem;">Reposição</span>':'<span style="color: var(--text-muted); font-size: 0.7rem;">Regular</span>';return`
                             <tr>
                               <td style="white-space: nowrap;">
                                 <strong>${m}</strong>
                                 <span style="font-size: 0.68rem; color: var(--text-muted); margin-left: 4px;">${n.horaInicio}</span>
                               </td>
                               <td><div style="color: var(--text-white); font-weight: 500;">${n.titulo}</div></td>
-                              <td class="col-hide-sm">${d}</td>
-                              <td>${w}</td>
+                              <td class="col-hide-sm">${r}</td>
+                              <td>${u}</td>
                               <td class="col-hide-sm">
                                 <span style="color: var(--text-secondary); font-size: 0.72rem;">
                                   ${n.justificativaFalta||n.observacoes||"-"}
@@ -912,14 +912,14 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
               <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Total Pago</div>
               <div style="font-size: 1.05rem; font-weight: 700; color: #4ade80; margin-top: 1px;">
-                R$ ${u.toFixed(2)}
+                R$ ${h.toFixed(2)}
               </div>
             </div>
 
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
               <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Em Aberto</div>
-              <div style="font-size: 1.05rem; font-weight: 700; color: ${S>0?"#f87171":"var(--text-white)"}; margin-top: 1px;">
-                R$ ${S.toFixed(2)}
+              <div style="font-size: 1.05rem; font-weight: 700; color: ${I>0?"#f87171":"var(--text-white)"}; margin-top: 1px;">
+                R$ ${I.toFixed(2)}
               </div>
             </div>
           </div>
@@ -946,21 +946,21 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                         </tr>
                       </thead>
                       <tbody>
-                        ${c.map(n=>{const m=n.status==="pago",w=n.status==="atrasado";let d="";return m?d='<span class="badge badge-success" style="font-size: 0.62rem;">Pago</span>':w?d='<span class="badge badge-danger" style="font-size: 0.62rem;">Atrasado</span>':d='<span class="badge badge-warning" style="font-size: 0.62rem;">Pendente</span>',`
+                        ${c.map(n=>{const m=n.status==="pago",u=n.status==="atrasado";let r="";return m?r='<span class="badge badge-success" style="font-size: 0.62rem;">Pago</span>':u?r='<span class="badge badge-danger" style="font-size: 0.62rem;">Atrasado</span>':r='<span class="badge badge-warning" style="font-size: 0.62rem;">Pendente</span>',`
                             <tr>
                               <td style="white-space: nowrap;">
                                 <strong style="color: var(--text-white);">${n.descricao}</strong>
                               </td>
                               <td class="col-hide-sm">${n.dataVencimento.split("-").reverse().join("/")}</td>
                               <td style="font-weight: 600; color: var(--text-white);">R$ ${n.valor.toFixed(2)}</td>
-                              <td>${d}</td>
+                              <td>${r}</td>
                               <td class="col-hide-sm">${n.dataPagamento?n.dataPagamento.split("-").reverse().join("/"):"-"}</td>
                               <td style="text-align: right;">
                                 ${m?`
                                       <button type="button" class="btn btn-secondary btn-sm btn-print-receipt" data-id="${n.id}" style="font-size: 0.7rem; padding: 2px 7px;">
                                         Recibo
                                       </button>
-                                    `:b?`
+                                    `:g?`
                                         <button type="button" class="btn btn-primary btn-sm btn-pay-now" data-id="${n.id}" style="font-size: 0.7rem; padding: 2px 7px;">
                                           Baixar
                                         </button>
@@ -976,7 +976,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </div>
 
       </div>
-    `;re({title:`Ficha do Aluno: ${a.nome}`,bodyHtml:L,modalClass:"modal-lg",cancelText:"Fechar",confirmText:""}),setTimeout(()=>{var h;const n=document.getElementById("btn-tab-pedagogico"),m=document.getElementById("btn-tab-financeiro"),w=document.getElementById("panel-tab-pedagogico"),d=document.getElementById("panel-tab-financeiro");n==null||n.addEventListener("click",()=>{n.classList.add("active"),m==null||m.classList.remove("active"),w&&(w.style.display="flex"),d&&(d.style.display="none")}),m==null||m.addEventListener("click",()=>{m.classList.add("active"),n==null||n.classList.remove("active"),d&&(d.style.display="flex"),w&&(w.style.display="none")}),(h=document.getElementById("btn-quick-schedule-reposicao"))==null||h.addEventListener("click",()=>{ve(),$("agenda")}),document.querySelectorAll(".btn-print-receipt").forEach(z=>{z.addEventListener("click",T=>{const _=T.currentTarget.dataset.id,N=c.find(C=>C.id===_);N&&qe(N,a)})}),document.querySelectorAll(".btn-pay-now").forEach(z=>{z.addEventListener("click",T=>{const _=T.currentTarget.dataset.id,N=c.find(B=>B.id===_);if(!N)return;const C=k.getTodayDateString(),D=`
+    `;ne({title:`Ficha do Aluno: ${a.nome}`,bodyHtml:z,modalClass:"modal-lg",cancelText:"Fechar",confirmText:""}),setTimeout(()=>{var y;const n=document.getElementById("btn-tab-pedagogico"),m=document.getElementById("btn-tab-financeiro"),u=document.getElementById("panel-tab-pedagogico"),r=document.getElementById("panel-tab-financeiro");n==null||n.addEventListener("click",()=>{n.classList.add("active"),m==null||m.classList.remove("active"),u&&(u.style.display="flex"),r&&(r.style.display="none")}),m==null||m.addEventListener("click",()=>{m.classList.add("active"),n==null||n.classList.remove("active"),r&&(r.style.display="flex"),u&&(u.style.display="none")}),(y=document.getElementById("btn-quick-schedule-reposicao"))==null||y.addEventListener("click",()=>{ve(),w("agenda")}),document.querySelectorAll(".btn-print-receipt").forEach(P=>{P.addEventListener("click",_=>{const O=_.currentTarget.dataset.id,N=c.find(C=>C.id===O);N&&qe(N,a)})}),document.querySelectorAll(".btn-pay-now").forEach(P=>{P.addEventListener("click",_=>{const O=_.currentTarget.dataset.id,N=c.find(D=>D.id===O);if(!N)return;const C=k.getTodayDateString(),T=`
             <div style="display: flex; flex-direction: column; gap: 14px;">
               <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px;">
                 <div style="font-weight: 700; color: var(--text-white); font-size: 0.95rem;">${N.descricao}</div>
@@ -1010,7 +1010,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 <input type="text" id="baixa-obs" class="form-input" placeholder="Ex: Pago com comprovante via WhatsApp" />
               </div>
             </div>
-          `;re({title:`Dar Baixa: ${N.descricao}`,bodyHtml:D,modalClass:"modal-sm",confirmText:"Confirmar Recebimento",cancelText:"Cancelar",onConfirm:()=>{const B=document.getElementById("baixa-data").value,O=document.getElementById("baixa-forma").value,V=document.getElementById("baixa-obs").value;if(!B)return F("Informe a data de recebimento.","error"),!1;const G=(t==null?void 0:t.nome)||"Administrador";k.darBaixaPayment(N.id,B,O,G,V),F(`Baixa de R$ ${N.valor.toFixed(2)} efetuada com sucesso!`,"success"),s();const K=k.getStudents().find(J=>J.id===a.id)||a;return l(K),setTimeout(()=>{var J;(J=document.getElementById("btn-tab-financeiro"))==null||J.click()},50),!0}})})})},50)}function E(a){const M=k.getPlans(),g=!!a,c=a?k.getStudentPayments(a.id):[],A=M.map(p=>`<option value="${p.id}" ${(a==null?void 0:a.planoId)===p.id?"selected":""}>${p.nome}</option>`).join(""),P=Ze.map(p=>`<option value="${p}" ${(a==null?void 0:a.instrumentoPrincipal)===p?"selected":""}>${p}</option>`).join(""),r=`
+          `;ne({title:`Dar Baixa: ${N.descricao}`,bodyHtml:T,modalClass:"modal-sm",confirmText:"Confirmar Recebimento",cancelText:"Cancelar",onConfirm:()=>{const D=document.getElementById("baixa-data").value,q=document.getElementById("baixa-forma").value,V=document.getElementById("baixa-obs").value;if(!D)return B("Informe a data de recebimento.","error"),!1;const G=(t==null?void 0:t.nome)||"Administrador";k.darBaixaPayment(N.id,D,q,G,V),B(`Baixa de R$ ${N.valor.toFixed(2)} efetuada com sucesso!`,"success"),s();const K=k.getStudents().find(J=>J.id===a.id)||a;return d(K),setTimeout(()=>{var J;(J=document.getElementById("btn-tab-financeiro"))==null||J.click()},50),!0}})})})},50)}function S(a){const M=k.getPlans(),f=!!a,c=a?k.getStudentPayments(a.id):[],A=M.map(p=>`<option value="${p.id}" ${(a==null?void 0:a.planoId)===p.id?"selected":""}>${p.nome}</option>`).join(""),L=Xe.map(p=>`<option value="${p}" ${(a==null?void 0:a.instrumentoPrincipal)===p?"selected":""}>${p}</option>`).join(""),i=`
       <form id="student-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         
         <!-- Seletor de Abas Organizado em 2 Níveis -->
@@ -1100,7 +1100,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <label class="form-label" for="student-instrumento">Instrumento Principal</label>
             <select id="student-instrumento" class="form-select">
               <option value="">Selecione...</option>
-              ${P}
+              ${L}
             </select>
           </div>
 
@@ -1186,12 +1186,12 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                         </tr>
                       </thead>
                       <tbody>
-                        ${c.map(p=>{const x=p.dataVencimento.split("-").reverse().join("/"),b=p.dataPagamento?p.dataPagamento.split("-").reverse().join("/"):"-";let i="";return p.status==="pago"?i='<span class="badge badge-success" style="font-size: 0.65rem; padding: 2px 6px;">Pago</span>':p.status==="atrasado"?i='<span class="badge badge-coral" style="font-size: 0.65rem; padding: 2px 6px; font-weight: 700;">Atrasado</span>':i='<span class="badge badge-warning" style="font-size: 0.65rem; padding: 2px 6px;">Pendente</span>',`
+                        ${c.map(p=>{const x=p.dataVencimento.split("-").reverse().join("/"),g=p.dataPagamento?p.dataPagamento.split("-").reverse().join("/"):"-";let l="";return p.status==="pago"?l='<span class="badge badge-success" style="font-size: 0.65rem; padding: 2px 6px;">Pago</span>':p.status==="atrasado"?l='<span class="badge badge-coral" style="font-size: 0.65rem; padding: 2px 6px; font-weight: 700;">Atrasado</span>':l='<span class="badge badge-warning" style="font-size: 0.65rem; padding: 2px 6px;">Pendente</span>',`
                             <tr>
                               <td style="padding: 6px 10px; font-weight: 600; color: var(--text-white);">R$ ${p.valor.toFixed(2)}</td>
                               <td style="padding: 6px 10px;">${x}</td>
-                              <td class="col-hide-sm" style="padding: 6px 10px; color: ${p.dataPagamento?"var(--text-white)":"var(--text-muted)"};">${b}</td>
-                              <td style="padding: 6px 10px; text-align: center;">${i}</td>
+                              <td class="col-hide-sm" style="padding: 6px 10px; color: ${p.dataPagamento?"var(--text-white)":"var(--text-muted)"};">${g}</td>
+                              <td style="padding: 6px 10px; text-align: center;">${l}</td>
                             </tr>
                           `}).join("")}
                       </tbody>
@@ -1209,7 +1209,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
         </div>
       </form>
-    `;re({title:g?`Editar Aluno: ${a.nome}`:"Cadastrar Novo Aluno",bodyHtml:r,modalClass:"modal-lg",confirmText:g?"Salvar Alterações":"Cadastrar Aluno",onConfirm:()=>{var D,B;const p=document.getElementById("student-nome").value.trim(),x=document.getElementById("student-nascimento").value,b=document.getElementById("student-email").value.trim(),i=document.getElementById("student-telefone").value.trim(),f=document.getElementById("student-resp-nome").value.trim(),v=document.getElementById("student-resp-parentesco").value,I=document.getElementById("student-resp-tel").value.trim(),u=document.getElementById("student-instrumento").value,S=document.getElementById("student-nivel").value,L=document.getElementById("student-plano").value,n=document.getElementById("student-status").value,m=document.getElementById("student-modulo").value.trim(),w=document.getElementById("student-saldo-reposicoes").value,d=Math.max(0,parseInt(w,10)||0),h=(D=document.getElementById("student-valor-mensalidade"))==null?void 0:D.value,z=Math.max(0,parseFloat(h)||280),T=(B=document.getElementById("student-dia-vencimento"))==null?void 0:B.value,_=Math.min(31,Math.max(1,parseInt(T,10)||10)),N=document.getElementById("student-obs").value.trim();if(!p)return F("Informe o nome do aluno.","error"),!1;const C=(t==null?void 0:t.nome)||"Administrador";return g&&a?(k.updateStudent(a.id,{nome:p,dataNascimento:x,email:b,telefone:i,responsavelNome:f,responsavelParentesco:v,responsavelTelefone:I,instrumentoPrincipal:u,nivelMusical:S,planoId:L,status:n,moduloAtual:m,saldoReposicoes:d,valorMensalidade:z,diaVencimento:_,observacoes:N},C),F("Dados do aluno atualizados com sucesso!","success")):(k.addStudent({nome:p,dataNascimento:x,email:b,telefone:i,responsavelNome:f,responsavelParentesco:v,responsavelTelefone:I,instrumentoPrincipal:u,nivelMusical:S,planoId:L,status:n,moduloAtual:m,saldoReposicoes:d,valorMensalidade:z,diaVencimento:_,observacoes:N},C),F("Aluno cadastrado com sucesso!","success")),s(),!0}}),setTimeout(()=>{const p=document.querySelectorAll(".btn-form-tab"),x=document.querySelectorAll(".form-tab-panel");p.forEach(b=>{b.addEventListener("click",i=>{const f=i.currentTarget.dataset.tab;p.forEach(v=>{v.classList.remove("active")}),i.currentTarget.classList.add("active"),x.forEach(v=>{v.style.display=v.id===`form-panel-${f}`?"flex":"none"})})})},50)}return s(),e}const pe=[{key:"alunos",title:"Alunos",icon:"👥",items:[{key:"acesso",label:"Acesso ao formulário de alunos"},{key:"cadastrar",label:"Cadastrar novo aluno"},{key:"alterar",label:"Alterar aluno"},{key:"excluir",label:"Excluir aluno"}]},{key:"agenda",title:"Agenda",icon:"📅",items:[{key:"acesso",label:"Acesso ao formulário de agenda"},{key:"cadastrar",label:"Criar novo agendamento"},{key:"alterar",label:"Alterar agendamento"},{key:"excluir",label:"Excluir agendamento"}]},{key:"planos",title:"Planos de Ensino",icon:"🎵",items:[{key:"acesso",label:"Acesso ao formulário de planos de ensino"},{key:"cadastrar",label:"Cadastrar novo plano"},{key:"alterar",label:"Alterar plano e módulos"},{key:"excluir",label:"Excluir plano de ensino"}]},{key:"financeiro",title:"Financeiro",icon:"💰",items:[{key:"acesso",label:"Acesso ao módulo financeiro e mensalidades"},{key:"cadastrar",label:"Lançar novos pagamentos e gerar mensalidades"},{key:"alterar",label:"Dar baixa e alterar lançamentos"},{key:"excluir",label:"Excluir registros financeiros"}]},{key:"relatorios",title:"Relatórios",icon:"📊",items:[{key:"acesso",label:"Acesso ao módulo de relatórios"},{key:"gerar",label:"Gerar e emitir relatórios em PDF"}]},{key:"home",title:"Início",icon:"🏠",items:[{key:"acesso",label:"Acesso ao formulário da página inicial (Início)"}]},{key:"auditoria",title:"Auditoria",icon:"📋",items:[{key:"acesso",label:"Acesso ao formulário de auditoria"}]},{key:"configuracoes",title:"Configurações",icon:"⚙️",items:[{key:"acesso",label:"Acesso ao formulário de configurações"},{key:"alterar",label:"Alterar dados e parâmetros do sistema"}]}],je=pe.reduce(($,e)=>$+e.items.length,0);function et($){let e=0;return pe.forEach(t=>{const o=$[t.key];o&&t.items.forEach(s=>{o[s.key]&&e++})}),e}function tt($){var E;const e=document.createElement("div"),t=Y.getCurrentUser();if((t==null?void 0:t.papel)!=="admin")return e.innerHTML=`
+    `;ne({title:f?`Editar Aluno: ${a.nome}`:"Cadastrar Novo Aluno",bodyHtml:i,modalClass:"modal-lg",confirmText:f?"Salvar Alterações":"Cadastrar Aluno",onConfirm:()=>{var T,D;const p=document.getElementById("student-nome").value.trim(),x=document.getElementById("student-nascimento").value,g=document.getElementById("student-email").value.trim(),l=document.getElementById("student-telefone").value.trim(),v=document.getElementById("student-resp-nome").value.trim(),b=document.getElementById("student-resp-parentesco").value,E=document.getElementById("student-resp-tel").value.trim(),h=document.getElementById("student-instrumento").value,I=document.getElementById("student-nivel").value,z=document.getElementById("student-plano").value,n=document.getElementById("student-status").value,m=document.getElementById("student-modulo").value.trim(),u=document.getElementById("student-saldo-reposicoes").value,r=Math.max(0,parseInt(u,10)||0),y=(T=document.getElementById("student-valor-mensalidade"))==null?void 0:T.value,P=Math.max(0,parseFloat(y)||280),_=(D=document.getElementById("student-dia-vencimento"))==null?void 0:D.value,O=Math.min(31,Math.max(1,parseInt(_,10)||10)),N=document.getElementById("student-obs").value.trim();if(!p)return B("Informe o nome do aluno.","error"),!1;const C=(t==null?void 0:t.nome)||"Administrador";return f&&a?(k.updateStudent(a.id,{nome:p,dataNascimento:x,email:g,telefone:l,responsavelNome:v,responsavelParentesco:b,responsavelTelefone:E,instrumentoPrincipal:h,nivelMusical:I,planoId:z,status:n,moduloAtual:m,saldoReposicoes:r,valorMensalidade:P,diaVencimento:O,observacoes:N},C),B("Dados do aluno atualizados com sucesso!","success")):(k.addStudent({nome:p,dataNascimento:x,email:g,telefone:l,responsavelNome:v,responsavelParentesco:b,responsavelTelefone:E,instrumentoPrincipal:h,nivelMusical:I,planoId:z,status:n,moduloAtual:m,saldoReposicoes:r,valorMensalidade:P,diaVencimento:O,observacoes:N},C),B("Aluno cadastrado com sucesso!","success")),s(),!0}}),setTimeout(()=>{const p=document.querySelectorAll(".btn-form-tab"),x=document.querySelectorAll(".form-tab-panel");p.forEach(g=>{g.addEventListener("click",l=>{const v=l.currentTarget.dataset.tab;p.forEach(b=>{b.classList.remove("active")}),l.currentTarget.classList.add("active"),x.forEach(b=>{b.style.display=b.id===`form-panel-${v}`?"flex":"none"})})})},50)}return s(),e}const pe=[{key:"alunos",title:"Alunos",icon:"👥",items:[{key:"acesso",label:"Acesso ao formulário de alunos"},{key:"cadastrar",label:"Cadastrar novo aluno"},{key:"alterar",label:"Alterar aluno"},{key:"excluir",label:"Excluir aluno"}]},{key:"agenda",title:"Agenda",icon:"📅",items:[{key:"acesso",label:"Acesso ao formulário de agenda"},{key:"cadastrar",label:"Criar novo agendamento"},{key:"alterar",label:"Alterar agendamento"},{key:"excluir",label:"Excluir agendamento"}]},{key:"planos",title:"Planos de Ensino",icon:"🎵",items:[{key:"acesso",label:"Acesso ao formulário de planos de ensino"},{key:"cadastrar",label:"Cadastrar novo plano"},{key:"alterar",label:"Alterar plano e módulos"},{key:"excluir",label:"Excluir plano de ensino"}]},{key:"financeiro",title:"Financeiro",icon:"💰",items:[{key:"acesso",label:"Acesso ao módulo financeiro e mensalidades"},{key:"cadastrar",label:"Lançar novos pagamentos e gerar mensalidades"},{key:"alterar",label:"Dar baixa e alterar lançamentos"},{key:"excluir",label:"Excluir registros financeiros"}]},{key:"relatorios",title:"Relatórios",icon:"📊",items:[{key:"acesso",label:"Acesso ao módulo de relatórios"},{key:"gerar",label:"Gerar e emitir relatórios em PDF"}]},{key:"home",title:"Início",icon:"🏠",items:[{key:"acesso",label:"Acesso ao formulário da página inicial (Início)"}]},{key:"auditoria",title:"Auditoria",icon:"📋",items:[{key:"acesso",label:"Acesso ao formulário de auditoria"}]},{key:"configuracoes",title:"Configurações",icon:"⚙️",items:[{key:"acesso",label:"Acesso ao formulário de configurações"},{key:"alterar",label:"Alterar dados e parâmetros do sistema"}]}],je=pe.reduce((w,e)=>w+e.items.length,0);function et(w){let e=0;return pe.forEach(t=>{const o=w[t.key];o&&t.items.forEach(s=>{o[s.key]&&e++})}),e}function tt(w){var S;const e=document.createElement("div"),t=Y.getCurrentUser();if((t==null?void 0:t.papel)!=="admin")return e.innerHTML=`
       <div class="panel-card" style="padding: 50px 24px; text-align: center; max-width: 540px; margin: 40px auto;">
         <div style="font-size: 3rem; margin-bottom: 16px;">🔒</div>
         <h2 style="color: var(--color-coral); font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 10px;">
@@ -1222,7 +1222,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           Voltar para a Página Inicial
         </button>
       </div>
-    `,(E=e.querySelector("#btn-unauth-home"))==null||E.addEventListener("click",()=>$("home")),e;let o="";function s(){var A,P;const a=k.getUsers(),M=o.toLowerCase(),g=a.filter(r=>r.nome.toLowerCase().includes(M)||r.login.toLowerCase().includes(M)||r.papel.toLowerCase().includes(M));e.innerHTML=`
+    `,(S=e.querySelector("#btn-unauth-home"))==null||S.addEventListener("click",()=>w("home")),e;let o="";function s(){var A,L;const a=k.getUsers(),M=o.toLowerCase(),f=a.filter(i=>i.nome.toLowerCase().includes(M)||i.login.toLowerCase().includes(M)||i.papel.toLowerCase().includes(M));e.innerHTML=`
       <!-- Cabeçalho da Tela -->
       <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
@@ -1235,7 +1235,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </div>
 
         <button class="btn btn-primary" id="btn-new-user" style="display: flex; align-items: center; gap: 6px;">
-          ${j.plus} Cadastrar Novo Usuário
+          ${R.plus} Cadastrar Novo Usuário
         </button>
       </div>
 
@@ -1259,7 +1259,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             style="padding-left: 36px;"
           />
           <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
-            ${j.search}
+            ${R.search}
           </div>
         </div>
         ${o?'<button class="btn btn-secondary btn-sm" id="btn-clear-search">Limpar</button>':""}
@@ -1268,7 +1268,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <!-- Painel e Tabela de Usuários -->
       <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-card-header">
-          <h3 class="panel-card-title">Usuários Cadastrados (${g.length})</h3>
+          <h3 class="panel-card-title">Usuários Cadastrados (${f.length})</h3>
         </div>
 
         <div class="table-responsive">
@@ -1284,45 +1284,45 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
               </tr>
             </thead>
             <tbody>
-              ${g.map(r=>{const p=r.papel==="admin"?"Administrador":r.papel==="professor"?"Professor":"Atendente",x=Se(r),b=et(x);return`
+              ${f.map(i=>{const p=i.papel==="admin"?"Administrador":i.papel==="professor"?"Professor":"Atendente",x=Se(i),g=et(x);return`
                     <tr>
                       <td>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                          <div style="width: 28px; height: 28px; border-radius: 50%; background: ${r.isSistema?"var(--color-coral)":"#282b3a"}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; color: #ffffff; flex-shrink: 0;">
-                            ${r.nome[0]||"U"}
+                          <div style="width: 28px; height: 28px; border-radius: 50%; background: ${i.isSistema?"var(--color-coral)":"#282b3a"}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; color: #ffffff; flex-shrink: 0;">
+                            ${i.nome[0]||"U"}
                           </div>
                           <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${r.nome}
+                            ${i.nome}
                           </span>
                         </div>
                       </td>
                       <td class="col-hide-sm">
                         <code style="background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px; font-size: 0.82rem; color: #ff9187; white-space: nowrap;">
-                          ${r.login}
+                          ${i.login}
                         </code>
                       </td>
                       <td class="col-hide-xs">
-                        <span class="badge ${r.papel==="admin"?"badge-coral":"badge-info"}" style="font-size: 0.72rem; white-space: nowrap;">
+                        <span class="badge ${i.papel==="admin"?"badge-coral":"badge-info"}" style="font-size: 0.72rem; white-space: nowrap;">
                           ${p}
                         </span>
                       </td>
                       <td class="col-hide-md">
-                        <span class="badge ${r.papel==="admin"?"badge-coral":b>0?"badge-success":"badge-secondary"}" style="font-size: 0.72rem; white-space: nowrap;" title="Ações permitidas para este perfil">
-                          ${r.papel==="admin"?`Acesso Total (${je})`:`${b} de ${je} ações`}
+                        <span class="badge ${i.papel==="admin"?"badge-coral":g>0?"badge-success":"badge-secondary"}" style="font-size: 0.72rem; white-space: nowrap;" title="Ações permitidas para este perfil">
+                          ${i.papel==="admin"?`Acesso Total (${je})`:`${g} de ${je} ações`}
                         </span>
                       </td>
                       <td class="col-hide-sm">
-                        ${r.isSistema?'<span class="badge badge-warning" style="font-size: 0.72rem; white-space: nowrap;">🔒 Sistema</span>':'<span style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">Comum</span>'}
+                        ${i.isSistema?'<span class="badge badge-warning" style="font-size: 0.72rem; white-space: nowrap;">🔒 Sistema</span>':'<span style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">Comum</span>'}
                       </td>
                       <td style="text-align: right;">
                         <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                          <button class="btn btn-secondary btn-icon-only btn-edit-user" data-id="${r.id}" title="Editar Dados e Permissões" style="width: 28px; height: 28px; padding: 0;">
-                            ${j.edit}
+                          <button class="btn btn-secondary btn-icon-only btn-edit-user" data-id="${i.id}" title="Editar Dados e Permissões" style="width: 28px; height: 28px; padding: 0;">
+                            ${R.edit}
                           </button>
-                          ${r.isSistema?`<button class="btn btn-secondary btn-icon-only" disabled title="Não é permitido excluir o administrador inicial do sistema" style="opacity: 0.25; cursor: not-allowed; width: 28px; height: 28px; padding: 0;">
-                                   ${j.trash}
-                                 </button>`:`<button class="btn btn-danger btn-icon-only btn-delete-user" data-id="${r.id}" title="Excluir Usuário" style="width: 28px; height: 28px; padding: 0;">
-                                   ${j.trash}
+                          ${i.isSistema?`<button class="btn btn-secondary btn-icon-only" disabled title="Não é permitido excluir o administrador inicial do sistema" style="opacity: 0.25; cursor: not-allowed; width: 28px; height: 28px; padding: 0;">
+                                   ${R.trash}
+                                 </button>`:`<button class="btn btn-danger btn-icon-only btn-delete-user" data-id="${i.id}" title="Excluir Usuário" style="width: 28px; height: 28px; padding: 0;">
+                                   ${R.trash}
                                  </button>`}
                         </div>
                       </td>
@@ -1332,7 +1332,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </table>
         </div>
       </div>
-    `,(A=e.querySelector("#btn-new-user"))==null||A.addEventListener("click",()=>{l()});const c=e.querySelector("#user-search-input");c&&c.addEventListener("input",r=>{o=r.target.value,s();const p=e.querySelector("#user-search-input");p&&(p.focus(),p.setSelectionRange(p.value.length,p.value.length))}),(P=e.querySelector("#btn-clear-search"))==null||P.addEventListener("click",()=>{o="",s()}),e.querySelectorAll(".btn-edit-user").forEach(r=>{r.addEventListener("click",p=>{const x=p.currentTarget.dataset.id,b=k.getUsers().find(i=>i.id===x);b&&l(b)})}),e.querySelectorAll(".btn-delete-user").forEach(r=>{r.addEventListener("click",p=>{const x=p.currentTarget.dataset.id,b=k.getUsers().find(i=>i.id===x);b&&fe({title:"Excluir Usuário",message:`Tem certeza que deseja excluir o usuário "<strong>${b.nome}</strong>" (login: <code>${b.login}</code>)?`,onConfirm:()=>{try{k.deleteUser(b.id,(t==null?void 0:t.nome)||"Administrador"),F(`Usuário "${b.nome}" excluído.`,"info"),s()}catch(i){F(i.message||"Erro ao excluir usuário.","error")}}})})})}function l(a){var i,f,v,I;const M=!!a,g=a?a.papel:"professor",c=g==="admin",A=Se(a),P=`
+    `,(A=e.querySelector("#btn-new-user"))==null||A.addEventListener("click",()=>{d()});const c=e.querySelector("#user-search-input");c&&c.addEventListener("input",i=>{o=i.target.value,s();const p=e.querySelector("#user-search-input");p&&(p.focus(),p.setSelectionRange(p.value.length,p.value.length))}),(L=e.querySelector("#btn-clear-search"))==null||L.addEventListener("click",()=>{o="",s()}),e.querySelectorAll(".btn-edit-user").forEach(i=>{i.addEventListener("click",p=>{const x=p.currentTarget.dataset.id,g=k.getUsers().find(l=>l.id===x);g&&d(g)})}),e.querySelectorAll(".btn-delete-user").forEach(i=>{i.addEventListener("click",p=>{const x=p.currentTarget.dataset.id,g=k.getUsers().find(l=>l.id===x);g&&fe({title:"Excluir Usuário",message:`Tem certeza que deseja excluir o usuário "<strong>${g.nome}</strong>" (login: <code>${g.login}</code>)?`,onConfirm:()=>{try{k.deleteUser(g.id,(t==null?void 0:t.nome)||"Administrador"),B(`Usuário "${g.nome}" excluído.`,"info"),s()}catch(l){B(l.message||"Erro ao excluir usuário.","error")}}})})})}function d(a){var l,v,b,E;const M=!!a,f=a?a.papel:"professor",c=f==="admin",A=Se(a),L=`
       <form id="user-modal-form">
         <div class="form-group">
           <label class="form-label" for="user-nome">Nome Completo</label>
@@ -1354,9 +1354,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div class="form-group">
           <label class="form-label" for="user-papel">Perfil / Papel no Sistema</label>
           <select id="user-papel" class="form-select" ${a!=null&&a.isSistema?'disabled title="O administrador raiz deve manter o perfil admin"':""}>
-            <option value="admin" ${g==="admin"?"selected":""}>Administrador (Acesso Total)</option>
-            <option value="professor" ${g==="professor"?"selected":""}>Professor</option>
-            <option value="atendente" ${g==="atendente"?"selected":""}>Atendente</option>
+            <option value="admin" ${f==="admin"?"selected":""}>Administrador (Acesso Total)</option>
+            <option value="professor" ${f==="professor"?"selected":""}>Professor</option>
+            <option value="atendente" ${f==="atendente"?"selected":""}>Atendente</option>
           </select>
         </div>
 
@@ -1394,39 +1394,39 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
           <!-- Lista Estruturada de Formulários (sem barra de corte interna) -->
           <div class="permissions-list-container" style="display: flex; flex-direction: column; gap: 10px;">
-            ${pe.map(u=>{const S=A[u.key]||{},L=u.items.filter(n=>S[n.key]).length;return`
-                <div class="perm-group-card" id="card-group-${u.key}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden;">
+            ${pe.map(h=>{const I=A[h.key]||{},z=h.items.filter(n=>I[n.key]).length;return`
+                <div class="perm-group-card" id="card-group-${h.key}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden;">
                   
                   <!-- Cabeçalho do Formulário -->
                   <div 
                     class="perm-group-header" 
-                    id="header-group-${u.key}" 
-                    data-group="${u.key}" 
+                    id="header-group-${h.key}" 
+                    data-group="${h.key}" 
                     style="background: rgba(255, 255, 255, 0.03); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); cursor: pointer; user-select: none;"
                   >
                     <div style="display: flex; align-items: center; gap: 10px;">
                       <span 
-                        id="arrow-perm-${u.key}" 
+                        id="arrow-perm-${h.key}" 
                         style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; font-size: 0.75rem; color: var(--color-coral); transition: transform 0.2s ease; transform: rotate(0deg);"
                         title="Clique para abrir ou encolher"
                       >
                         ▼
                       </span>
 
-                      <span style="font-size: 1.15rem;">${u.icon}</span>
+                      <span style="font-size: 1.15rem;">${h.icon}</span>
 
                       <div style="display: flex; align-items: center; gap: 8px;">
                         <strong style="font-size: 0.88rem; color: var(--text-white); font-family: var(--font-heading);">
-                          ${u.title}
+                          ${h.title}
                         </strong>
-                        <span id="group-counter-${u.key}" style="font-size: 0.72rem; color: var(--text-muted);">
-                          ${L}/${u.items.length} liberadas
+                        <span id="group-counter-${h.key}" style="font-size: 0.72rem; color: var(--text-muted);">
+                          ${z}/${h.items.length} liberadas
                         </span>
                       </div>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
-                      <button type="button" class="btn btn-secondary btn-sm btn-group-toggle" data-group="${u.key}" style="padding: 3px 10px; font-size: 0.7rem;">
+                      <button type="button" class="btn btn-secondary btn-sm btn-group-toggle" data-group="${h.key}" style="padding: 3px 10px; font-size: 0.7rem;">
                         Alternar Grupo
                       </button>
                     </div>
@@ -1434,22 +1434,22 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
                   <!-- Lista de Permissões do Formulário (Inicia recolhida para todos os formulários) -->
                   <div 
-                    id="group-body-${u.key}" 
+                    id="group-body-${h.key}" 
                     class="perm-group-body" 
                     style="display: none; padding: 10px 14px; flex-direction: column; gap: 8px; background: rgba(0, 0, 0, 0.12);"
                   >
-                    ${u.items.map(n=>{const m=!!S[n.key];return`
+                    ${h.items.map(n=>{const m=!!I[n.key];return`
                           <label 
                             class="perm-item-row" 
-                            id="row-perm-${u.key}-${n.key}" 
+                            id="row-perm-${h.key}-${n.key}" 
                             style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: ${m?"rgba(34, 197, 94, 0.06)":"rgba(234, 67, 53, 0.04)"}; border: 1px solid ${m?"rgba(34, 197, 94, 0.25)":"rgba(234, 67, 53, 0.15)"}; border-radius: var(--radius-sm); cursor: pointer; user-select: none; gap: 10px; transition: all 0.2s ease;"
                           >
                             <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                               <input 
                                 type="checkbox" 
                                 class="perm-checkbox" 
-                                id="perm-${u.key}-${n.key}" 
-                                data-group="${u.key}" 
+                                id="perm-${h.key}-${n.key}" 
+                                data-group="${h.key}" 
                                 data-action="${n.key}" 
                                 ${m?"checked":""} 
                                 style="width: 17px; height: 17px; accent-color: var(--color-coral); cursor: pointer; flex-shrink: 0;"
@@ -1460,7 +1460,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                             </div>
 
                             <span 
-                              id="badge-perm-${u.key}-${n.key}" 
+                              id="badge-perm-${h.key}-${n.key}" 
                               class="badge ${m?"badge-success":"badge-coral"}" 
                               style="font-size: 0.68rem; padding: 2px 8px; font-weight: 700; flex-shrink: 0;"
                             >
@@ -1478,7 +1478,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
         </div>
       </form>
-    `;re({title:M?`Editar Usuário: ${a.nome}`:"Cadastrar Novo Usuário",bodyHtml:P,modalClass:"modal-lg",confirmText:M?"Salvar Alterações":"Cadastrar Usuário",onConfirm:()=>{var z,T,_,N,C,D,B,O,V,G,K,J,Q,W,te,ae,de,oe,q,se,X,me;const u=document.getElementById("user-nome").value.trim(),S=document.getElementById("user-login").value.trim(),L=document.getElementById("user-senha").value.trim(),n=document.getElementById("user-papel"),m=n?n.value:"professor";if(!u||!S||!L)return F("Preencha Nome, Login e Senha.","error"),!1;if(k.getUsers().find(R=>R.login===S&&R.id!==(a==null?void 0:a.id)))return F(`O login "${S}" já está em uso por outro usuário.`,"error"),!1;let d;m==="admin"?d=JSON.parse(JSON.stringify(ge.admin)):d={alunos:{acesso:((z=document.getElementById("perm-alunos-acesso"))==null?void 0:z.checked)??!1,cadastrar:((T=document.getElementById("perm-alunos-cadastrar"))==null?void 0:T.checked)??!1,alterar:((_=document.getElementById("perm-alunos-alterar"))==null?void 0:_.checked)??!1,excluir:((N=document.getElementById("perm-alunos-excluir"))==null?void 0:N.checked)??!1},agenda:{acesso:((C=document.getElementById("perm-agenda-acesso"))==null?void 0:C.checked)??!1,cadastrar:((D=document.getElementById("perm-agenda-cadastrar"))==null?void 0:D.checked)??!1,alterar:((B=document.getElementById("perm-agenda-alterar"))==null?void 0:B.checked)??!1,excluir:((O=document.getElementById("perm-agenda-excluir"))==null?void 0:O.checked)??!1},planos:{acesso:((V=document.getElementById("perm-planos-acesso"))==null?void 0:V.checked)??!1,cadastrar:((G=document.getElementById("perm-planos-cadastrar"))==null?void 0:G.checked)??!1,alterar:((K=document.getElementById("perm-planos-alterar"))==null?void 0:K.checked)??!1,excluir:((J=document.getElementById("perm-planos-excluir"))==null?void 0:J.checked)??!1},financeiro:{acesso:((Q=document.getElementById("perm-financeiro-acesso"))==null?void 0:Q.checked)??!1,cadastrar:((W=document.getElementById("perm-financeiro-cadastrar"))==null?void 0:W.checked)??!1,alterar:((te=document.getElementById("perm-financeiro-alterar"))==null?void 0:te.checked)??!1,excluir:((ae=document.getElementById("perm-financeiro-excluir"))==null?void 0:ae.checked)??!1},relatorios:{acesso:((de=document.getElementById("perm-relatorios-acesso"))==null?void 0:de.checked)??!1,gerar:((oe=document.getElementById("perm-relatorios-gerar"))==null?void 0:oe.checked)??!1},home:{acesso:((q=document.getElementById("perm-home-acesso"))==null?void 0:q.checked)??!1},auditoria:{acesso:((se=document.getElementById("perm-auditoria-acesso"))==null?void 0:se.checked)??!1},configuracoes:{acesso:((X=document.getElementById("perm-configuracoes-acesso"))==null?void 0:X.checked)??!1,alterar:((me=document.getElementById("perm-configuracoes-alterar"))==null?void 0:me.checked)??!1}};const h=(t==null?void 0:t.nome)||"Administrador";return M&&a?(k.updateUser(a.id,{nome:u,login:S,senha:L,papel:a.isSistema?"admin":m,permissoes:a.isSistema?ge.admin:d},h),F("Usuário e permissões atualizados com sucesso!","success")):(k.addUser({nome:u,login:S,senha:L,papel:m,permissoes:d},h),F("Novo usuário cadastrado com sucesso!","success")),s(),!0}});const r=document.getElementById("user-papel"),p=document.getElementById("user-permissions-section"),x=(u,S,L)=>{const n=document.getElementById(`row-perm-${u}-${S}`),m=document.getElementById(`badge-perm-${u}-${S}`);n&&m&&(L?(n.style.background="rgba(34, 197, 94, 0.06)",n.style.borderColor="rgba(34, 197, 94, 0.25)",m.className="badge badge-success",m.textContent="Liberado"):(n.style.background="rgba(234, 67, 53, 0.04)",n.style.borderColor="rgba(234, 67, 53, 0.15)",m.className="badge badge-coral",m.textContent="Bloqueado")),b(u)},b=u=>{const S=document.getElementById(`group-counter-${u}`),L=pe.find(n=>n.key===u);if(S&&L){let n=0;L.items.forEach(m=>{const w=document.getElementById(`perm-${u}-${m.key}`);w&&w.checked&&n++}),S.textContent=`${n}/${L.items.length} liberadas`}};r==null||r.addEventListener("change",()=>{const u=r.value;if(u==="admin")p.style.display="none";else if(p.style.display="block",!M){const S=ge[u]||ge.professor;pe.forEach(L=>{L.items.forEach(n=>{var w;const m=document.getElementById(`perm-${L.key}-${n.key}`);if(m){const d=((w=S[L.key])==null?void 0:w[n.key])??!1;m.checked=d,x(L.key,n.key,d)}})})}}),pe.forEach(u=>{const S=document.getElementById(`header-group-${u.key}`),L=document.getElementById(`group-body-${u.key}`),n=document.getElementById(`arrow-perm-${u.key}`);S==null||S.addEventListener("click",m=>{if(!m.target.closest(".btn-group-toggle")&&L&&n){const w=L.style.display==="flex";L.style.display=w?"none":"flex",n.style.transform=w?"rotate(0deg)":"rotate(180deg)"}}),u.items.forEach(m=>{const w=document.getElementById(`perm-${u.key}-${m.key}`);w==null||w.addEventListener("change",()=>{if(x(u.key,m.key,w.checked),w.checked&&m.key!=="acesso"){const d=document.getElementById(`perm-${u.key}-acesso`);d&&!d.checked&&(d.checked=!0,x(u.key,"acesso",!0))}!w.checked&&m.key==="acesso"&&u.items.forEach(d=>{if(d.key!=="acesso"){const h=document.getElementById(`perm-${u.key}-${d.key}`);h&&h.checked&&(h.checked=!1,x(u.key,d.key,!1))}})})}),document.querySelectorAll(`.btn-group-toggle[data-group="${u.key}"]`).forEach(m=>{m.addEventListener("click",w=>{w.stopPropagation();const d=u.items.map(z=>document.getElementById(`perm-${u.key}-${z.key}`)).filter(Boolean),h=d.every(z=>z.checked);d.forEach(z=>{z.checked=!h,x(u.key,z.dataset.action,!h)})})})}),(i=document.getElementById("btn-perm-expand"))==null||i.addEventListener("click",()=>{pe.forEach(u=>{const S=document.getElementById(`group-body-${u.key}`),L=document.getElementById(`arrow-perm-${u.key}`);S&&L&&(S.style.display="flex",L.style.transform="rotate(180deg)")})}),(f=document.getElementById("btn-perm-collapse"))==null||f.addEventListener("click",()=>{pe.forEach(u=>{const S=document.getElementById(`group-body-${u.key}`),L=document.getElementById(`arrow-perm-${u.key}`);S&&L&&(S.style.display="none",L.style.transform="rotate(0deg)")})}),(v=document.getElementById("btn-perm-all"))==null||v.addEventListener("click",()=>{pe.forEach(u=>{u.items.forEach(S=>{const L=document.getElementById(`perm-${u.key}-${S.key}`);L&&(L.checked=!0,x(u.key,S.key,!0))})})}),(I=document.getElementById("btn-perm-none"))==null||I.addEventListener("click",()=>{pe.forEach(u=>{u.items.forEach(S=>{const L=document.getElementById(`perm-${u.key}-${S.key}`);L&&(L.checked=!1,x(u.key,S.key,!1))})})})}return s(),e}function at($){const e=document.createElement("div"),t=Y.getCurrentUser();let o="";const s=Z(t,"planos","cadastrar"),l=Z(t,"planos","alterar"),E=Z(t,"planos","excluir");function a(){var P,r;const c=k.getPlans().filter(p=>{const x=o.toLowerCase();return p.nome.toLowerCase().includes(x)||p.descricao&&p.descricao.toLowerCase().includes(x)});e.innerHTML=`
+    `;ne({title:M?`Editar Usuário: ${a.nome}`:"Cadastrar Novo Usuário",bodyHtml:L,modalClass:"modal-lg",confirmText:M?"Salvar Alterações":"Cadastrar Usuário",onConfirm:()=>{var P,_,O,N,C,T,D,q,V,G,K,J,ee,Q,le,te,de,ae,j,oe,X,me;const h=document.getElementById("user-nome").value.trim(),I=document.getElementById("user-login").value.trim(),z=document.getElementById("user-senha").value.trim(),n=document.getElementById("user-papel"),m=n?n.value:"professor";if(!h||!I||!z)return B("Preencha Nome, Login e Senha.","error"),!1;if(k.getUsers().find(F=>F.login===I&&F.id!==(a==null?void 0:a.id)))return B(`O login "${I}" já está em uso por outro usuário.`,"error"),!1;let r;m==="admin"?r=JSON.parse(JSON.stringify(ge.admin)):r={alunos:{acesso:((P=document.getElementById("perm-alunos-acesso"))==null?void 0:P.checked)??!1,cadastrar:((_=document.getElementById("perm-alunos-cadastrar"))==null?void 0:_.checked)??!1,alterar:((O=document.getElementById("perm-alunos-alterar"))==null?void 0:O.checked)??!1,excluir:((N=document.getElementById("perm-alunos-excluir"))==null?void 0:N.checked)??!1},agenda:{acesso:((C=document.getElementById("perm-agenda-acesso"))==null?void 0:C.checked)??!1,cadastrar:((T=document.getElementById("perm-agenda-cadastrar"))==null?void 0:T.checked)??!1,alterar:((D=document.getElementById("perm-agenda-alterar"))==null?void 0:D.checked)??!1,excluir:((q=document.getElementById("perm-agenda-excluir"))==null?void 0:q.checked)??!1},planos:{acesso:((V=document.getElementById("perm-planos-acesso"))==null?void 0:V.checked)??!1,cadastrar:((G=document.getElementById("perm-planos-cadastrar"))==null?void 0:G.checked)??!1,alterar:((K=document.getElementById("perm-planos-alterar"))==null?void 0:K.checked)??!1,excluir:((J=document.getElementById("perm-planos-excluir"))==null?void 0:J.checked)??!1},financeiro:{acesso:((ee=document.getElementById("perm-financeiro-acesso"))==null?void 0:ee.checked)??!1,cadastrar:((Q=document.getElementById("perm-financeiro-cadastrar"))==null?void 0:Q.checked)??!1,alterar:((le=document.getElementById("perm-financeiro-alterar"))==null?void 0:le.checked)??!1,excluir:((te=document.getElementById("perm-financeiro-excluir"))==null?void 0:te.checked)??!1},relatorios:{acesso:((de=document.getElementById("perm-relatorios-acesso"))==null?void 0:de.checked)??!1,gerar:((ae=document.getElementById("perm-relatorios-gerar"))==null?void 0:ae.checked)??!1},home:{acesso:((j=document.getElementById("perm-home-acesso"))==null?void 0:j.checked)??!1},auditoria:{acesso:((oe=document.getElementById("perm-auditoria-acesso"))==null?void 0:oe.checked)??!1},configuracoes:{acesso:((X=document.getElementById("perm-configuracoes-acesso"))==null?void 0:X.checked)??!1,alterar:((me=document.getElementById("perm-configuracoes-alterar"))==null?void 0:me.checked)??!1}};const y=(t==null?void 0:t.nome)||"Administrador";return M&&a?(k.updateUser(a.id,{nome:h,login:I,senha:z,papel:a.isSistema?"admin":m,permissoes:a.isSistema?ge.admin:r},y),B("Usuário e permissões atualizados com sucesso!","success")):(k.addUser({nome:h,login:I,senha:z,papel:m,permissoes:r},y),B("Novo usuário cadastrado com sucesso!","success")),s(),!0}});const i=document.getElementById("user-papel"),p=document.getElementById("user-permissions-section"),x=(h,I,z)=>{const n=document.getElementById(`row-perm-${h}-${I}`),m=document.getElementById(`badge-perm-${h}-${I}`);n&&m&&(z?(n.style.background="rgba(34, 197, 94, 0.06)",n.style.borderColor="rgba(34, 197, 94, 0.25)",m.className="badge badge-success",m.textContent="Liberado"):(n.style.background="rgba(234, 67, 53, 0.04)",n.style.borderColor="rgba(234, 67, 53, 0.15)",m.className="badge badge-coral",m.textContent="Bloqueado")),g(h)},g=h=>{const I=document.getElementById(`group-counter-${h}`),z=pe.find(n=>n.key===h);if(I&&z){let n=0;z.items.forEach(m=>{const u=document.getElementById(`perm-${h}-${m.key}`);u&&u.checked&&n++}),I.textContent=`${n}/${z.items.length} liberadas`}};i==null||i.addEventListener("change",()=>{const h=i.value;if(h==="admin")p.style.display="none";else if(p.style.display="block",!M){const I=ge[h]||ge.professor;pe.forEach(z=>{z.items.forEach(n=>{var u;const m=document.getElementById(`perm-${z.key}-${n.key}`);if(m){const r=((u=I[z.key])==null?void 0:u[n.key])??!1;m.checked=r,x(z.key,n.key,r)}})})}}),pe.forEach(h=>{const I=document.getElementById(`header-group-${h.key}`),z=document.getElementById(`group-body-${h.key}`),n=document.getElementById(`arrow-perm-${h.key}`);I==null||I.addEventListener("click",m=>{if(!m.target.closest(".btn-group-toggle")&&z&&n){const u=z.style.display==="flex";z.style.display=u?"none":"flex",n.style.transform=u?"rotate(0deg)":"rotate(180deg)"}}),h.items.forEach(m=>{const u=document.getElementById(`perm-${h.key}-${m.key}`);u==null||u.addEventListener("change",()=>{if(x(h.key,m.key,u.checked),u.checked&&m.key!=="acesso"){const r=document.getElementById(`perm-${h.key}-acesso`);r&&!r.checked&&(r.checked=!0,x(h.key,"acesso",!0))}!u.checked&&m.key==="acesso"&&h.items.forEach(r=>{if(r.key!=="acesso"){const y=document.getElementById(`perm-${h.key}-${r.key}`);y&&y.checked&&(y.checked=!1,x(h.key,r.key,!1))}})})}),document.querySelectorAll(`.btn-group-toggle[data-group="${h.key}"]`).forEach(m=>{m.addEventListener("click",u=>{u.stopPropagation();const r=h.items.map(P=>document.getElementById(`perm-${h.key}-${P.key}`)).filter(Boolean),y=r.every(P=>P.checked);r.forEach(P=>{P.checked=!y,x(h.key,P.dataset.action,!y)})})})}),(l=document.getElementById("btn-perm-expand"))==null||l.addEventListener("click",()=>{pe.forEach(h=>{const I=document.getElementById(`group-body-${h.key}`),z=document.getElementById(`arrow-perm-${h.key}`);I&&z&&(I.style.display="flex",z.style.transform="rotate(180deg)")})}),(v=document.getElementById("btn-perm-collapse"))==null||v.addEventListener("click",()=>{pe.forEach(h=>{const I=document.getElementById(`group-body-${h.key}`),z=document.getElementById(`arrow-perm-${h.key}`);I&&z&&(I.style.display="none",z.style.transform="rotate(0deg)")})}),(b=document.getElementById("btn-perm-all"))==null||b.addEventListener("click",()=>{pe.forEach(h=>{h.items.forEach(I=>{const z=document.getElementById(`perm-${h.key}-${I.key}`);z&&(z.checked=!0,x(h.key,I.key,!0))})})}),(E=document.getElementById("btn-perm-none"))==null||E.addEventListener("click",()=>{pe.forEach(h=>{h.items.forEach(I=>{const z=document.getElementById(`perm-${h.key}-${I.key}`);z&&(z.checked=!1,x(h.key,I.key,!1))})})})}return s(),e}function at(w){const e=document.createElement("div"),t=Y.getCurrentUser();let o="";const s=W(t,"planos","cadastrar"),d=W(t,"planos","alterar"),S=W(t,"planos","excluir");function a(){var L,i;const c=k.getPlans().filter(p=>{const x=o.toLowerCase();return p.nome.toLowerCase().includes(x)||p.descricao&&p.descricao.toLowerCase().includes(x)});e.innerHTML=`
       <!-- Cabeçalho da Tela -->
       <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
@@ -1492,7 +1492,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
         ${s?`
               <button class="btn btn-primary" id="btn-new-plan" style="display: flex; align-items: center; gap: 6px;">
-                ${j.plus} Cadastrar Novo Plano
+                ${R.plus} Cadastrar Novo Plano
               </button>
             `:""}
       </div>
@@ -1509,7 +1509,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             style="padding-left: 36px;"
           />
           <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
-            ${j.search}
+            ${R.search}
           </div>
         </div>
         ${o?'<button class="btn btn-secondary btn-sm" id="btn-clear-search">Limpar</button>':""}
@@ -1544,7 +1544,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                             <td>
                               <div style="display: flex; align-items: center; gap: 10px;">
                                 <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: rgba(234, 67, 53, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-coral); flex-shrink: 0;">
-                                  ${j.planos}
+                                  ${R.planos}
                                 </div>
                                 <div>
                                   <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
@@ -1566,17 +1566,17 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                             </td>
                             <td style="text-align: right;">
                               <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                                ${l?`
+                                ${d?`
                                       <button class="btn btn-secondary btn-icon-only btn-edit-plan" data-id="${p.id}" title="Editar Plano e Módulos">
-                                        ${j.edit}
+                                        ${R.edit}
                                       </button>
                                     `:""}
-                                ${E?`
+                                ${S?`
                                       <button class="btn btn-danger btn-icon-only btn-delete-plan" data-id="${p.id}" title="Excluir Plano">
-                                        ${j.trash}
+                                        ${R.trash}
                                       </button>
                                     `:""}
-                                ${!l&&!E?'<span style="font-size: 0.72rem; color: var(--text-muted);">Visualização</span>':""}
+                                ${!d&&!S?'<span style="font-size: 0.72rem; color: var(--text-muted);">Visualização</span>':""}
                               </div>
                             </td>
                           </tr>
@@ -1585,26 +1585,26 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </table>
         </div>
       </div>
-    `,(P=e.querySelector("#btn-new-plan"))==null||P.addEventListener("click",()=>{M()});const A=e.querySelector("#plan-search-input");A&&A.addEventListener("input",p=>{o=p.target.value,a();const x=e.querySelector("#plan-search-input");x&&(x.focus(),x.setSelectionRange(x.value.length,x.value.length))}),(r=e.querySelector("#btn-clear-search"))==null||r.addEventListener("click",()=>{o="",a()}),e.querySelectorAll(".btn-edit-plan").forEach(p=>{p.addEventListener("click",x=>{const b=x.currentTarget.dataset.id,i=k.getPlans().find(f=>f.id===b);i&&M(i)})}),e.querySelectorAll(".btn-delete-plan").forEach(p=>{p.addEventListener("click",x=>{const b=x.currentTarget.dataset.id,i=k.getPlans().find(f=>f.id===b);i&&fe({title:"Excluir Plano de Ensino",message:`Tem certeza que deseja excluir o plano "<strong>${i.nome}</strong>" e todos os seus <strong>${i.modulos.length} módulos</strong> vinculados?`,onConfirm:()=>{k.deletePlan(i.id,(t==null?void 0:t.nome)||"Administrador"),F(`Plano "${i.nome}" excluído.`,"info"),a()}})})})}function M(g){const c=!!g;let A=g?JSON.parse(JSON.stringify(g.modulos)):[{id:"m1",ordem:1,titulo:"Módulo 1: Fundamentos"},{id:"m2",ordem:2,titulo:"Módulo 2: Aprofundamento Prático"}];function P(){return A.length===0?`
+    `,(L=e.querySelector("#btn-new-plan"))==null||L.addEventListener("click",()=>{M()});const A=e.querySelector("#plan-search-input");A&&A.addEventListener("input",p=>{o=p.target.value,a();const x=e.querySelector("#plan-search-input");x&&(x.focus(),x.setSelectionRange(x.value.length,x.value.length))}),(i=e.querySelector("#btn-clear-search"))==null||i.addEventListener("click",()=>{o="",a()}),e.querySelectorAll(".btn-edit-plan").forEach(p=>{p.addEventListener("click",x=>{const g=x.currentTarget.dataset.id,l=k.getPlans().find(v=>v.id===g);l&&M(l)})}),e.querySelectorAll(".btn-delete-plan").forEach(p=>{p.addEventListener("click",x=>{const g=x.currentTarget.dataset.id,l=k.getPlans().find(v=>v.id===g);l&&fe({title:"Excluir Plano de Ensino",message:`Tem certeza que deseja excluir o plano "<strong>${l.nome}</strong>" e todos os seus <strong>${l.modulos.length} módulos</strong> vinculados?`,onConfirm:()=>{k.deletePlan(l.id,(t==null?void 0:t.nome)||"Administrador"),B(`Plano "${l.nome}" excluído.`,"info"),a()}})})})}function M(f){const c=!!f;let A=f?JSON.parse(JSON.stringify(f.modulos)):[{id:"m1",ordem:1,titulo:"Módulo 1: Fundamentos"},{id:"m2",ordem:2,titulo:"Módulo 2: Aprofundamento Prático"}];function L(){return A.length===0?`
           <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.82rem; border: 1px dashed var(--border-subtle); border-radius: var(--radius-sm); background: rgba(0, 0, 0, 0.1);">
             🎵 Nenhum módulo na trilha pedagógica ainda.<br/>
             <span style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 4px; display: inline-block;">
               Digite o nome do módulo no campo acima e tecle Enter ou clique em "+ Adicionar".
             </span>
           </div>
-        `:A.map((b,i)=>`
-            <div class="module-card-item" data-idx="${i}" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 6px 10px; display: flex; align-items: center; gap: 10px; transition: border-color 0.15s ease;">
+        `:A.map((g,l)=>`
+            <div class="module-card-item" data-idx="${l}" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 6px 10px; display: flex; align-items: center; gap: 10px; transition: border-color 0.15s ease;">
               <!-- Badge de Ordem Numérica -->
               <div style="width: 26px; height: 26px; border-radius: 6px; background: rgba(234, 67, 53, 0.15); color: var(--color-coral); font-weight: 700; font-size: 0.74rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(234, 67, 53, 0.3);">
-                ${String(i+1).padStart(2,"0")}
+                ${String(l+1).padStart(2,"0")}
               </div>
 
               <!-- Input Editável In-Place -->
               <input 
                 type="text" 
                 class="module-title-input" 
-                data-idx="${i}" 
-                value="${b.titulo}" 
+                data-idx="${l}" 
+                value="${g.titulo}" 
                 placeholder="Título do módulo..." 
                 style="flex: 1; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); color: var(--text-white); font-size: 0.84rem; padding: 6px 10px; outline: none;" 
               />
@@ -1614,35 +1614,35 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 <button 
                   type="button" 
                   class="btn btn-secondary btn-icon-only btn-move-up" 
-                  data-idx="${i}" 
+                  data-idx="${l}" 
                   title="Mover para Cima" 
                   style="width: 26px; height: 26px; padding: 0; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;"
-                  ${i===0?'disabled style="opacity: 0.25; cursor: not-allowed; width: 26px; height: 26px; padding: 0;"':""}
+                  ${l===0?'disabled style="opacity: 0.25; cursor: not-allowed; width: 26px; height: 26px; padding: 0;"':""}
                 >
                   ▲
                 </button>
                 <button 
                   type="button" 
                   class="btn btn-secondary btn-icon-only btn-move-down" 
-                  data-idx="${i}" 
+                  data-idx="${l}" 
                   title="Mover para Baixo" 
                   style="width: 26px; height: 26px; padding: 0; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;"
-                  ${i===A.length-1?'disabled style="opacity: 0.25; cursor: not-allowed; width: 26px; height: 26px; padding: 0;"':""}
+                  ${l===A.length-1?'disabled style="opacity: 0.25; cursor: not-allowed; width: 26px; height: 26px; padding: 0;"':""}
                 >
                   ▼
                 </button>
                 <button 
                   type="button" 
                   class="btn btn-danger btn-icon-only btn-remove-module" 
-                  data-idx="${i}" 
+                  data-idx="${l}" 
                   title="Excluir Módulo" 
                   style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);"
                 >
-                  ${j.trash}
+                  ${R.trash}
                 </button>
               </div>
             </div>
-          `).join("")}const r=`
+          `).join("")}const i=`
       <form id="plan-modal-form" style="display: flex; flex-direction: column; gap: 12px;">
         
         <!-- 1. Identificação Básica do Plano (Compacto em 2 Colunas) -->
@@ -1659,7 +1659,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 id="plan-nome" 
                 class="form-input" 
                 placeholder="Ex: Violão Popular" 
-                value="${(g==null?void 0:g.nome)||""}" 
+                value="${(f==null?void 0:f.nome)||""}" 
                 required 
                 style="padding: 7px 10px; font-size: 0.84rem;"
               />
@@ -1672,7 +1672,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 id="plan-desc" 
                 class="form-input" 
                 placeholder="Ex: Do nível iniciante à prática de repertório" 
-                value="${(g==null?void 0:g.descricao)||""}" 
+                value="${(f==null?void 0:f.descricao)||""}" 
                 style="padding: 7px 10px; font-size: 0.84rem;"
               />
             </div>
@@ -1708,7 +1708,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
               id="btn-quick-add-module" 
               style="display: flex; align-items: center; gap: 4px; font-size: 0.78rem; padding: 7px 14px; white-space: nowrap;"
             >
-              ${j.plus} Adicionar Módulo
+              ${R.plus} Adicionar Módulo
             </button>
           </div>
 
@@ -1717,12 +1717,12 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             id="modules-list-container" 
             style="max-height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 2px;"
           >
-            ${P()}
+            ${L()}
           </div>
         </div>
 
       </form>
-    `;re({title:c?`Editar Plano: ${g.nome}`:"Cadastrar Plano & Trilha de Ensino",bodyHtml:r,modalClass:"modal-lg",confirmText:c?"Salvar Alterações":"Cadastrar Plano",onConfirm:()=>{const b=document.getElementById("plan-nome").value.trim(),i=document.getElementById("plan-desc").value.trim(),f=A.map((I,u)=>({id:I.id||"mod_"+(u+1)+"_"+Date.now(),ordem:u+1,titulo:I.titulo.trim()})).filter(I=>I.titulo.length>0);if(!b)return F("Informe o nome do plano de ensino.","error"),!1;if(f.length===0)return F("Adicione pelo menos um módulo à trilha pedagógica.","error"),!1;const v=(t==null?void 0:t.nome)||"Administrador";return c&&g?(k.updatePlan(g.id,{nome:b,descricao:i,modulos:f},v),F("Plano e módulos atualizados com sucesso!","success")):(k.addPlan({nome:b,descricao:i,modulos:f},v),F("Plano de ensino cadastrado com sucesso!","success")),a(),!0}});function p(){const b=document.getElementById("modules-list-container"),i=document.getElementById("modules-counter-badge");b&&(i&&(i.textContent=`${A.length} ${A.length===1?"módulo":"módulos"}`),b.innerHTML=P(),b.querySelectorAll(".module-title-input").forEach(f=>{f.addEventListener("input",v=>{const I=parseInt(v.target.getAttribute("data-idx")||"0",10);A[I]&&(A[I].titulo=v.target.value)})}),b.querySelectorAll(".btn-move-up:not([disabled])").forEach(f=>{f.addEventListener("click",v=>{const I=parseInt(v.currentTarget.getAttribute("data-idx")||"0",10);if(I>0){const u=A[I];A[I]=A[I-1],A[I-1]=u,A.forEach((S,L)=>S.ordem=L+1),p()}})}),b.querySelectorAll(".btn-move-down:not([disabled])").forEach(f=>{f.addEventListener("click",v=>{const I=parseInt(v.currentTarget.getAttribute("data-idx")||"0",10);if(I<A.length-1){const u=A[I];A[I]=A[I+1],A[I+1]=u,A.forEach((S,L)=>S.ordem=L+1),p()}})}),b.querySelectorAll(".btn-remove-module").forEach(f=>{f.addEventListener("click",v=>{const I=parseInt(v.currentTarget.getAttribute("data-idx")||"0",10);A.splice(I,1),A.forEach((u,S)=>u.ordem=S+1),p()})}))}function x(){const b=document.getElementById("quick-add-module-input");if(!b)return;const i=b.value.trim();if(!i){F("Digite o nome do módulo para adicionar.","info"),b.focus();return}const f=A.length+1;A.push({id:"mod_"+f+"_"+Date.now(),ordem:f,titulo:i}),b.value="",p(),b.focus();const v=document.getElementById("modules-list-container");v&&(v.scrollTop=v.scrollHeight)}setTimeout(()=>{const b=document.getElementById("btn-quick-add-module"),i=document.getElementById("quick-add-module-input");b==null||b.addEventListener("click",()=>{x()}),i==null||i.addEventListener("keydown",f=>{f.key==="Enter"&&(f.preventDefault(),x())}),p()},50)}return a(),e}function ot($){const e=document.createElement("div"),t=Y.getCurrentUser();let o="",s="todos",l=new Date;const E=Z(t,"financeiro","cadastrar"),a=Z(t,"financeiro","alterar"),M=Z(t,"financeiro","excluir");function g(){var m,w,d,h,z,T,_,N;const r=k.getPayments(),p=k.getStudents(),x=new Date,b=l!==null&&x.getMonth()===l.getMonth()&&x.getFullYear()===l.getFullYear(),i=l?`${l.getFullYear()}-${String(l.getMonth()+1).padStart(2,"0")}`:"",f=r.filter(C=>C.status==="pago").reduce((C,D)=>C+D.valor,0),v=r.filter(C=>C.status==="pendente").reduce((C,D)=>C+D.valor,0),I=r.filter(C=>C.status==="atrasado").reduce((C,D)=>C+D.valor,0),u=p.filter(C=>C.status==="ativo"&&k.isStudentOverdue(C.id)),S=r.filter(C=>{const D=p.find(J=>J.id===C.alunoId),B=D?D.nome.toLowerCase():"",O=C.descricao.toLowerCase(),V=B.includes(o.toLowerCase())||O.includes(o.toLowerCase())||C.mesReferencia&&C.mesReferencia.includes(o),G=s==="todos"||C.status===s,K=!i||C.mesReferencia===i||C.dataVencimento.startsWith(i);return V&&G&&K});e.innerHTML=`
+    `;ne({title:c?`Editar Plano: ${f.nome}`:"Cadastrar Plano & Trilha de Ensino",bodyHtml:i,modalClass:"modal-lg",confirmText:c?"Salvar Alterações":"Cadastrar Plano",onConfirm:()=>{const g=document.getElementById("plan-nome").value.trim(),l=document.getElementById("plan-desc").value.trim(),v=A.map((E,h)=>({id:E.id||"mod_"+(h+1)+"_"+Date.now(),ordem:h+1,titulo:E.titulo.trim()})).filter(E=>E.titulo.length>0);if(!g)return B("Informe o nome do plano de ensino.","error"),!1;if(v.length===0)return B("Adicione pelo menos um módulo à trilha pedagógica.","error"),!1;const b=(t==null?void 0:t.nome)||"Administrador";return c&&f?(k.updatePlan(f.id,{nome:g,descricao:l,modulos:v},b),B("Plano e módulos atualizados com sucesso!","success")):(k.addPlan({nome:g,descricao:l,modulos:v},b),B("Plano de ensino cadastrado com sucesso!","success")),a(),!0}});function p(){const g=document.getElementById("modules-list-container"),l=document.getElementById("modules-counter-badge");g&&(l&&(l.textContent=`${A.length} ${A.length===1?"módulo":"módulos"}`),g.innerHTML=L(),g.querySelectorAll(".module-title-input").forEach(v=>{v.addEventListener("input",b=>{const E=parseInt(b.target.getAttribute("data-idx")||"0",10);A[E]&&(A[E].titulo=b.target.value)})}),g.querySelectorAll(".btn-move-up:not([disabled])").forEach(v=>{v.addEventListener("click",b=>{const E=parseInt(b.currentTarget.getAttribute("data-idx")||"0",10);if(E>0){const h=A[E];A[E]=A[E-1],A[E-1]=h,A.forEach((I,z)=>I.ordem=z+1),p()}})}),g.querySelectorAll(".btn-move-down:not([disabled])").forEach(v=>{v.addEventListener("click",b=>{const E=parseInt(b.currentTarget.getAttribute("data-idx")||"0",10);if(E<A.length-1){const h=A[E];A[E]=A[E+1],A[E+1]=h,A.forEach((I,z)=>I.ordem=z+1),p()}})}),g.querySelectorAll(".btn-remove-module").forEach(v=>{v.addEventListener("click",b=>{const E=parseInt(b.currentTarget.getAttribute("data-idx")||"0",10);A.splice(E,1),A.forEach((h,I)=>h.ordem=I+1),p()})}))}function x(){const g=document.getElementById("quick-add-module-input");if(!g)return;const l=g.value.trim();if(!l){B("Digite o nome do módulo para adicionar.","info"),g.focus();return}const v=A.length+1;A.push({id:"mod_"+v+"_"+Date.now(),ordem:v,titulo:l}),g.value="",p(),g.focus();const b=document.getElementById("modules-list-container");b&&(b.scrollTop=b.scrollHeight)}setTimeout(()=>{const g=document.getElementById("btn-quick-add-module"),l=document.getElementById("quick-add-module-input");g==null||g.addEventListener("click",()=>{x()}),l==null||l.addEventListener("keydown",v=>{v.key==="Enter"&&(v.preventDefault(),x())}),p()},50)}return a(),e}function ot(w){const e=document.createElement("div"),t=Y.getCurrentUser();let o="",s="todos",d=new Date;const S=W(t,"financeiro","cadastrar"),a=W(t,"financeiro","alterar"),M=W(t,"financeiro","excluir");function f(){var m,u,r,y,P,_,O,N;const i=k.getPayments(),p=k.getStudents(),x=new Date,g=d!==null&&x.getMonth()===d.getMonth()&&x.getFullYear()===d.getFullYear(),l=d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`:"",v=i.filter(C=>C.status==="pago").reduce((C,T)=>C+T.valor,0),b=i.filter(C=>C.status==="pendente").reduce((C,T)=>C+T.valor,0),E=i.filter(C=>C.status==="atrasado").reduce((C,T)=>C+T.valor,0),h=p.filter(C=>C.status==="ativo"&&k.isStudentOverdue(C.id)),I=i.filter(C=>{const T=p.find(J=>J.id===C.alunoId),D=T?T.nome.toLowerCase():"",q=C.descricao.toLowerCase(),V=D.includes(o.toLowerCase())||q.includes(o.toLowerCase())||C.mesReferencia&&C.mesReferencia.includes(o),G=s==="todos"||C.status===s,K=!l||C.mesReferencia===l||C.dataVencimento.startsWith(l);return V&&G&&K});e.innerHTML=`
       <!-- Cabeçalho Principal -->
       <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
@@ -1735,12 +1735,12 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </div>
 
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          ${E?`
+          ${S?`
                 <button class="btn btn-secondary" id="btn-gerar-lote" style="display: inline-flex; align-items: center; gap: 6px;">
                   🗓️ Gerar Mensalidades do Mês
                 </button>
                 <button class="btn btn-primary" id="btn-novo-lancamento" style="display: inline-flex; align-items: center; gap: 6px;">
-                  ${j.plus} Novo Lançamento
+                  ${R.plus} Novo Lançamento
                 </button>
               `:""}
         </div>
@@ -1751,40 +1751,40 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div class="panel-card" style="padding: 16px; border-left: 4px solid #22c55e;">
           <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Total Recebido</div>
           <div style="font-size: 1.4rem; font-weight: 800; color: #4ade80; margin-top: 4px;">
-            R$ ${f.toFixed(2)}
+            R$ ${v.toFixed(2)}
           </div>
           <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">
-            ${r.filter(C=>C.status==="pago").length} mensalidades quitadas
+            ${i.filter(C=>C.status==="pago").length} mensalidades quitadas
           </div>
         </div>
 
         <div class="panel-card" style="padding: 16px; border-left: 4px solid #f59e0b;">
           <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">A Vencer / Pendente</div>
           <div style="font-size: 1.4rem; font-weight: 800; color: #fbbf24; margin-top: 4px;">
-            R$ ${v.toFixed(2)}
+            R$ ${b.toFixed(2)}
           </div>
           <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">
-            ${r.filter(C=>C.status==="pendente").length} aguardando vencimento
+            ${i.filter(C=>C.status==="pendente").length} aguardando vencimento
           </div>
         </div>
 
         <div class="panel-card" style="padding: 16px; border-left: 4px solid #ef4444;">
           <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Em Atraso / Vencido</div>
           <div style="font-size: 1.4rem; font-weight: 800; color: #f87171; margin-top: 4px;">
-            R$ ${I.toFixed(2)}
+            R$ ${E.toFixed(2)}
           </div>
           <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">
-            ${r.filter(C=>C.status==="atrasado").length} parcelas expiradas
+            ${i.filter(C=>C.status==="atrasado").length} parcelas expiradas
           </div>
         </div>
 
         <div class="panel-card" style="padding: 16px; border-left: 4px solid #a855f7;">
           <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Alunos Inadimplentes</div>
           <div style="font-size: 1.4rem; font-weight: 800; color: #c084fc; margin-top: 4px;">
-            ${u.length} <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">de ${p.filter(C=>C.status==="ativo").length} ativos</span>
+            ${h.length} <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">de ${p.filter(C=>C.status==="ativo").length} ativos</span>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">
-            ${u.length===0?"✓ 100% em dia":"Requer acompanhamento"}
+            ${h.length===0?"✓ 100% em dia":"Requer acompanhamento"}
           </div>
         </div>
       </div>
@@ -1793,14 +1793,14 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div class="calendar-title-group" style="display: flex; align-items: center; gap: 14px;">
           <h3 class="calendar-month-title" style="min-width: 220px; font-size: 1.05rem; margin: 0; font-weight: 700;">
-            ${l?`Mensalidade / ${l.getFullYear()}-${String(l.getMonth()+1).padStart(2,"0")}`:"Todas as Mensalidades"}
+            ${d?`Mensalidade / ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`:"Todas as Mensalidades"}
           </h3>
           
           <div class="calendar-nav-buttons" style="display: flex; gap: 4px;">
             <button type="button" class="btn btn-secondary btn-icon-only" id="fin-btn-prev-month" title="Mês anterior" style="width: 28px; height: 28px; padding: 0;">
               ◀
             </button>
-            <button type="button" class="btn ${b?"btn-primary":"btn-secondary"}" id="fin-btn-current-month" style="padding: 6px 14px; font-size: 0.8rem;">
+            <button type="button" class="btn ${g?"btn-primary":"btn-secondary"}" id="fin-btn-current-month" style="padding: 6px 14px; font-size: 0.8rem;">
               Mês Atual
             </button>
             <button type="button" class="btn btn-secondary btn-icon-only" id="fin-btn-next-month" title="Próximo mês" style="width: 28px; height: 28px; padding: 0;">
@@ -1810,7 +1810,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </div>
 
         <div style="display: flex; align-items: center; gap: 8px;">
-          <button type="button" class="btn ${l===null?"btn-primary":"btn-secondary"}" id="fin-btn-all-months" style="padding: 6px 14px; font-size: 0.8rem;" title="Ver todos os lançamentos sem filtrar por mês">
+          <button type="button" class="btn ${d===null?"btn-primary":"btn-secondary"}" id="fin-btn-all-months" style="padding: 6px 14px; font-size: 0.8rem;" title="Ver todos os lançamentos sem filtrar por mês">
             Ver Todos
           </button>
         </div>
@@ -1828,7 +1828,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             style="padding-left: 36px;"
           />
           <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
-            ${j.search}
+            ${R.search}
           </div>
         </div>
 
@@ -1853,7 +1853,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <!-- Tabela Principal de Pagamentos -->
       <div class="panel-card">
         <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="panel-card-title">Lançamentos Financeiros (${S.length})</h3>
+          <h3 class="panel-card-title">Lançamentos Financeiros (${I.length})</h3>
         </div>
 
         <div class="table-responsive">
@@ -1869,15 +1869,15 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
               </tr>
             </thead>
             <tbody>
-              ${S.length===0?'<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum lançamento financeiro encontrado para os filtros selecionados.</td></tr>':S.map(C=>{const D=p.find(G=>G.id===C.alunoId),B=C.status==="pago",O=C.status==="atrasado";let V="";return B?V='<span class="badge badge-success" style="font-size: 0.72rem;">✓ Pago</span>':O?V='<span class="badge badge-coral" style="font-size: 0.72rem; font-weight: 700;">⚠️ Atrasado</span>':V='<span class="badge badge-warning" style="font-size: 0.72rem;">⏳ Pendente</span>',`
+              ${I.length===0?'<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum lançamento financeiro encontrado para os filtros selecionados.</td></tr>':I.map(C=>{const T=p.find(G=>G.id===C.alunoId),D=C.status==="pago",q=C.status==="atrasado";let V="";return D?V='<span class="badge badge-success" style="font-size: 0.72rem;">✓ Pago</span>':q?V='<span class="badge badge-coral" style="font-size: 0.72rem; font-weight: 700;">⚠️ Atrasado</span>':V='<span class="badge badge-warning" style="font-size: 0.72rem;">⏳ Pendente</span>',`
                           <tr>
                             <td>
                               <div style="display: flex; align-items: center; gap: 8px;">
                                 <div style="width: 28px; height: 28px; border-radius: 50%; background: #282b3a; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-coral); font-size: 0.8rem; flex-shrink: 0;">
-                                  ${D!=null&&D.nome?D.nome[0]:"?"}
+                                  ${T!=null&&T.nome?T.nome[0]:"?"}
                                 </div>
                                 <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                  ${(D==null?void 0:D.nome)||"Aluno não identificado"}
+                                  ${(T==null?void 0:T.nome)||"Aluno não identificado"}
                                 </span>
                               </div>
                             </td>
@@ -1889,7 +1889,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                             </td>
 
                             <td class="col-hide-sm" style="white-space: nowrap;">
-                              <span style="font-size: 0.84rem; color: ${O?"#f87171":"var(--text-white)"}; font-weight: ${O?"700":"normal"};">
+                              <span style="font-size: 0.84rem; color: ${q?"#f87171":"var(--text-white)"}; font-weight: ${q?"700":"normal"};">
                                 ${C.dataVencimento.split("-").reverse().join("/")}
                               </span>
                             </td>
@@ -1904,13 +1904,13 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
                             <td style="text-align: right;">
                               <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                                ${!B&&a?`
+                                ${!D&&a?`
                                       <button class="btn btn-secondary btn-icon-only btn-action-baixa" data-id="${C.id}" title="Dar Baixa / Confirmar Recebimento" style="width: 28px; height: 28px; padding: 0; color: #34d399; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08); box-shadow: none;">
-                                        ${j.check}
+                                        ${R.check}
                                       </button>
                                     `:""}
 
-                                ${B?`
+                                ${D?`
                                       <button class="btn btn-secondary btn-icon-only btn-action-recibo" data-id="${C.id}" title="Imprimir Comprovante / Recibo" style="color: #60a5fa; width: 28px; height: 28px; padding: 0; box-shadow: none;">
                                         🖨️
                                       </button>
@@ -1918,13 +1918,13 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
                                 ${a?`
                                       <button class="btn btn-secondary btn-icon-only btn-action-edit" data-id="${C.id}" title="Editar Lançamento" style="width: 28px; height: 28px; padding: 0; box-shadow: none;">
-                                        ${j.edit}
+                                        ${R.edit}
                                       </button>
                                     `:""}
 
                                 ${M?`
                                       <button class="btn btn-danger btn-icon-only btn-action-delete" data-id="${C.id}" title="Excluir Lançamento" style="width: 28px; height: 28px; padding: 0; box-shadow: none;">
-                                        ${j.trash}
+                                        ${R.trash}
                                       </button>
                                     `:""}
                               </div>
@@ -1935,15 +1935,15 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </table>
         </div>
       </div>
-    `,(m=e.querySelector("#fin-btn-prev-month"))==null||m.addEventListener("click",()=>{l||(l=new Date),l=new Date(l.getFullYear(),l.getMonth()-1,1),g()}),(w=e.querySelector("#fin-btn-next-month"))==null||w.addEventListener("click",()=>{l||(l=new Date),l=new Date(l.getFullYear(),l.getMonth()+1,1),g()}),(d=e.querySelector("#fin-btn-current-month"))==null||d.addEventListener("click",()=>{l=new Date,g()}),(h=e.querySelector("#fin-btn-all-months"))==null||h.addEventListener("click",()=>{l=null,g()});const L=e.querySelector("#fin-search-input");L==null||L.addEventListener("input",C=>{o=C.target.value,g();const D=e.querySelector("#fin-search-input");D&&(D.focus(),D.selectionStart=D.selectionEnd=D.value.length)}),(z=e.querySelector("#btn-clear-fin-search"))==null||z.addEventListener("click",()=>{o="",g()});const n=e.querySelector("#fin-status-filter");n==null||n.addEventListener("change",()=>{s=n.value,g()}),(T=e.querySelector("#btn-limpar-status"))==null||T.addEventListener("click",()=>{s="todos",g()}),(_=e.querySelector("#btn-gerar-lote"))==null||_.addEventListener("click",()=>{A()}),(N=e.querySelector("#btn-novo-lancamento"))==null||N.addEventListener("click",()=>{P()}),e.querySelectorAll(".btn-action-baixa").forEach(C=>{C.addEventListener("click",D=>{const B=D.currentTarget.dataset.id,O=r.find(V=>V.id===B);O&&c(O)})}),e.querySelectorAll(".btn-action-recibo").forEach(C=>{C.addEventListener("click",D=>{const B=D.currentTarget.dataset.id,O=r.find(V=>V.id===B);if(O){const V=p.find(G=>G.id===O.alunoId);V&&qe(O,V)}})}),e.querySelectorAll(".btn-action-edit").forEach(C=>{C.addEventListener("click",D=>{const B=D.currentTarget.dataset.id,O=r.find(V=>V.id===B);O&&P(O)})}),e.querySelectorAll(".btn-action-delete").forEach(C=>{C.addEventListener("click",D=>{const B=D.currentTarget.dataset.id,O=r.find(V=>V.id===B);O&&fe({title:"Excluir Lançamento Financeiro",message:`Deseja realmente excluir o lançamento "<strong>${O.descricao}</strong>" no valor de <strong>R$ ${O.valor.toFixed(2)}</strong>? Esta operação ficará registrada na auditoria e não poderá ser desfeita.`,onConfirm:()=>{k.deletePayment(O.id,(t==null?void 0:t.nome)||"Administrador"),F("Lançamento excluído com sucesso!","info"),g()}})})})}function c(r){const p=k.getStudents().find(i=>i.id===r.alunoId),x=k.getTodayDateString(),b=`
+    `,(m=e.querySelector("#fin-btn-prev-month"))==null||m.addEventListener("click",()=>{d||(d=new Date),d=new Date(d.getFullYear(),d.getMonth()-1,1),f()}),(u=e.querySelector("#fin-btn-next-month"))==null||u.addEventListener("click",()=>{d||(d=new Date),d=new Date(d.getFullYear(),d.getMonth()+1,1),f()}),(r=e.querySelector("#fin-btn-current-month"))==null||r.addEventListener("click",()=>{d=new Date,f()}),(y=e.querySelector("#fin-btn-all-months"))==null||y.addEventListener("click",()=>{d=null,f()});const z=e.querySelector("#fin-search-input");z==null||z.addEventListener("input",C=>{o=C.target.value,f();const T=e.querySelector("#fin-search-input");T&&(T.focus(),T.selectionStart=T.selectionEnd=T.value.length)}),(P=e.querySelector("#btn-clear-fin-search"))==null||P.addEventListener("click",()=>{o="",f()});const n=e.querySelector("#fin-status-filter");n==null||n.addEventListener("change",()=>{s=n.value,f()}),(_=e.querySelector("#btn-limpar-status"))==null||_.addEventListener("click",()=>{s="todos",f()}),(O=e.querySelector("#btn-gerar-lote"))==null||O.addEventListener("click",()=>{A()}),(N=e.querySelector("#btn-novo-lancamento"))==null||N.addEventListener("click",()=>{L()}),e.querySelectorAll(".btn-action-baixa").forEach(C=>{C.addEventListener("click",T=>{const D=T.currentTarget.dataset.id,q=i.find(V=>V.id===D);q&&c(q)})}),e.querySelectorAll(".btn-action-recibo").forEach(C=>{C.addEventListener("click",T=>{const D=T.currentTarget.dataset.id,q=i.find(V=>V.id===D);if(q){const V=p.find(G=>G.id===q.alunoId);V&&qe(q,V)}})}),e.querySelectorAll(".btn-action-edit").forEach(C=>{C.addEventListener("click",T=>{const D=T.currentTarget.dataset.id,q=i.find(V=>V.id===D);q&&L(q)})}),e.querySelectorAll(".btn-action-delete").forEach(C=>{C.addEventListener("click",T=>{const D=T.currentTarget.dataset.id,q=i.find(V=>V.id===D);q&&fe({title:"Excluir Lançamento Financeiro",message:`Deseja realmente excluir o lançamento "<strong>${q.descricao}</strong>" no valor de <strong>R$ ${q.valor.toFixed(2)}</strong>? Esta operação ficará registrada na auditoria e não poderá ser desfeita.`,onConfirm:()=>{k.deletePayment(q.id,(t==null?void 0:t.nome)||"Administrador"),B("Lançamento excluído com sucesso!","info"),f()}})})})}function c(i){const p=k.getStudents().find(l=>l.id===i.alunoId),x=k.getTodayDateString(),g=`
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px;">
-          <div style="font-weight: 700; color: var(--text-white); font-size: 0.95rem;">${r.descricao}</div>
+          <div style="font-weight: 700; color: var(--text-white); font-size: 0.95rem;">${i.descricao}</div>
           <div style="color: #4ade80; font-size: 1.25rem; font-weight: 800; margin-top: 4px;">
-            R$ ${r.valor.toFixed(2)}
+            R$ ${i.valor.toFixed(2)}
           </div>
           <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
-            Aluno: <strong>${(p==null?void 0:p.nome)||"N/A"}</strong> &bull; Vencimento: ${r.dataVencimento.split("-").reverse().join("/")}
+            Aluno: <strong>${(p==null?void 0:p.nome)||"N/A"}</strong> &bull; Vencimento: ${i.dataVencimento.split("-").reverse().join("/")}
           </div>
         </div>
 
@@ -1969,7 +1969,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <input type="text" id="modal-baixa-obs" class="form-input" placeholder="Ex: Comprovante arquivado / Pago no balcão" />
         </div>
       </div>
-    `;re({title:"Confirmar Baixa de Pagamento",bodyHtml:b,modalClass:"modal-sm",confirmText:"Confirmar e Quitar",confirmBtnClass:"btn-primary",cancelText:"Cancelar",onConfirm:()=>{const i=document.getElementById("modal-baixa-data").value,f=document.getElementById("modal-baixa-forma").value,v=document.getElementById("modal-baixa-obs").value;return i?(k.darBaixaPayment(r.id,i,f,(t==null?void 0:t.nome)||"Administrador",v),F(`Baixa efetuada com sucesso! R$ ${r.valor.toFixed(2)} recebido.`,"success"),g(),!0):(F("Informe a data de recebimento.","error"),!1)}})}function A(){const r=new Date,p=r.getFullYear(),x=r.getMonth()+1,b=`
+    `;ne({title:"Confirmar Baixa de Pagamento",bodyHtml:g,modalClass:"modal-sm",confirmText:"Confirmar e Quitar",confirmBtnClass:"btn-primary",cancelText:"Cancelar",onConfirm:()=>{const l=document.getElementById("modal-baixa-data").value,v=document.getElementById("modal-baixa-forma").value,b=document.getElementById("modal-baixa-obs").value;return l?(k.darBaixaPayment(i.id,l,v,(t==null?void 0:t.nome)||"Administrador",b),B(`Baixa efetuada com sucesso! R$ ${i.valor.toFixed(2)} recebido.`,"success"),f(),!0):(B("Informe a data de recebimento.","error"),!1)}})}function A(){const i=new Date,p=i.getFullYear(),x=i.getMonth()+1,g=`
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-sm); padding: 12px; font-size: 0.84rem; color: var(--text-white); line-height: 1.4;">
           ℹ️ <strong>Como funciona a geração em lote:</strong>
@@ -2004,37 +2004,37 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
         </div>
       </div>
-    `;re({title:"Gerar Mensalidades em Lote",bodyHtml:b,modalClass:"modal-sm",confirmText:"Gerar Faturas Agora",cancelText:"Cancelar",onConfirm:()=>{const i=parseInt(document.getElementById("lote-ano").value,10),f=parseInt(document.getElementById("lote-mes").value,10);if(!i||!f)return F("Selecione ano e mês válidos.","error"),!1;const v=k.gerarMensalidadesMes(i,f,(t==null?void 0:t.nome)||"Administrador");return v.criadas===0&&v.puladas>0?F(`Todas as ${v.puladas} mensalidades deste mês já estavam criadas!`,"info"):F(`Sucesso: ${v.criadas} mensalidade(s) gerada(s)! (${v.puladas} já existentes puladas)`,"success"),g(),!0}})}function P(r){const p=!!r,x=k.getStudents(),b=k.getTodayDateString(),i=x.map(v=>`<option value="${v.id}" ${(r==null?void 0:r.alunoId)===v.id?"selected":""}>${v.nome} (${v.instrumentoPrincipal||"Geral"})</option>`).join(""),f=`
+    `;ne({title:"Gerar Mensalidades em Lote",bodyHtml:g,modalClass:"modal-sm",confirmText:"Gerar Faturas Agora",cancelText:"Cancelar",onConfirm:()=>{const l=parseInt(document.getElementById("lote-ano").value,10),v=parseInt(document.getElementById("lote-mes").value,10);if(!l||!v)return B("Selecione ano e mês válidos.","error"),!1;const b=k.gerarMensalidadesMes(l,v,(t==null?void 0:t.nome)||"Administrador");return b.criadas===0&&b.puladas>0?B(`Todas as ${b.puladas} mensalidades deste mês já estavam criadas!`,"info"):B(`Sucesso: ${b.criadas} mensalidade(s) gerada(s)! (${b.puladas} já existentes puladas)`,"success"),f(),!0}})}function L(i){const p=!!i,x=k.getStudents(),g=k.getTodayDateString(),l=x.map(b=>`<option value="${b.id}" ${(i==null?void 0:i.alunoId)===b.id?"selected":""}>${b.nome} (${b.instrumentoPrincipal||"Geral"})</option>`).join(""),v=`
       <form id="payment-form" style="display: flex; flex-direction: column; gap: 12px;">
         <div class="form-group" style="margin: 0;">
           <label class="form-label" for="pay-aluno">Aluno Correspondente</label>
           <select id="pay-aluno" class="form-select" required ${p?"disabled":""}>
             <option value="">Selecione um aluno...</option>
-            ${i}
+            ${l}
           </select>
         </div>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="pay-desc">Descrição</label>
-            <input type="text" id="pay-desc" class="form-input" placeholder="Ex: Mensalidade Outubro/2026" value="${(r==null?void 0:r.descricao)||""}" required />
+            <input type="text" id="pay-desc" class="form-input" placeholder="Ex: Mensalidade Outubro/2026" value="${(i==null?void 0:i.descricao)||""}" required />
           </div>
 
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="pay-mes">Mês Ref. (YYYY-MM)</label>
-            <input type="text" id="pay-mes" class="form-input" placeholder="2026-10" value="${(r==null?void 0:r.mesReferencia)||""}" />
+            <input type="text" id="pay-mes" class="form-input" placeholder="2026-10" value="${(i==null?void 0:i.mesReferencia)||""}" />
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="pay-valor">Valor (R$)</label>
-            <input type="number" id="pay-valor" class="form-input" min="0" step="5" placeholder="280.00" value="${(r==null?void 0:r.valor)??280}" required />
+            <input type="number" id="pay-valor" class="form-input" min="0" step="5" placeholder="280.00" value="${(i==null?void 0:i.valor)??280}" required />
           </div>
 
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="pay-vencimento">Data de Vencimento</label>
-            <input type="date" id="pay-vencimento" class="form-input" value="${(r==null?void 0:r.dataVencimento)||b}" required />
+            <input type="date" id="pay-vencimento" class="form-input" value="${(i==null?void 0:i.dataVencimento)||g}" required />
           </div>
         </div>
 
@@ -2042,9 +2042,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="pay-status">Status do Pagamento</label>
             <select id="pay-status" class="form-select" required>
-              <option value="pendente" ${(r==null?void 0:r.status)==="pendente"?"selected":""}>Pendente (A Vencer)</option>
-              <option value="pago" ${(r==null?void 0:r.status)==="pago"?"selected":""}>Pago (Quitado)</option>
-              <option value="atrasado" ${(r==null?void 0:r.status)==="atrasado"?"selected":""}>Atrasado</option>
+              <option value="pendente" ${(i==null?void 0:i.status)==="pendente"?"selected":""}>Pendente (A Vencer)</option>
+              <option value="pago" ${(i==null?void 0:i.status)==="pago"?"selected":""}>Pago (Quitado)</option>
+              <option value="atrasado" ${(i==null?void 0:i.status)==="atrasado"?"selected":""}>Atrasado</option>
             </select>
           </div>
 
@@ -2052,22 +2052,22 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <label class="form-label" for="pay-forma">Forma de Pagamento</label>
             <select id="pay-forma" class="form-select">
               <option value="">Não informada</option>
-              <option value="pix" ${(r==null?void 0:r.formaPagamento)==="pix"?"selected":""}>PIX</option>
-              <option value="dinheiro" ${(r==null?void 0:r.formaPagamento)==="dinheiro"?"selected":""}>Dinheiro</option>
-              <option value="cartao_credito" ${(r==null?void 0:r.formaPagamento)==="cartao_credito"?"selected":""}>Cartão de Crédito</option>
-              <option value="cartao_debito" ${(r==null?void 0:r.formaPagamento)==="cartao_debito"?"selected":""}>Cartão de Débito</option>
-              <option value="boleto" ${(r==null?void 0:r.formaPagamento)==="boleto"?"selected":""}>Boleto</option>
-              <option value="transferencia" ${(r==null?void 0:r.formaPagamento)==="transferencia"?"selected":""}>Transferência</option>
+              <option value="pix" ${(i==null?void 0:i.formaPagamento)==="pix"?"selected":""}>PIX</option>
+              <option value="dinheiro" ${(i==null?void 0:i.formaPagamento)==="dinheiro"?"selected":""}>Dinheiro</option>
+              <option value="cartao_credito" ${(i==null?void 0:i.formaPagamento)==="cartao_credito"?"selected":""}>Cartão de Crédito</option>
+              <option value="cartao_debito" ${(i==null?void 0:i.formaPagamento)==="cartao_debito"?"selected":""}>Cartão de Débito</option>
+              <option value="boleto" ${(i==null?void 0:i.formaPagamento)==="boleto"?"selected":""}>Boleto</option>
+              <option value="transferencia" ${(i==null?void 0:i.formaPagamento)==="transferencia"?"selected":""}>Transferência</option>
             </select>
           </div>
         </div>
 
         <div class="form-group" style="margin: 0;">
           <label class="form-label" for="pay-obs">Observações Adicionais</label>
-          <input type="text" id="pay-obs" class="form-input" placeholder="Detalhes opcionais sobre o lançamento..." value="${(r==null?void 0:r.observacoes)||""}" />
+          <input type="text" id="pay-obs" class="form-input" placeholder="Detalhes opcionais sobre o lançamento..." value="${(i==null?void 0:i.observacoes)||""}" />
         </div>
       </form>
-    `;re({title:p?`Editar Lançamento: ${r.descricao}`:"Novo Lançamento Financeiro",bodyHtml:f,modalClass:"modal-md",confirmText:p?"Salvar Alterações":"Cadastrar Lançamento",cancelText:"Cancelar",onConfirm:()=>{const v=p&&r?r.alunoId:document.getElementById("pay-aluno").value,I=document.getElementById("pay-desc").value.trim(),u=document.getElementById("pay-mes").value.trim()||void 0,S=document.getElementById("pay-valor").value,L=parseFloat(S)||0,n=document.getElementById("pay-vencimento").value,m=document.getElementById("pay-status").value,w=document.getElementById("pay-forma").value||void 0,d=document.getElementById("pay-obs").value.trim()||void 0;if(!v)return F("Selecione um aluno.","error"),!1;if(!I)return F("Informe a descrição do lançamento.","error"),!1;if(L<=0)return F("Informe um valor válido maior que zero.","error"),!1;if(!n)return F("Informe a data de vencimento.","error"),!1;const h=(t==null?void 0:t.nome)||"Administrador";return p&&r?(k.updatePayment(r.id,{descricao:I,mesReferencia:u,valor:L,dataVencimento:n,status:m,formaPagamento:w,dataPagamento:m==="pago"?r.dataPagamento||b:void 0,observacoes:d},h),F("Lançamento atualizado com sucesso!","success")):(k.addPayment({alunoId:v,descricao:I,mesReferencia:u,valor:L,dataVencimento:n,status:m,formaPagamento:w,dataPagamento:m==="pago"?b:void 0,observacoes:d},h),F("Novo lançamento cadastrado com sucesso!","success")),g(),!0}}),p||setTimeout(()=>{const v=document.getElementById("pay-aluno");v==null||v.addEventListener("change",()=>{const I=x.find(u=>u.id===v.value);if(I){const u=document.getElementById("pay-valor");u&&typeof I.valorMensalidade=="number"&&(u.value=I.valorMensalidade.toString())}})},50)}return g(),e}function st($){const e=document.createElement("div"),t=Y.getCurrentUser(),o=Z(t,"relatorios","gerar");let s="alunos",l="todos",E="todos",a="todos",M="todos",g="todos",c="nome_asc",A="",P="",r="",p="",x="todos",b="todos",i="todos",f="vencimento_asc";function v(){var Q,W,te,ae,de,oe,q,se,X,me,R,ee,ce,be,he,ye,xe,Pe,Me;const n=k.getSettings(),m=k.getStudents(),w=k.getPlans(),d=k.getPayments(),h=Array.from(new Set(m.map(y=>y.instrumentoPrincipal).filter(Boolean))).sort();let z=m.filter(y=>{if(l!=="todos"&&y.status!==l||E!=="todos"&&y.instrumentoPrincipal!==E||a!=="todos"&&y.nivelMusical!==a||M!=="todos"&&y.planoId!==M)return!1;if(g!=="todos"){const H=k.isStudentOverdue(y.id);if(g==="em_dia"&&H||g==="atrasado"&&!H)return!1}return!0});z.sort((y,H)=>c==="nome_asc"?y.nome.localeCompare(H.nome):c==="nome_desc"?H.nome.localeCompare(y.nome):c==="data_desc"?(H.criadoEm||"").localeCompare(y.criadoEm||""):c==="data_asc"?(y.criadoEm||"").localeCompare(H.criadoEm||""):0);const T=z.length,_=z.filter(y=>y.status==="ativo").length,N=z.filter(y=>y.status==="inativo").length,C=z.filter(y=>k.isStudentOverdue(y.id)).length,D=new Date().toISOString().slice(0,10);let B=d.filter(y=>{if(A&&y.dataVencimento<A||P&&y.dataVencimento>P)return!1;const H=y.mesReferencia||y.dataVencimento.slice(0,7);if(r&&H<r||p&&H>p||b!=="todos"&&y.alunoId!==b||i!=="todos"&&y.formaPagamento!==i)return!1;const ne=y.status!=="pago"&&y.dataVencimento<D;return!(x==="pago"&&y.status!=="pago"||x==="pendente"&&(y.status==="pago"||ne)||x==="atrasado"&&!ne)});const O=new Map(m.map(y=>[y.id,y.nome]));B.sort((y,H)=>{if(f==="vencimento_asc")return y.dataVencimento.localeCompare(H.dataVencimento);if(f==="vencimento_desc")return H.dataVencimento.localeCompare(y.dataVencimento);if(f==="valor_desc")return H.valor-y.valor;if(f==="aluno_asc"){const ne=O.get(y.alunoId)||"",ke=O.get(H.alunoId)||"";return ne.localeCompare(ke)}return 0});const V=B.length,G=B.reduce((y,H)=>y+H.valor,0),K=B.filter(y=>y.status==="pago").reduce((y,H)=>y+H.valor,0),J=B.filter(y=>y.status!=="pago").reduce((y,H)=>y+H.valor,0);e.innerHTML=`
+    `;ne({title:p?`Editar Lançamento: ${i.descricao}`:"Novo Lançamento Financeiro",bodyHtml:v,modalClass:"modal-md",confirmText:p?"Salvar Alterações":"Cadastrar Lançamento",cancelText:"Cancelar",onConfirm:()=>{const b=p&&i?i.alunoId:document.getElementById("pay-aluno").value,E=document.getElementById("pay-desc").value.trim(),h=document.getElementById("pay-mes").value.trim()||void 0,I=document.getElementById("pay-valor").value,z=parseFloat(I)||0,n=document.getElementById("pay-vencimento").value,m=document.getElementById("pay-status").value,u=document.getElementById("pay-forma").value||void 0,r=document.getElementById("pay-obs").value.trim()||void 0;if(!b)return B("Selecione um aluno.","error"),!1;if(!E)return B("Informe a descrição do lançamento.","error"),!1;if(z<=0)return B("Informe um valor válido maior que zero.","error"),!1;if(!n)return B("Informe a data de vencimento.","error"),!1;const y=(t==null?void 0:t.nome)||"Administrador";return p&&i?(k.updatePayment(i.id,{descricao:E,mesReferencia:h,valor:z,dataVencimento:n,status:m,formaPagamento:u,dataPagamento:m==="pago"?i.dataPagamento||g:void 0,observacoes:r},y),B("Lançamento atualizado com sucesso!","success")):(k.addPayment({alunoId:b,descricao:E,mesReferencia:h,valor:z,dataVencimento:n,status:m,formaPagamento:u,dataPagamento:m==="pago"?g:void 0,observacoes:r},y),B("Novo lançamento cadastrado com sucesso!","success")),f(),!0}}),p||setTimeout(()=>{const b=document.getElementById("pay-aluno");b==null||b.addEventListener("change",()=>{const E=x.find(h=>h.id===b.value);if(E){const h=document.getElementById("pay-valor");h&&typeof E.valorMensalidade=="number"&&(h.value=E.valorMensalidade.toString())}})},50)}return f(),e}function st(w){const e=document.createElement("div"),t=Y.getCurrentUser(),o=W(t,"relatorios","gerar");let s="alunos",d="todos",S="todos",a="todos",M="todos",f="todos",c="nome_asc",A="",L="",i="",p="",x="todos",g="todos",l="todos",v="vencimento_asc";function b(){var ee,Q,le,te,de,ae,j,oe,X,me,F,Z,ce,be,he,ye,xe,Me,Pe;const n=k.getSettings(),m=k.getStudents(),u=k.getPlans(),r=k.getPayments(),y=Array.from(new Set(m.map($=>$.instrumentoPrincipal).filter(Boolean))).sort();let P=m.filter($=>{if(d!=="todos"&&$.status!==d||S!=="todos"&&$.instrumentoPrincipal!==S||a!=="todos"&&$.nivelMusical!==a||M!=="todos"&&$.planoId!==M)return!1;if(f!=="todos"){const H=k.isStudentOverdue($.id);if(f==="em_dia"&&H||f==="atrasado"&&!H)return!1}return!0});P.sort(($,H)=>c==="nome_asc"?$.nome.localeCompare(H.nome):c==="nome_desc"?H.nome.localeCompare($.nome):c==="data_desc"?(H.criadoEm||"").localeCompare($.criadoEm||""):c==="data_asc"?($.criadoEm||"").localeCompare(H.criadoEm||""):0);const _=P.length,O=P.filter($=>$.status==="ativo").length,N=P.filter($=>$.status==="inativo").length,C=P.filter($=>k.isStudentOverdue($.id)).length,T=new Date().toISOString().slice(0,10);let D=r.filter($=>{if(A&&$.dataVencimento<A||L&&$.dataVencimento>L)return!1;const H=$.mesReferencia||$.dataVencimento.slice(0,7);if(i&&H<i||p&&H>p||g!=="todos"&&$.alunoId!==g||l!=="todos"&&$.formaPagamento!==l)return!1;const se=$.status!=="pago"&&$.dataVencimento<T;return!(x==="pago"&&$.status!=="pago"||x==="pendente"&&($.status==="pago"||se)||x==="atrasado"&&!se)});const q=new Map(m.map($=>[$.id,$.nome]));D.sort(($,H)=>{if(v==="vencimento_asc")return $.dataVencimento.localeCompare(H.dataVencimento);if(v==="vencimento_desc")return H.dataVencimento.localeCompare($.dataVencimento);if(v==="valor_desc")return H.valor-$.valor;if(v==="aluno_asc"){const se=q.get($.alunoId)||"",ke=q.get(H.alunoId)||"";return se.localeCompare(ke)}return 0});const V=D.length,G=D.reduce(($,H)=>$+H.valor,0),K=D.filter($=>$.status==="pago").reduce(($,H)=>$+H.valor,0),J=D.filter($=>$.status!=="pago").reduce(($,H)=>$+H.valor,0);e.innerHTML=`
       <!-- Cabeçalho do Módulo -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
         <div>
@@ -2130,17 +2130,17 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Status do Aluno</label>
               <select id="filtro-aluno-status" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
-                <option value="todos" ${l==="todos"?"selected":""}>Todos os Status</option>
-                <option value="ativo" ${l==="ativo"?"selected":""}>Somente Ativos</option>
-                <option value="inativo" ${l==="inativo"?"selected":""}>Somente Inativos</option>
+                <option value="todos" ${d==="todos"?"selected":""}>Todos os Status</option>
+                <option value="ativo" ${d==="ativo"?"selected":""}>Somente Ativos</option>
+                <option value="inativo" ${d==="inativo"?"selected":""}>Somente Inativos</option>
               </select>
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Instrumento</label>
               <select id="filtro-aluno-instrumento" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
-                <option value="todos" ${E==="todos"?"selected":""}>Todos os Instrumentos</option>
-                ${h.map(y=>`<option value="${y}" ${E===y?"selected":""}>${y}</option>`).join("")}
+                <option value="todos" ${S==="todos"?"selected":""}>Todos os Instrumentos</option>
+                ${y.map($=>`<option value="${$}" ${S===$?"selected":""}>${$}</option>`).join("")}
               </select>
             </div>
 
@@ -2159,16 +2159,16 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
               <label class="form-label" style="font-size: 0.72rem;">Plano de Ensino</label>
               <select id="filtro-aluno-plano" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
                 <option value="todos" ${M==="todos"?"selected":""}>Todos os Planos</option>
-                ${w.map(y=>`<option value="${y.id}" ${M===y.id?"selected":""}>${y.nome}</option>`).join("")}
+                ${u.map($=>`<option value="${$.id}" ${M===$.id?"selected":""}>${$.nome}</option>`).join("")}
               </select>
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Situação Financeira</label>
               <select id="filtro-aluno-financeiro" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
-                <option value="todos" ${g==="todos"?"selected":""}>Todos</option>
-                <option value="em_dia" ${g==="em_dia"?"selected":""}>Em Dia</option>
-                <option value="atrasado" ${g==="atrasado"?"selected":""}>Com Mensalidade em Atraso</option>
+                <option value="todos" ${f==="todos"?"selected":""}>Todos</option>
+                <option value="em_dia" ${f==="em_dia"?"selected":""}>Em Dia</option>
+                <option value="atrasado" ${f==="atrasado"?"selected":""}>Com Mensalidade em Atraso</option>
               </select>
             </div>
 
@@ -2188,11 +2188,11 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
             <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total Localizado</div>
-            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">${T}</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-white); margin-top: 2px;">${_}</div>
           </div>
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
             <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Alunos Ativos</div>
-            <div style="font-size: 1.25rem; font-weight: 700; color: #4ade80; margin-top: 2px;">${_}</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #4ade80; margin-top: 2px;">${O}</div>
           </div>
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px;">
             <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Alunos Inativos</div>
@@ -2208,7 +2208,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div class="panel-card">
           <div class="panel-card-header" style="padding: 12px 16px;">
             <h3 class="panel-card-title" style="font-size: 0.84rem;">
-              Prévia do Relatório de Alunos (${z.length} registros)
+              Prévia do Relatório de Alunos (${P.length} registros)
             </h3>
           </div>
           <div class="table-responsive">
@@ -2224,15 +2224,15 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 </tr>
               </thead>
               <tbody>
-                ${z.length===0?'<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Nenhum aluno atende aos filtros aplicados.</td></tr>':z.map(y=>{const H=w.find(Oe=>Oe.id===y.planoId),ne=y.status==="ativo",ke=k.isStudentOverdue(y.id);return`
+                ${P.length===0?'<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Nenhum aluno atende aos filtros aplicados.</td></tr>':P.map($=>{const H=u.find(Oe=>Oe.id===$.planoId),se=$.status==="ativo",ke=k.isStudentOverdue($.id);return`
                             <tr>
-                              <td style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${y.nome}</td>
-                              <td class="col-hide-md">${y.instrumentoPrincipal||"Geral"}</td>
-                              <td class="col-hide-sm" style="color: var(--text-secondary);">${y.telefone||"-"}</td>
+                              <td style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${$.nome}</td>
+                              <td class="col-hide-md">${$.instrumentoPrincipal||"Geral"}</td>
+                              <td class="col-hide-sm" style="color: var(--text-secondary);">${$.telefone||"-"}</td>
                               <td class="col-hide-sm" style="color: var(--text-secondary);">${(H==null?void 0:H.nome)||"-"}</td>
                               <td class="col-hide-xs">
-                                <span class="badge ${ne?"badge-success":"badge-warning"}" style="font-size: 0.7rem; padding: 2px 7px;">
-                                  ${ne?"Ativo":"Inativo"}
+                                <span class="badge ${se?"badge-success":"badge-warning"}" style="font-size: 0.7rem; padding: 2px 7px;">
+                                  ${se?"Ativo":"Inativo"}
                                 </span>
                               </td>
                               <td>
@@ -2269,12 +2269,12 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
 
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Vencimento Até</label>
-              <input type="date" id="filtro-fin-datafim" class="form-input" style="font-size: 0.8rem; padding: 5px 8px;" value="${P}" />
+              <input type="date" id="filtro-fin-datafim" class="form-input" style="font-size: 0.8rem; padding: 5px 8px;" value="${L}" />
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Mês Ref. De</label>
-              <input type="month" id="filtro-fin-mesref-ini" class="form-input" style="font-size: 0.8rem; padding: 5px 8px;" value="${r}" />
+              <input type="month" id="filtro-fin-mesref-ini" class="form-input" style="font-size: 0.8rem; padding: 5px 8px;" value="${i}" />
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
@@ -2295,30 +2295,30 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Aluno Específico</label>
               <select id="filtro-fin-aluno" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
-                <option value="todos" ${b==="todos"?"selected":""}>Todos os Alunos</option>
-                ${m.map(y=>`<option value="${y.id}" ${b===y.id?"selected":""}>${y.nome}</option>`).join("")}
+                <option value="todos" ${g==="todos"?"selected":""}>Todos os Alunos</option>
+                ${m.map($=>`<option value="${$.id}" ${g===$.id?"selected":""}>${$.nome}</option>`).join("")}
               </select>
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Forma de Pagamento</label>
               <select id="filtro-fin-metodo" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
-                <option value="todos" ${i==="todos"?"selected":""}>Todas as Formas</option>
-                <option value="pix" ${i==="pix"?"selected":""}>PIX</option>
-                <option value="cartao_credito" ${i==="cartao_credito"?"selected":""}>Cartão de Crédito</option>
-                <option value="cartao_debito" ${i==="cartao_debito"?"selected":""}>Cartão de Débito</option>
-                <option value="boleto" ${i==="boleto"?"selected":""}>Boleto</option>
-                <option value="dinheiro" ${i==="dinheiro"?"selected":""}>Dinheiro</option>
+                <option value="todos" ${l==="todos"?"selected":""}>Todas as Formas</option>
+                <option value="pix" ${l==="pix"?"selected":""}>PIX</option>
+                <option value="cartao_credito" ${l==="cartao_credito"?"selected":""}>Cartão de Crédito</option>
+                <option value="cartao_debito" ${l==="cartao_debito"?"selected":""}>Cartão de Débito</option>
+                <option value="boleto" ${l==="boleto"?"selected":""}>Boleto</option>
+                <option value="dinheiro" ${l==="dinheiro"?"selected":""}>Dinheiro</option>
               </select>
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-size: 0.72rem;">Ordenação</label>
               <select id="filtro-fin-ordem" class="form-select" style="font-size: 0.8rem; padding: 6px 10px;">
-                <option value="vencimento_asc" ${f==="vencimento_asc"?"selected":""}>Vencimento Mais Próximo</option>
-                <option value="vencimento_desc" ${f==="vencimento_desc"?"selected":""}>Vencimento Mais Distante</option>
-                <option value="valor_desc" ${f==="valor_desc"?"selected":""}>Maior Valor Primeiro</option>
-                <option value="aluno_asc" ${f==="aluno_asc"?"selected":""}>Nome do Aluno (A → Z)</option>
+                <option value="vencimento_asc" ${v==="vencimento_asc"?"selected":""}>Vencimento Mais Próximo</option>
+                <option value="vencimento_desc" ${v==="vencimento_desc"?"selected":""}>Vencimento Mais Distante</option>
+                <option value="valor_desc" ${v==="valor_desc"?"selected":""}>Maior Valor Primeiro</option>
+                <option value="aluno_asc" ${v==="aluno_asc"?"selected":""}>Nome do Aluno (A → Z)</option>
               </select>
             </div>
           </div>
@@ -2348,7 +2348,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div class="panel-card">
           <div class="panel-card-header" style="padding: 12px 16px;">
             <h3 class="panel-card-title" style="font-size: 0.84rem;">
-              Prévia do Relatório Financeiro (${B.length} lançamentos)
+              Prévia do Relatório Financeiro (${D.length} lançamentos)
             </h3>
           </div>
           <div class="table-responsive">
@@ -2363,15 +2363,15 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                 </tr>
               </thead>
               <tbody>
-                ${B.length===0?'<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Nenhum lançamento atende aos filtros aplicados.</td></tr>':B.map(y=>{const H=y.status==="pago",ne=!H&&y.dataVencimento<D;return`
+                ${D.length===0?'<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Nenhum lançamento atende aos filtros aplicados.</td></tr>':D.map($=>{const H=$.status==="pago",se=!H&&$.dataVencimento<T;return`
                             <tr>
-                              <td style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${O.get(y.alunoId)||"Aluno"}</td>
-                              <td class="col-hide-md" style="color: var(--text-secondary);">${y.descricao}${y.mesReferencia?` / ${y.mesReferencia}`:""}</td>
-                              <td class="col-hide-sm">${y.dataVencimento.split("-").reverse().join("/")}</td>
-                              <td style="font-weight: 700;">R$ ${y.valor.toFixed(2)}</td>
+                              <td style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${q.get($.alunoId)||"Aluno"}</td>
+                              <td class="col-hide-md" style="color: var(--text-secondary);">${$.descricao}${$.mesReferencia?` / ${$.mesReferencia}`:""}</td>
+                              <td class="col-hide-sm">${$.dataVencimento.split("-").reverse().join("/")}</td>
+                              <td style="font-weight: 700;">R$ ${$.valor.toFixed(2)}</td>
                               <td class="col-hide-xs">
-                                <span class="badge ${H?"badge-success":ne?"badge-coral":"badge-warning"}" style="font-size: 0.7rem; padding: 2px 7px;">
-                                  ${H?"Pago":ne?"Atrasado":"Pendente"}
+                                <span class="badge ${H?"badge-success":se?"badge-coral":"badge-warning"}" style="font-size: 0.7rem; padding: 2px 7px;">
+                                  ${H?"Pago":se?"Atrasado":"Pendente"}
                                 </span>
                               </td>
                             </tr>
@@ -2381,7 +2381,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
         </div>
       </div>
-    `,(Q=e.querySelector("#btn-tab-rel-alunos"))==null||Q.addEventListener("click",()=>{s="alunos",v()}),(W=e.querySelector("#btn-tab-rel-financeiro"))==null||W.addEventListener("click",()=>{s="financeiro",v()}),(te=e.querySelector("#filtro-aluno-status"))==null||te.addEventListener("change",y=>{l=y.target.value,v()}),(ae=e.querySelector("#filtro-aluno-instrumento"))==null||ae.addEventListener("change",y=>{E=y.target.value,v()}),(de=e.querySelector("#filtro-aluno-nivel"))==null||de.addEventListener("change",y=>{a=y.target.value,v()}),(oe=e.querySelector("#filtro-aluno-plano"))==null||oe.addEventListener("change",y=>{M=y.target.value,v()}),(q=e.querySelector("#filtro-aluno-financeiro"))==null||q.addEventListener("change",y=>{g=y.target.value,v()}),(se=e.querySelector("#filtro-aluno-ordem"))==null||se.addEventListener("change",y=>{c=y.target.value,v()}),(X=e.querySelector("#btn-limpar-filtros-alunos"))==null||X.addEventListener("click",()=>{l="todos",E="todos",a="todos",M="todos",g="todos",c="nome_asc",v()}),(me=e.querySelector("#filtro-fin-dataini"))==null||me.addEventListener("change",y=>{A=y.target.value,v()}),(R=e.querySelector("#filtro-fin-datafim"))==null||R.addEventListener("change",y=>{P=y.target.value,v()}),(ee=e.querySelector("#filtro-fin-mesref-ini"))==null||ee.addEventListener("change",y=>{r=y.target.value,v()}),(ce=e.querySelector("#filtro-fin-mesref-fim"))==null||ce.addEventListener("change",y=>{p=y.target.value,v()}),(be=e.querySelector("#filtro-fin-status"))==null||be.addEventListener("change",y=>{x=y.target.value,v()}),(he=e.querySelector("#filtro-fin-aluno"))==null||he.addEventListener("change",y=>{b=y.target.value,v()}),(ye=e.querySelector("#filtro-fin-metodo"))==null||ye.addEventListener("change",y=>{i=y.target.value,v()}),(xe=e.querySelector("#filtro-fin-ordem"))==null||xe.addEventListener("change",y=>{f=y.target.value,v()}),(Pe=e.querySelector("#btn-limpar-filtros-fin"))==null||Pe.addEventListener("click",()=>{A="",P="",r="",p="",x="todos",b="todos",i="todos",f="vencimento_asc",v()}),(Me=e.querySelector("#btn-gerar-pdf"))==null||Me.addEventListener("click",async()=>{if(!o){F("Você não possui permissão para emitir relatórios.","error");return}const y=e.querySelector("#btn-gerar-pdf"),H=y?y.innerHTML:"";y&&(y.disabled=!0,y.innerHTML="<span>⏳</span> Gerando PDF...");try{s==="alunos"?await S(n,z,w):await L(n,B,m,{mesIni:r,mesFim:p}),F("PDF gerado com sucesso!","success")}catch(ne){console.error("Erro ao gerar PDF:",ne),F("Ocorreu um erro ao gerar o documento PDF.","error")}finally{y&&(y.disabled=!1,y.innerHTML=H)}})}function I(n){return new Promise(m=>{if(n&&n.trim()!==""){const w=new Image;w.crossOrigin="Anonymous",w.onload=()=>{try{const d=document.createElement("canvas");d.width=160,d.height=160;const h=d.getContext("2d");if(!h){m(n);return}const z=24;h.fillStyle="#ffffff",h.beginPath(),h.moveTo(z,0),h.lineTo(160-z,0),h.quadraticCurveTo(160,0,160,z),h.lineTo(160,160-z),h.quadraticCurveTo(160,160,160-z,160),h.lineTo(z,160),h.quadraticCurveTo(0,160,0,160-z),h.lineTo(0,z),h.quadraticCurveTo(0,0,z,0),h.closePath(),h.fill();const T=12,_=160-T*2,N=160-T*2;let C=_,D=N;const B=w.width/w.height;B>1?D=_/B:C=N*B;const O=T+(_-C)/2,V=T+(N-D)/2;h.drawImage(w,O,V,C,D),m(d.toDataURL("image/png"))}catch{m(n)}},w.onerror=()=>{u().then(m)},w.src=n;return}u().then(m)})}function u(){return new Promise(n=>{try{const m=document.createElement("canvas");m.width=160,m.height=160;const w=m.getContext("2d");if(!w){n("");return}const d=32;w.fillStyle="#181c2b",w.beginPath(),w.moveTo(d,0),w.lineTo(160-d,0),w.quadraticCurveTo(160,0,160,d),w.lineTo(160,160-d),w.quadraticCurveTo(160,160,160-d,160),w.lineTo(d,160),w.quadraticCurveTo(0,160,0,160-d),w.lineTo(0,d),w.quadraticCurveTo(0,0,d,0),w.closePath(),w.fill(),w.lineWidth=3,w.strokeStyle="#2d3748",w.stroke();const h=new Image,z=`
+    `,(ee=e.querySelector("#btn-tab-rel-alunos"))==null||ee.addEventListener("click",()=>{s="alunos",b()}),(Q=e.querySelector("#btn-tab-rel-financeiro"))==null||Q.addEventListener("click",()=>{s="financeiro",b()}),(le=e.querySelector("#filtro-aluno-status"))==null||le.addEventListener("change",$=>{d=$.target.value,b()}),(te=e.querySelector("#filtro-aluno-instrumento"))==null||te.addEventListener("change",$=>{S=$.target.value,b()}),(de=e.querySelector("#filtro-aluno-nivel"))==null||de.addEventListener("change",$=>{a=$.target.value,b()}),(ae=e.querySelector("#filtro-aluno-plano"))==null||ae.addEventListener("change",$=>{M=$.target.value,b()}),(j=e.querySelector("#filtro-aluno-financeiro"))==null||j.addEventListener("change",$=>{f=$.target.value,b()}),(oe=e.querySelector("#filtro-aluno-ordem"))==null||oe.addEventListener("change",$=>{c=$.target.value,b()}),(X=e.querySelector("#btn-limpar-filtros-alunos"))==null||X.addEventListener("click",()=>{d="todos",S="todos",a="todos",M="todos",f="todos",c="nome_asc",b()}),(me=e.querySelector("#filtro-fin-dataini"))==null||me.addEventListener("change",$=>{A=$.target.value,b()}),(F=e.querySelector("#filtro-fin-datafim"))==null||F.addEventListener("change",$=>{L=$.target.value,b()}),(Z=e.querySelector("#filtro-fin-mesref-ini"))==null||Z.addEventListener("change",$=>{i=$.target.value,b()}),(ce=e.querySelector("#filtro-fin-mesref-fim"))==null||ce.addEventListener("change",$=>{p=$.target.value,b()}),(be=e.querySelector("#filtro-fin-status"))==null||be.addEventListener("change",$=>{x=$.target.value,b()}),(he=e.querySelector("#filtro-fin-aluno"))==null||he.addEventListener("change",$=>{g=$.target.value,b()}),(ye=e.querySelector("#filtro-fin-metodo"))==null||ye.addEventListener("change",$=>{l=$.target.value,b()}),(xe=e.querySelector("#filtro-fin-ordem"))==null||xe.addEventListener("change",$=>{v=$.target.value,b()}),(Me=e.querySelector("#btn-limpar-filtros-fin"))==null||Me.addEventListener("click",()=>{A="",L="",i="",p="",x="todos",g="todos",l="todos",v="vencimento_asc",b()}),(Pe=e.querySelector("#btn-gerar-pdf"))==null||Pe.addEventListener("click",async()=>{if(!o){B("Você não possui permissão para emitir relatórios.","error");return}const $=e.querySelector("#btn-gerar-pdf"),H=$?$.innerHTML:"";$&&($.disabled=!0,$.innerHTML="<span>⏳</span> Gerando PDF...");try{s==="alunos"?await I(n,P,u):await z(n,D,m,{mesIni:i,mesFim:p}),B("PDF gerado com sucesso!","success")}catch(se){console.error("Erro ao gerar PDF:",se),B("Ocorreu um erro ao gerar o documento PDF.","error")}finally{$&&($.disabled=!1,$.innerHTML=H)}})}function E(n){return new Promise(m=>{if(n&&n.trim()!==""){const u=new Image;u.crossOrigin="Anonymous",u.onload=()=>{try{const r=document.createElement("canvas");r.width=160,r.height=160;const y=r.getContext("2d");if(!y){m(n);return}const P=24;y.fillStyle="#ffffff",y.beginPath(),y.moveTo(P,0),y.lineTo(160-P,0),y.quadraticCurveTo(160,0,160,P),y.lineTo(160,160-P),y.quadraticCurveTo(160,160,160-P,160),y.lineTo(P,160),y.quadraticCurveTo(0,160,0,160-P),y.lineTo(0,P),y.quadraticCurveTo(0,0,P,0),y.closePath(),y.fill();const _=12,O=160-_*2,N=160-_*2;let C=O,T=N;const D=u.width/u.height;D>1?T=O/D:C=N*D;const q=_+(O-C)/2,V=_+(N-T)/2;y.drawImage(u,q,V,C,T),m(r.toDataURL("image/png"))}catch{m(n)}},u.onerror=()=>{h().then(m)},u.src=n;return}h().then(m)})}function h(){return new Promise(n=>{try{const m=document.createElement("canvas");m.width=160,m.height=160;const u=m.getContext("2d");if(!u){n("");return}const r=32;u.fillStyle="#181c2b",u.beginPath(),u.moveTo(r,0),u.lineTo(160-r,0),u.quadraticCurveTo(160,0,160,r),u.lineTo(160,160-r),u.quadraticCurveTo(160,160,160-r,160),u.lineTo(r,160),u.quadraticCurveTo(0,160,0,160-r),u.lineTo(0,r),u.quadraticCurveTo(0,0,r,0),u.closePath(),u.fill(),u.lineWidth=3,u.strokeStyle="#2d3748",u.stroke();const y=new Image,P=`
           <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 100 100" fill="none">
             <path d="M 50 16 C 68 16 84 31 84 50 C 84 58 81 65 76 71" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" fill="none"/>
             <path d="M 50 84 C 32 84 16 69 16 50 C 16 42 19 35 24 29" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" fill="none"/>
@@ -2398,7 +2398,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <rect x="68" y="34" width="6" height="32" rx="3" fill="#ffffff" />
             <circle cx="80" cy="54" r="3" fill="#ffffff" />
           </svg>
-        `,T=new Blob([z],{type:"image/svg+xml;charset=utf-8"}),_=URL.createObjectURL(T);h.onload=()=>{w.drawImage(h,20,20,120,120),URL.revokeObjectURL(_),n(m.toDataURL("image/png"))},h.onerror=()=>{URL.revokeObjectURL(_),n("")},h.src=_}catch{n("")}})}async function S(n,m,w){const d=new Te({orientation:"portrait",unit:"mm",format:"a4"}),h=new Date().toLocaleString("pt-BR"),z=n.nomeMenu||n.nomeFantasia||n.nomeEscola||"ACUSTICAMENTE",T=n.razaoSocial||"Acusticamente Ensino Musical Ltda",_=n.cnpj?`CNPJ: ${n.cnpj}`:"",N=[n.telefoneContato,n.emailContato].filter(Boolean).join(" • "),C=[n.logradouro?`${n.logradouro}, ${n.numero||"s/n"}`:"",n.complemento,n.bairro,n.cidade?`${n.cidade} - ${n.estado||"SP"}`:"",n.cep?`CEP: ${n.cep}`:""].filter(Boolean).join(" • "),D=await I(n.logotipoCustomizado);D&&d.addImage(D,"PNG",14,12,17,17);const B=D?35:14;d.setFont("helvetica","bold"),d.setFontSize(13),d.setTextColor(15,23,42),d.text(z,B,17),d.setFont("helvetica","normal"),d.setFontSize(8),d.setTextColor(71,85,105),d.text([T,_].filter(Boolean).join(" • "),B,21.5),d.setFontSize(7.5),d.setTextColor(100,116,139),C&&d.text(C,B,25.5),N&&d.text(N,B,C?29.5:25.5),d.setFont("helvetica","bold"),d.setFontSize(12),d.setTextColor(217,72,59),d.text("RELATÓRIO DE ALUNOS",196,17,{align:"right"}),d.setFont("helvetica","normal"),d.setFontSize(8),d.setTextColor(100,116,139),d.text(`Emissão: ${h}`,196,22,{align:"right"}),d.text(`Total: ${m.length} aluno(s)`,196,26.5,{align:"right"}),d.setDrawColor(203,213,225),d.setLineWidth(.4),d.line(14,33,196,33);const O=m.filter(q=>q.status==="ativo").length,V=m.filter(q=>q.status==="inativo").length,G=m.filter(q=>k.isStudentOverdue(q.id)).length,K=[{label:"TOTAL DE ALUNOS",value:`${m.length}`,color:[15,23,42]},{label:"ALUNOS ATIVOS",value:`${O}`,color:[22,163,74]},{label:"ALUNOS INATIVOS",value:`${V}`,color:[202,138,4]},{label:"INADIMPLENTES",value:`${G}`,color:[220,38,38]}],J=43,Q=12,W=36;K.forEach((q,se)=>{const X=14+se*(J+3);d.setFillColor(248,250,252),d.roundedRect(X,W,J,Q,1.5,1.5,"F"),d.setDrawColor(226,232,240),d.roundedRect(X,W,J,Q,1.5,1.5,"S"),d.setFont("helvetica","bold"),d.setFontSize(6.5),d.setTextColor(100,116,139),d.text(q.label,X+3,W+4),d.setFontSize(10.5),d.setTextColor(q.color[0],q.color[1],q.color[2]),d.text(q.value,X+3,W+9.5)});const te=m.map((q,se)=>{const X=w.find(ee=>ee.id===q.planoId),me=q.status==="ativo",R=k.isStudentOverdue(q.id);return[(se+1).toString(),q.nome,q.instrumentoPrincipal||"Música Geral",q.telefone||"-",(X==null?void 0:X.nome)||"-",me?"Ativo":"Inativo",R?"Atrasado":"Em dia"]});De(d,{startY:52,margin:{left:14,right:14,bottom:18},head:[["#","Nome do Aluno","Instrumento","Telefone","Plano de Ensino","Status","Financeiro"]],body:te.length>0?te:[["-","Nenhum registro selecionado","-","-","-","-","-"]],theme:"grid",headStyles:{fillColor:[24,28,43],textColor:[255,255,255],fontStyle:"bold",fontSize:7.5,halign:"left",valign:"middle"},styles:{font:"helvetica",fontSize:7.5,cellPadding:2,textColor:[30,41,59],lineColor:[226,232,240],lineWidth:.1},alternateRowStyles:{fillColor:[248,250,252]},columnStyles:{0:{cellWidth:8,halign:"center",textColor:[148,163,184]},1:{cellWidth:50,fontStyle:"bold"},2:{cellWidth:32},3:{cellWidth:28},4:{cellWidth:34},5:{cellWidth:15,halign:"center"},6:{cellWidth:15,halign:"center"}},didParseCell:q=>{q.section==="body"&&(q.column.index===5&&(q.cell.raw==="Ativo"?(q.cell.styles.textColor=[22,163,74],q.cell.styles.fontStyle="bold"):q.cell.styles.textColor=[202,138,4]),q.column.index===6&&(q.cell.raw==="Atrasado"?(q.cell.styles.textColor=[220,38,38],q.cell.styles.fontStyle="bold"):q.cell.styles.textColor=[22,163,74]))}});const ae=d.internal.getNumberOfPages();for(let q=1;q<=ae;q++)d.setPage(q),d.setDrawColor(226,232,240),d.setLineWidth(.3),d.line(14,287,196,287),d.setFont("helvetica","normal"),d.setFontSize(7),d.setTextColor(148,163,184),d.text(`${z} • Sistema de Gestão Escolar & Pedagógica`,14,292),d.text(`Página ${q} de ${ae}`,196,292,{align:"right"});const de=d.output("blob"),oe=URL.createObjectURL(de);window.open(oe,"_blank")}async function L(n,m,w,d){const h=new Te({orientation:"portrait",unit:"mm",format:"a4"}),z=new Map(w.map(R=>[R.id,R.nome])),T=new Date().toLocaleString("pt-BR"),_=n.nomeMenu||n.nomeFantasia||n.nomeEscola||"ACUSTICAMENTE",N=n.razaoSocial||"Acusticamente Ensino Musical Ltda",C=n.cnpj?`CNPJ: ${n.cnpj}`:"",D=[n.telefoneContato,n.emailContato].filter(Boolean).join(" • "),B=[n.logradouro?`${n.logradouro}, ${n.numero||"s/n"}`:"",n.complemento,n.bairro,n.cidade?`${n.cidade} - ${n.estado||"SP"}`:"",n.cep?`CEP: ${n.cep}`:""].filter(Boolean).join(" • "),O=new Date().toISOString().slice(0,10),V=m.reduce((R,ee)=>R+ee.valor,0),G=m.filter(R=>R.status==="pago").reduce((R,ee)=>R+ee.valor,0),K=m.filter(R=>R.status!=="pago").reduce((R,ee)=>R+ee.valor,0),J=await I(n.logotipoCustomizado);J&&h.addImage(J,"PNG",14,12,17,17);const Q=J?35:14;h.setFont("helvetica","bold"),h.setFontSize(13),h.setTextColor(15,23,42),h.text(_,Q,17),h.setFont("helvetica","normal"),h.setFontSize(8),h.setTextColor(71,85,105),h.text([N,C].filter(Boolean).join(" • "),Q,21.5),h.setFontSize(7.5),h.setTextColor(100,116,139),B&&h.text(B,Q,25.5),D&&h.text(D,Q,B?29.5:25.5),h.setFont("helvetica","bold"),h.setFontSize(12),h.setTextColor(5,150,105),h.text("RELATÓRIO FINANCEIRO",196,17,{align:"right"}),h.setFont("helvetica","normal"),h.setFontSize(8),h.setTextColor(100,116,139),h.text(`Emissão: ${T}`,196,22,{align:"right"});let W=`Total: ${m.length} registro(s)`;d!=null&&d.mesIni&&(d!=null&&d.mesFim)?W=`Ref: ${d.mesIni} a ${d.mesFim} • ${m.length} reg.`:d!=null&&d.mesIni?W=`Ref: a partir de ${d.mesIni} • ${m.length} reg.`:d!=null&&d.mesFim&&(W=`Ref: até ${d.mesFim} • ${m.length} reg.`),h.text(W,196,26.5,{align:"right"}),h.setDrawColor(203,213,225),h.setLineWidth(.4),h.line(14,33,196,33);const te=[{label:"LANÇAMENTOS",value:`${m.length}`,color:[15,23,42]},{label:"MONTANTE GERAL",value:`R$ ${V.toFixed(2)}`,color:[15,23,42]},{label:"TOTAL RECEBIDO",value:`R$ ${G.toFixed(2)}`,color:[22,163,74]},{label:"PENDENTE / ATRASO",value:`R$ ${K.toFixed(2)}`,color:[220,38,38]}],ae=43,de=12,oe=36;te.forEach((R,ee)=>{const ce=14+ee*(ae+3);h.setFillColor(248,250,252),h.roundedRect(ce,oe,ae,de,1.5,1.5,"F"),h.setDrawColor(226,232,240),h.roundedRect(ce,oe,ae,de,1.5,1.5,"S"),h.setFont("helvetica","bold"),h.setFontSize(6.5),h.setTextColor(100,116,139),h.text(R.label,ce+3,oe+4),h.setFontSize(10),h.setTextColor(R.color[0],R.color[1],R.color[2]),h.text(R.value,ce+3,oe+9.5)});const q=m.map((R,ee)=>{const ce=R.status==="pago",be=!ce&&R.dataVencimento<O,he=ce?"Pago":be?"Atrasado":"Pendente",ye=R.descricao+(R.mesReferencia?` / ${R.mesReferencia}`:""),xe=R.dataVencimento.split("-").reverse().join("/");return[(ee+1).toString(),z.get(R.alunoId)||"Aluno",ye,xe,`R$ ${R.valor.toFixed(2)}`,he]});De(h,{startY:52,margin:{left:14,right:14,bottom:18},head:[["#","Aluno","Descrição / Referência","Vencimento","Valor (R$)","Status"]],body:q.length>0?q:[["-","Nenhum lançamento selecionado","-","-","-","-"]],theme:"grid",headStyles:{fillColor:[15,23,42],textColor:[255,255,255],fontStyle:"bold",fontSize:7.5,halign:"left",valign:"middle"},styles:{font:"helvetica",fontSize:7.5,cellPadding:2,textColor:[30,41,59],lineColor:[226,232,240],lineWidth:.1},alternateRowStyles:{fillColor:[248,250,252]},columnStyles:{0:{cellWidth:8,halign:"center",textColor:[148,163,184]},1:{cellWidth:50,fontStyle:"bold"},2:{cellWidth:54},3:{cellWidth:26,halign:"center"},4:{cellWidth:26,halign:"right",fontStyle:"bold"},5:{cellWidth:18,halign:"center"}},didParseCell:R=>{R.section==="body"&&R.column.index===5&&(R.cell.raw==="Pago"?(R.cell.styles.textColor=[22,163,74],R.cell.styles.fontStyle="bold"):R.cell.raw==="Atrasado"?(R.cell.styles.textColor=[220,38,38],R.cell.styles.fontStyle="bold"):R.cell.styles.textColor=[202,138,4])}});const se=h.internal.getNumberOfPages();for(let R=1;R<=se;R++)h.setPage(R),h.setDrawColor(226,232,240),h.setLineWidth(.3),h.line(14,287,196,287),h.setFont("helvetica","normal"),h.setFontSize(7),h.setTextColor(148,163,184),h.text(`${_} • Gestão Financeira & Escolar`,14,292),h.text(`Página ${R} de ${se}`,196,292,{align:"right"});const X=h.output("blob"),me=URL.createObjectURL(X);window.open(me,"_blank")}return v(),e}function nt($){const e=document.createElement("div");let t=new Date,o="";const s=g=>g.toString().padStart(2,"0");function l(g){const c=g.getDate(),P=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][g.getMonth()],r=g.getFullYear(),p=new Date,x=p.getDate()===c&&p.getMonth()===g.getMonth()&&p.getFullYear()===r;return`${c} de ${P} de ${r}${x?" (Hoje)":""}`}function E(g){return`${g.getFullYear()}-${s(g.getMonth()+1)}-${s(g.getDate())}`}function a(){var i,f,v,I,u,S,L;const g=U.getLogs(),c=new Date,A=`${s(c.getDate())}/${s(c.getMonth()+1)}/${c.getFullYear()}`,P=g.filter(n=>{var m;return(m=n.dataHoraFormatada)==null?void 0:m.startsWith(A)}).length,r=t?`${s(t.getDate())}/${s(t.getMonth()+1)}/${t.getFullYear()}`:"",p=t!==null&&c.getDate()===t.getDate()&&c.getMonth()===t.getMonth()&&c.getFullYear()===t.getFullYear(),x=g.filter(n=>{const m=!t||n.dataHoraFormatada&&n.dataHoraFormatada.startsWith(r)||n.dataHora&&n.dataHora.startsWith(E(t)),w=o===""||n.tela.toLowerCase().includes(o.toLowerCase())||n.usuarioNome.toLowerCase().includes(o.toLowerCase())||n.usuarioLogin.toLowerCase().includes(o.toLowerCase())||n.acao.toLowerCase().includes(o.toLowerCase())||n.detalhes.toLowerCase().includes(o.toLowerCase());return m&&w});e.innerHTML=`
+        `,_=new Blob([P],{type:"image/svg+xml;charset=utf-8"}),O=URL.createObjectURL(_);y.onload=()=>{u.drawImage(y,20,20,120,120),URL.revokeObjectURL(O),n(m.toDataURL("image/png"))},y.onerror=()=>{URL.revokeObjectURL(O),n("")},y.src=O}catch{n("")}})}async function I(n,m,u){const r=new Te({orientation:"portrait",unit:"mm",format:"a4"}),y=new Date().toLocaleString("pt-BR"),P=n.nomeMenu||n.nomeFantasia||n.nomeEscola||"ACUSTICAMENTE",_=n.razaoSocial||"Acusticamente Ensino Musical Ltda",O=n.cnpj?`CNPJ: ${n.cnpj}`:"",N=[n.telefoneContato,n.emailContato].filter(Boolean).join(" • "),C=[n.logradouro?`${n.logradouro}, ${n.numero||"s/n"}`:"",n.complemento,n.bairro,n.cidade?`${n.cidade} - ${n.estado||"SP"}`:"",n.cep?`CEP: ${n.cep}`:""].filter(Boolean).join(" • "),T=await E(n.logotipoCustomizado);T&&r.addImage(T,"PNG",14,12,17,17);const D=T?35:14;r.setFont("helvetica","bold"),r.setFontSize(13),r.setTextColor(15,23,42),r.text(P,D,17),r.setFont("helvetica","normal"),r.setFontSize(8),r.setTextColor(71,85,105),r.text([_,O].filter(Boolean).join(" • "),D,21.5),r.setFontSize(7.5),r.setTextColor(100,116,139),C&&r.text(C,D,25.5),N&&r.text(N,D,C?29.5:25.5),r.setFont("helvetica","bold"),r.setFontSize(12),r.setTextColor(217,72,59),r.text("RELATÓRIO DE ALUNOS",196,17,{align:"right"}),r.setFont("helvetica","normal"),r.setFontSize(8),r.setTextColor(100,116,139),r.text(`Emissão: ${y}`,196,22,{align:"right"}),r.text(`Total: ${m.length} aluno(s)`,196,26.5,{align:"right"}),r.setDrawColor(203,213,225),r.setLineWidth(.4),r.line(14,33,196,33);const q=m.filter(j=>j.status==="ativo").length,V=m.filter(j=>j.status==="inativo").length,G=m.filter(j=>k.isStudentOverdue(j.id)).length,K=[{label:"TOTAL DE ALUNOS",value:`${m.length}`,color:[15,23,42]},{label:"ALUNOS ATIVOS",value:`${q}`,color:[22,163,74]},{label:"ALUNOS INATIVOS",value:`${V}`,color:[202,138,4]},{label:"INADIMPLENTES",value:`${G}`,color:[220,38,38]}],J=43,ee=12,Q=36;K.forEach((j,oe)=>{const X=14+oe*(J+3);r.setFillColor(248,250,252),r.roundedRect(X,Q,J,ee,1.5,1.5,"F"),r.setDrawColor(226,232,240),r.roundedRect(X,Q,J,ee,1.5,1.5,"S"),r.setFont("helvetica","bold"),r.setFontSize(6.5),r.setTextColor(100,116,139),r.text(j.label,X+3,Q+4),r.setFontSize(10.5),r.setTextColor(j.color[0],j.color[1],j.color[2]),r.text(j.value,X+3,Q+9.5)});const le=m.map((j,oe)=>{const X=u.find(Z=>Z.id===j.planoId),me=j.status==="ativo",F=k.isStudentOverdue(j.id);return[(oe+1).toString(),j.nome,j.instrumentoPrincipal||"Música Geral",j.telefone||"-",(X==null?void 0:X.nome)||"-",me?"Ativo":"Inativo",F?"Atrasado":"Em dia"]});De(r,{startY:52,margin:{left:14,right:14,bottom:18},head:[["#","Nome do Aluno","Instrumento","Telefone","Plano de Ensino","Status","Financeiro"]],body:le.length>0?le:[["-","Nenhum registro selecionado","-","-","-","-","-"]],theme:"grid",headStyles:{fillColor:[24,28,43],textColor:[255,255,255],fontStyle:"bold",fontSize:7.5,halign:"left",valign:"middle"},styles:{font:"helvetica",fontSize:7.5,cellPadding:2,textColor:[30,41,59],lineColor:[226,232,240],lineWidth:.1},alternateRowStyles:{fillColor:[248,250,252]},columnStyles:{0:{cellWidth:8,halign:"center",textColor:[148,163,184]},1:{cellWidth:50,fontStyle:"bold"},2:{cellWidth:32},3:{cellWidth:28},4:{cellWidth:34},5:{cellWidth:15,halign:"center"},6:{cellWidth:15,halign:"center"}},didParseCell:j=>{j.section==="body"&&(j.column.index===5&&(j.cell.raw==="Ativo"?(j.cell.styles.textColor=[22,163,74],j.cell.styles.fontStyle="bold"):j.cell.styles.textColor=[202,138,4]),j.column.index===6&&(j.cell.raw==="Atrasado"?(j.cell.styles.textColor=[220,38,38],j.cell.styles.fontStyle="bold"):j.cell.styles.textColor=[22,163,74]))}});const te=r.internal.getNumberOfPages();for(let j=1;j<=te;j++)r.setPage(j),r.setDrawColor(226,232,240),r.setLineWidth(.3),r.line(14,287,196,287),r.setFont("helvetica","normal"),r.setFontSize(7),r.setTextColor(148,163,184),r.text(`${P} • Sistema de Gestão Escolar & Pedagógica`,14,292),r.text(`Página ${j} de ${te}`,196,292,{align:"right"});const de=r.output("blob"),ae=URL.createObjectURL(de);window.open(ae,"_blank")}async function z(n,m,u,r){const y=new Te({orientation:"portrait",unit:"mm",format:"a4"}),P=new Map(u.map(F=>[F.id,F.nome])),_=new Date().toLocaleString("pt-BR"),O=n.nomeMenu||n.nomeFantasia||n.nomeEscola||"ACUSTICAMENTE",N=n.razaoSocial||"Acusticamente Ensino Musical Ltda",C=n.cnpj?`CNPJ: ${n.cnpj}`:"",T=[n.telefoneContato,n.emailContato].filter(Boolean).join(" • "),D=[n.logradouro?`${n.logradouro}, ${n.numero||"s/n"}`:"",n.complemento,n.bairro,n.cidade?`${n.cidade} - ${n.estado||"SP"}`:"",n.cep?`CEP: ${n.cep}`:""].filter(Boolean).join(" • "),q=new Date().toISOString().slice(0,10),V=m.reduce((F,Z)=>F+Z.valor,0),G=m.filter(F=>F.status==="pago").reduce((F,Z)=>F+Z.valor,0),K=m.filter(F=>F.status!=="pago").reduce((F,Z)=>F+Z.valor,0),J=await E(n.logotipoCustomizado);J&&y.addImage(J,"PNG",14,12,17,17);const ee=J?35:14;y.setFont("helvetica","bold"),y.setFontSize(13),y.setTextColor(15,23,42),y.text(O,ee,17),y.setFont("helvetica","normal"),y.setFontSize(8),y.setTextColor(71,85,105),y.text([N,C].filter(Boolean).join(" • "),ee,21.5),y.setFontSize(7.5),y.setTextColor(100,116,139),D&&y.text(D,ee,25.5),T&&y.text(T,ee,D?29.5:25.5),y.setFont("helvetica","bold"),y.setFontSize(12),y.setTextColor(5,150,105),y.text("RELATÓRIO FINANCEIRO",196,17,{align:"right"}),y.setFont("helvetica","normal"),y.setFontSize(8),y.setTextColor(100,116,139),y.text(`Emissão: ${_}`,196,22,{align:"right"});let Q=`Total: ${m.length} registro(s)`;r!=null&&r.mesIni&&(r!=null&&r.mesFim)?Q=`Ref: ${r.mesIni} a ${r.mesFim} • ${m.length} reg.`:r!=null&&r.mesIni?Q=`Ref: a partir de ${r.mesIni} • ${m.length} reg.`:r!=null&&r.mesFim&&(Q=`Ref: até ${r.mesFim} • ${m.length} reg.`),y.text(Q,196,26.5,{align:"right"}),y.setDrawColor(203,213,225),y.setLineWidth(.4),y.line(14,33,196,33);const le=[{label:"LANÇAMENTOS",value:`${m.length}`,color:[15,23,42]},{label:"MONTANTE GERAL",value:`R$ ${V.toFixed(2)}`,color:[15,23,42]},{label:"TOTAL RECEBIDO",value:`R$ ${G.toFixed(2)}`,color:[22,163,74]},{label:"PENDENTE / ATRASO",value:`R$ ${K.toFixed(2)}`,color:[220,38,38]}],te=43,de=12,ae=36;le.forEach((F,Z)=>{const ce=14+Z*(te+3);y.setFillColor(248,250,252),y.roundedRect(ce,ae,te,de,1.5,1.5,"F"),y.setDrawColor(226,232,240),y.roundedRect(ce,ae,te,de,1.5,1.5,"S"),y.setFont("helvetica","bold"),y.setFontSize(6.5),y.setTextColor(100,116,139),y.text(F.label,ce+3,ae+4),y.setFontSize(10),y.setTextColor(F.color[0],F.color[1],F.color[2]),y.text(F.value,ce+3,ae+9.5)});const j=m.map((F,Z)=>{const ce=F.status==="pago",be=!ce&&F.dataVencimento<q,he=ce?"Pago":be?"Atrasado":"Pendente",ye=F.descricao+(F.mesReferencia?` / ${F.mesReferencia}`:""),xe=F.dataVencimento.split("-").reverse().join("/");return[(Z+1).toString(),P.get(F.alunoId)||"Aluno",ye,xe,`R$ ${F.valor.toFixed(2)}`,he]});De(y,{startY:52,margin:{left:14,right:14,bottom:18},head:[["#","Aluno","Descrição / Referência","Vencimento","Valor (R$)","Status"]],body:j.length>0?j:[["-","Nenhum lançamento selecionado","-","-","-","-"]],theme:"grid",headStyles:{fillColor:[15,23,42],textColor:[255,255,255],fontStyle:"bold",fontSize:7.5,halign:"left",valign:"middle"},styles:{font:"helvetica",fontSize:7.5,cellPadding:2,textColor:[30,41,59],lineColor:[226,232,240],lineWidth:.1},alternateRowStyles:{fillColor:[248,250,252]},columnStyles:{0:{cellWidth:8,halign:"center",textColor:[148,163,184]},1:{cellWidth:50,fontStyle:"bold"},2:{cellWidth:54},3:{cellWidth:26,halign:"center"},4:{cellWidth:26,halign:"right",fontStyle:"bold"},5:{cellWidth:18,halign:"center"}},didParseCell:F=>{F.section==="body"&&F.column.index===5&&(F.cell.raw==="Pago"?(F.cell.styles.textColor=[22,163,74],F.cell.styles.fontStyle="bold"):F.cell.raw==="Atrasado"?(F.cell.styles.textColor=[220,38,38],F.cell.styles.fontStyle="bold"):F.cell.styles.textColor=[202,138,4])}});const oe=y.internal.getNumberOfPages();for(let F=1;F<=oe;F++)y.setPage(F),y.setDrawColor(226,232,240),y.setLineWidth(.3),y.line(14,287,196,287),y.setFont("helvetica","normal"),y.setFontSize(7),y.setTextColor(148,163,184),y.text(`${O} • Gestão Financeira & Escolar`,14,292),y.text(`Página ${F} de ${oe}`,196,292,{align:"right"});const X=y.output("blob"),me=URL.createObjectURL(X);window.open(me,"_blank")}return b(),e}function nt(w){const e=document.createElement("div");let t=new Date,o="";const s=f=>f.toString().padStart(2,"0");function d(f){const c=f.getDate(),L=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][f.getMonth()],i=f.getFullYear(),p=new Date,x=p.getDate()===c&&p.getMonth()===f.getMonth()&&p.getFullYear()===i;return`${c} de ${L} de ${i}${x?" (Hoje)":""}`}function S(f){return`${f.getFullYear()}-${s(f.getMonth()+1)}-${s(f.getDate())}`}function a(){var l,v,b,E,h,I,z;const f=U.getLogs(),c=new Date,A=`${s(c.getDate())}/${s(c.getMonth()+1)}/${c.getFullYear()}`,L=f.filter(n=>{var m;return(m=n.dataHoraFormatada)==null?void 0:m.startsWith(A)}).length,i=t?`${s(t.getDate())}/${s(t.getMonth()+1)}/${t.getFullYear()}`:"",p=t!==null&&c.getDate()===t.getDate()&&c.getMonth()===t.getMonth()&&c.getFullYear()===t.getFullYear(),x=f.filter(n=>{const m=!t||n.dataHoraFormatada&&n.dataHoraFormatada.startsWith(i)||n.dataHora&&n.dataHora.startsWith(S(t)),u=o===""||n.tela.toLowerCase().includes(o.toLowerCase())||n.usuarioNome.toLowerCase().includes(o.toLowerCase())||n.usuarioLogin.toLowerCase().includes(o.toLowerCase())||n.acao.toLowerCase().includes(o.toLowerCase())||n.detalhes.toLowerCase().includes(o.toLowerCase());return m&&u});e.innerHTML=`
       <!-- Cabeçalho da Tela -->
       <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
@@ -2411,7 +2411,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </div>
 
         <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px;">
-          <span>Registros de Hoje: <strong style="color: var(--color-coral);">${P}</strong></span>
+          <span>Registros de Hoje: <strong style="color: var(--color-coral);">${L}</strong></span>
         </div>
       </div>
 
@@ -2419,7 +2419,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div class="calendar-title-group">
           <h2 class="calendar-month-title" style="min-width: 220px; font-size: 1.05rem;">
-            ${t?l(t):"Todo o Histórico"}
+            ${t?d(t):"Todo o Histórico"}
           </h2>
           
           <div class="calendar-nav-buttons">
@@ -2444,7 +2444,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             id="audit-date-picker" 
             class="form-input" 
             style="padding: 5px 10px; font-size: 0.8rem; width: auto; color: var(--text-white); background: var(--bg-card);" 
-            value="${t?E(t):""}" 
+            value="${t?S(t):""}" 
             title="Selecionar data específica"
           />
         </div>
@@ -2462,7 +2462,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             style="padding-left: 36px;"
           />
           <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
-            ${j.search}
+            ${R.search}
           </div>
         </div>
         ${o?'<button type="button" class="btn btn-secondary btn-sm" id="btn-clear-audit-search">Limpar</button>':""}
@@ -2473,9 +2473,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h3 class="panel-card-title">
             Registros de Auditoria (${x.length})
-            ${t?`<span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary); margin-left: 8px;">— ${r}</span>`:""}
+            ${t?`<span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary); margin-left: 8px;">— ${i}</span>`:""}
           </h3>
-          ${t!==null?`<span style="font-size: 0.76rem; color: var(--text-muted);">Filtrando por: <strong>${r}</strong></span>`:'<span style="font-size: 0.76rem; color: var(--text-muted);">Exibindo: <strong>Todo o Histórico</strong></span>'}
+          ${t!==null?`<span style="font-size: 0.76rem; color: var(--text-muted);">Filtrando por: <strong>${i}</strong></span>`:'<span style="font-size: 0.76rem; color: var(--text-muted);">Exibindo: <strong>Todo o Histórico</strong></span>'}
         </div>
 
         <div class="table-responsive">
@@ -2494,7 +2494,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
                     <tr>
                       <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 42px;">
                         <div style="font-size: 1.8rem; margin-bottom: 8px;">📋</div>
-                        <div>Nenhum registro de auditoria encontrado para ${t?`o dia <strong>${r}</strong>`:"o filtro selecionado"}.</div>
+                        <div>Nenhum registro de auditoria encontrado para ${t?`o dia <strong>${i}</strong>`:"o filtro selecionado"}.</div>
                         ${t!==null?`<button type="button" class="btn btn-secondary btn-sm" id="audit-empty-btn-all" style="margin-top: 12px; font-size: 0.78rem;">
                                 Ver todo o histórico
                               </button>`:""}
@@ -2537,7 +2537,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </table>
         </div>
       </div>
-    `,(i=e.querySelector("#audit-btn-prev"))==null||i.addEventListener("click",()=>{t||(t=new Date),t.setDate(t.getDate()-1),a()}),(f=e.querySelector("#audit-btn-next"))==null||f.addEventListener("click",()=>{t||(t=new Date),t.setDate(t.getDate()+1),a()}),(v=e.querySelector("#audit-btn-today"))==null||v.addEventListener("click",()=>{t=new Date,a()}),(I=e.querySelector("#audit-btn-all"))==null||I.addEventListener("click",()=>{t=null,a()}),(u=e.querySelector("#audit-empty-btn-all"))==null||u.addEventListener("click",()=>{t=null,a()}),(S=e.querySelector("#audit-date-picker"))==null||S.addEventListener("change",n=>{const m=n.target.value;if(m){const[w,d,h]=m.split("-").map(Number);t=new Date(w,d-1,h)}else t=null;a()});const b=e.querySelector("#audit-search-input");b==null||b.addEventListener("input",n=>{o=n.target.value,a();const m=e.querySelector("#audit-search-input");m&&(m.focus(),m.selectionStart=m.selectionEnd=m.value.length)}),(L=e.querySelector("#btn-clear-audit-search"))==null||L.addEventListener("click",()=>{o="",a()})}const M=()=>{a()};return window.addEventListener("audit_updated",M),a(),e}function rt($){var h;const e=document.createElement("div"),t=Y.getCurrentUser(),o=k.getSettings(),s=Z(t,"configuracoes","alterar");e.innerHTML=`
+    `,(l=e.querySelector("#audit-btn-prev"))==null||l.addEventListener("click",()=>{t||(t=new Date),t.setDate(t.getDate()-1),a()}),(v=e.querySelector("#audit-btn-next"))==null||v.addEventListener("click",()=>{t||(t=new Date),t.setDate(t.getDate()+1),a()}),(b=e.querySelector("#audit-btn-today"))==null||b.addEventListener("click",()=>{t=new Date,a()}),(E=e.querySelector("#audit-btn-all"))==null||E.addEventListener("click",()=>{t=null,a()}),(h=e.querySelector("#audit-empty-btn-all"))==null||h.addEventListener("click",()=>{t=null,a()}),(I=e.querySelector("#audit-date-picker"))==null||I.addEventListener("change",n=>{const m=n.target.value;if(m){const[u,r,y]=m.split("-").map(Number);t=new Date(u,r-1,y)}else t=null;a()});const g=e.querySelector("#audit-search-input");g==null||g.addEventListener("input",n=>{o=n.target.value,a();const m=e.querySelector("#audit-search-input");m&&(m.focus(),m.selectionStart=m.selectionEnd=m.value.length)}),(z=e.querySelector("#btn-clear-audit-search"))==null||z.addEventListener("click",()=>{o="",a()})}const M=()=>{a()};return window.addEventListener("audit_updated",M),a(),e}function rt(w){const e=document.createElement("div"),t=Y.getCurrentUser(),o=k.getSettings(),s=W(t,"configuracoes","alterar");e.innerHTML=`
     <!-- Cabeçalho da Tela -->
     <div style="margin-bottom: 20px;">
       <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700;">
@@ -2548,9 +2548,9 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
       </p>
     </div>
 
-    <!-- Seletor de Abas Padronizado em Pílulas -->
+    <!-- Seletor de Abas Padronizado em Pílulas (2 Abas) -->
     <div class="app-tabs-wrapper" style="margin-bottom: 16px;">
-      <div class="app-tabs-row cols-3">
+      <div class="app-tabs-row cols-2">
         <button 
           type="button" 
           class="app-tab-pill active" 
@@ -2569,16 +2569,6 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         >
           <span class="app-tab-pill-dot"></span>
           <span>⚙️ Configurações Gerais</span>
-        </button>
-
-        <button 
-          type="button" 
-          class="app-tab-pill" 
-          id="btn-tab-mongo" 
-          data-tab="mongo"
-        >
-          <span class="app-tab-pill-dot"></span>
-          <span>🍃 Banco de Dados (MongoDB)</span>
         </button>
       </div>
     </div>
@@ -2859,55 +2849,26 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
         </form>
       </div>
 
-      <!-- CONTEÚDO DA ABA 3: BANCO DE DADOS (MONGODB) -->
-      <div id="tab-content-mongo" style="padding: 24px; display: none;">
-        <div style="max-width: 580px;">
-          
-          <!-- Status Automático da Nuvem -->
-          <div style="background: rgba(34, 197, 94, 0.06); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <div style="font-weight: 700; color: #4ade80; font-size: 0.88rem;">✓ Conectado ao MongoDB Atlas</div>
-              <div style="font-size: 0.76rem; color: var(--text-secondary); margin-top: 2px;">
-                Sincronização em nuvem ativa e automática entre celular e computador.
-              </div>
-            </div>
-            <span class="badge badge-success" style="font-size: 0.7rem; padding: 3px 8px;">● Operacional</span>
-          </div>
-
-          <!-- Painel para Entrega Limpa ao Cliente -->
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px;">
-            <h5 style="font-size: 0.84rem; font-weight: 700; color: var(--text-white); margin: 0 0 6px 0;">
-              Entrega do Sistema ao Cliente
-            </h5>
-            <p style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4;">
-              Quando concluir seus testes no celular e no computador, utilize o botão abaixo para apagar todos os cadastros de teste e entregar o sistema completamente zerado.
-            </p>
-
-            ${s?`
-                  <button type="button" class="btn btn-secondary" id="btn-reset-clean-system" style="font-size: 0.8rem; padding: 8px 16px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4); display: flex; align-items: center; gap: 8px;">
-                    <span>🗑️</span> Zerar Cadastros de Teste (Entrega Limpa)
-                  </button>
-                `:'<span style="font-size: 0.8rem; color: var(--text-muted);">🔒 Exclusivo para administradores</span>'}
-          </div>
-
-        </div>
-      </div>
     </div>
 
     <!-- Linha Fina com Informações do Sistema -->
     <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 6px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; color: var(--text-secondary);">
-      <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
         <span style="font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 5px;">
           <span>🎵</span> Acusticamente
         </span>
         <span class="badge badge-primary" style="font-family: monospace; font-size: 0.68rem; padding: 1px 6px;">v1.0.0</span>
+        <span style="display: inline-flex; align-items: center; gap: 4px; color: #4ade80; font-size: 0.72rem; margin-left: 6px;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
+          MongoDB Conectado
+        </span>
       </div>
 
       <div style="display: flex; align-items: center; gap: 8px;">
         <span>Desenvolvido por <strong style="color: var(--color-coral); font-weight: 600;">DevHub</strong></span>
       </div>
     </div>
-  `;const l=e.querySelector("#btn-tab-gerais"),E=e.querySelector("#btn-tab-instituicao"),a=e.querySelector("#btn-tab-mongo"),M=e.querySelector("#tab-content-gerais"),g=e.querySelector("#tab-content-instituicao"),c=e.querySelector("#tab-content-mongo");function A(z,T){z&&(T?z.classList.add("active"):z.classList.remove("active"))}function P(z){M.style.display=z==="gerais"?"block":"none",g.style.display=z==="instituicao"?"block":"none",c.style.display=z==="mongo"?"block":"none",A(l,z==="gerais"),A(E,z==="instituicao"),A(a,z==="mongo")}l==null||l.addEventListener("click",()=>P("gerais")),E==null||E.addEventListener("click",()=>P("instituicao")),a==null||a.addEventListener("click",()=>P("mongo"));let r=o.logotipoCustomizado||"";const p=e.querySelector("#cfg-menu-name"),x=e.querySelector("#preview-menu-brand-name"),b=e.querySelector("#preview-report-brand-name"),i=e.querySelector("#preview-logo-menu"),f=e.querySelector("#preview-logo-report"),v=e.querySelector("#input-logo-file"),I=e.querySelector("#btn-upload-logo"),u=e.querySelector("#btn-reset-logo"),S=e.querySelector("#logo-feedback-msg");p==null||p.addEventListener("input",()=>{const z=p.value.trim()||"Acusticamente";x&&(x.textContent=z),b&&(b.textContent=z)}),I==null||I.addEventListener("click",()=>{v==null||v.click()}),v==null||v.addEventListener("change",z=>{const T=z.target.files;if(!T||T.length===0)return;const _=T[0];if(!_.type.startsWith("image/")){F("Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).","info");return}if(_.size>3*1024*1024){F("A imagem selecionada é muito pesada. Escolha uma imagem de até 3 MB.","info");return}const N=new FileReader;N.onload=C=>{var D;r=((D=C.target)==null?void 0:D.result)||"",i&&(i.innerHTML=ue(r,40)),f&&(f.innerHTML=ue(r,40)),u&&(u.disabled=!1,u.style.color="#ef4444"),S&&(S.style.display="block",S.style.color="var(--status-success)",S.textContent="Imagem carregada no preview. Clique em Salvar."),F("Logotipo carregado na pré-visualização!","info")},N.onerror=()=>{F("Erro ao processar o arquivo de imagem.","error")},N.readAsDataURL(_)}),u==null||u.addEventListener("click",()=>{r="",v&&(v.value=""),i&&(i.innerHTML=ue("",40)),f&&(f.innerHTML=ue("",40)),u&&(u.disabled=!0,u.style.color="var(--text-muted)"),S&&(S.style.display="block",S.style.color="var(--color-coral)",S.textContent="Logotipo padrão no preview. Clique em Salvar."),F("Logotipo padrão restaurado no preview.","info")});const L=e.querySelector("#form-settings-gerais");L==null||L.addEventListener("submit",z=>{z.preventDefault();const T=p.value.trim()||"Acusticamente";k.updateSettings({nomeMenu:T,logotipoCustomizado:r},(t==null?void 0:t.nome)||"Administrador"),S&&(S.style.display="none"),F("Configurações gerais salvas com sucesso!","success")});const n=e.querySelector("#cfg-cnpj");n==null||n.addEventListener("input",z=>{let T=z.target.value.replace(/\D/g,"").slice(0,14);T.length>12?T=T.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/,"$1.$2.$3/$4-$5"):T.length>8?T=T.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/,"$1.$2.$3/$4"):T.length>5?T=T.replace(/^(\d{2})(\d{3})(\d{1,3})$/,"$1.$2.$3"):T.length>2&&(T=T.replace(/^(\d{2})(\d{1,3})$/,"$1.$2")),z.target.value=T});const m=e.querySelector("#cfg-cep");m==null||m.addEventListener("input",z=>{let T=z.target.value.replace(/\D/g,"").slice(0,8);T.length>5&&(T=T.replace(/^(\d{5})(\d{1,3})$/,"$1-$2")),z.target.value=T});const w=e.querySelector("#cfg-uf");w==null||w.addEventListener("input",z=>{z.target.value=z.target.value.toUpperCase().slice(0,2)});const d=e.querySelector("#form-settings-institucional");return d==null||d.addEventListener("submit",z=>{z.preventDefault();const T=e.querySelector("#cfg-fantasia").value,_=e.querySelector("#cfg-razao").value,N=e.querySelector("#cfg-cnpj").value,C=e.querySelector("#cfg-ie").value,D=e.querySelector("#cfg-tel").value,B=e.querySelector("#cfg-email").value,O=e.querySelector("#cfg-site").value,V=e.querySelector("#cfg-cep").value,G=e.querySelector("#cfg-logradouro").value,K=e.querySelector("#cfg-numero").value,J=e.querySelector("#cfg-complemento").value,Q=e.querySelector("#cfg-bairro").value,W=e.querySelector("#cfg-cidade").value,te=e.querySelector("#cfg-uf").value.toUpperCase();k.updateSettings({nomeEscola:T,nomeClinica:T,nomeFantasia:T,razaoSocial:_,cnpj:N,inscricaoEstadual:C,telefoneContato:D,emailContato:B,website:O,cep:V,logradouro:G,numero:K,complemento:J,bairro:Q,cidade:W,estado:te},(t==null?void 0:t.nome)||"Administrador"),F("Dados da instituição salvos com sucesso!","success")}),(h=e.querySelector("#btn-reset-clean-system"))==null||h.addEventListener("click",()=>{fe({title:"Zerar Cadastros para Entrega",message:"Tem certeza que deseja apagar <strong>todos os alunos, aulas e lançamentos financeiros de teste</strong>? Esta ação deixará o banco de dados e o sistema 100% zerados e prontos para o cliente final.",confirmText:"Sim, Zerar Tudo",confirmBtnClass:"btn-danger",onConfirm:async()=>{await k.resetCleanDatabase((t==null?void 0:t.nome)||"Administrador"),F("Sistema zerado com sucesso! Pronto para entrega ao cliente.","success"),$("alunos")}})}),e}class it{constructor(){ie(this,"currentScreen","home");ie(this,"appRoot");this.appRoot=document.getElementById("app"),this.init()}init(){if(!Y.isAuthenticated()){this.currentScreen="login",this.render();return}const e=Y.getCurrentUser(),t=window.location.hash.replace("#","");t&&["home","agenda","alunos","planos","financeiro","relatorios","user","auditoria","configuracoes"].includes(t)&&le(e,t)?this.currentScreen=t:this.currentScreen=this.getFirstAllowedScreen(e),window.addEventListener("hashchange",()=>{const o=window.location.hash.replace("#","");o&&o!==this.currentScreen&&this.navigateTo(o)}),window.addEventListener("app-settings-updated",()=>{const o=k.getSettings(),s=document.querySelector(".sidebar-brand-name");s&&(s.textContent=o.nomeMenu||"Acusticamente");const l=document.querySelector(".sidebar-logo");l&&(l.innerHTML=ue(o.logotipoCustomizado,46))}),window.addEventListener("acusticamente:data-synced",()=>{Y.isAuthenticated()&&this.currentScreen!=="login"&&this.render()}),k.syncWithCloud(),this.render()}getFirstAllowedScreen(e){if(!e)return"login";const t=["home","agenda","alunos","planos","financeiro","relatorios","auditoria","configuracoes"];for(const o of t)if(le(e,o))return o;return"home"}navigateTo(e){const t=Y.getCurrentUser();if(!le(t,e)){F("Acesso bloqueado: você não possui permissão para acessar este formulário.","error");const o=this.getFirstAllowedScreen(t);this.currentScreen=o,window.location.hash=o,this.render();return}this.currentScreen=e,window.location.hash=e,this.render(),k.syncWithCloud()}render(){var r;if(this.appRoot.innerHTML="",!Y.isAuthenticated()||this.currentScreen==="login"){const p=Ye(()=>{const x=Y.getCurrentUser();this.navigateTo(this.getFirstAllowedScreen(x))});this.appRoot.appendChild(p);return}const e=document.createElement("div");e.className="app-container";const t=Y.getCurrentUser(),o=(t==null?void 0:t.papel)==="admin",s=k.getSettings(),l=s.nomeMenu||"Acusticamente";e.innerHTML=`
+  `;const d=e.querySelector("#btn-tab-gerais"),S=e.querySelector("#btn-tab-instituicao"),a=e.querySelector("#tab-content-gerais"),M=e.querySelector("#tab-content-instituicao");function f(u,r){u&&(r?u.classList.add("active"):u.classList.remove("active"))}function c(u){a.style.display=u==="gerais"?"block":"none",M.style.display=u==="instituicao"?"block":"none",f(d,u==="gerais"),f(S,u==="instituicao")}d==null||d.addEventListener("click",()=>c("gerais")),S==null||S.addEventListener("click",()=>c("instituicao"));let A=o.logotipoCustomizado||"";const L=e.querySelector("#cfg-menu-name"),i=e.querySelector("#preview-menu-brand-name"),p=e.querySelector("#preview-report-brand-name"),x=e.querySelector("#preview-logo-menu"),g=e.querySelector("#preview-logo-report"),l=e.querySelector("#input-logo-file"),v=e.querySelector("#btn-upload-logo"),b=e.querySelector("#btn-reset-logo"),E=e.querySelector("#logo-feedback-msg");L==null||L.addEventListener("input",()=>{const u=L.value.trim()||"Acusticamente";i&&(i.textContent=u),p&&(p.textContent=u)}),v==null||v.addEventListener("click",()=>{l==null||l.click()}),l==null||l.addEventListener("change",u=>{const r=u.target.files;if(!r||r.length===0)return;const y=r[0];if(!y.type.startsWith("image/")){B("Por favor, selecione um arquivo de imagem válido (PNG, JPG, SVG, WebP).","info");return}if(y.size>3*1024*1024){B("A imagem selecionada é muito pesada. Escolha uma imagem de até 3 MB.","info");return}const P=new FileReader;P.onload=_=>{var O;A=((O=_.target)==null?void 0:O.result)||"",x&&(x.innerHTML=ue(A,40)),g&&(g.innerHTML=ue(A,40)),b&&(b.disabled=!1,b.style.color="#ef4444"),E&&(E.style.display="block",E.style.color="var(--status-success)",E.textContent="Imagem carregada no preview. Clique em Salvar."),B("Logotipo carregado na pré-visualização!","info")},P.onerror=()=>{B("Erro ao processar o arquivo de imagem.","error")},P.readAsDataURL(y)}),b==null||b.addEventListener("click",()=>{A="",l&&(l.value=""),x&&(x.innerHTML=ue("",40)),g&&(g.innerHTML=ue("",40)),b&&(b.disabled=!0,b.style.color="var(--text-muted)"),E&&(E.style.display="block",E.style.color="var(--color-coral)",E.textContent="Logotipo padrão no preview. Clique em Salvar."),B("Logotipo padrão restaurado no preview.","info")});const h=e.querySelector("#form-settings-gerais");h==null||h.addEventListener("submit",u=>{u.preventDefault();const r=L.value.trim()||"Acusticamente";k.updateSettings({nomeMenu:r,logotipoCustomizado:A},(t==null?void 0:t.nome)||"Administrador"),E&&(E.style.display="none"),B("Configurações gerais salvas com sucesso!","success")});const I=e.querySelector("#cfg-cnpj");I==null||I.addEventListener("input",u=>{let r=u.target.value.replace(/\D/g,"").slice(0,14);r.length>12?r=r.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/,"$1.$2.$3/$4-$5"):r.length>8?r=r.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/,"$1.$2.$3/$4"):r.length>5?r=r.replace(/^(\d{2})(\d{3})(\d{1,3})$/,"$1.$2.$3"):r.length>2&&(r=r.replace(/^(\d{2})(\d{1,3})$/,"$1.$2")),u.target.value=r});const z=e.querySelector("#cfg-cep");z==null||z.addEventListener("input",u=>{let r=u.target.value.replace(/\D/g,"").slice(0,8);r.length>5&&(r=r.replace(/^(\d{5})(\d{1,3})$/,"$1-$2")),u.target.value=r});const n=e.querySelector("#cfg-uf");n==null||n.addEventListener("input",u=>{u.target.value=u.target.value.toUpperCase().slice(0,2)});const m=e.querySelector("#form-settings-institucional");return m==null||m.addEventListener("submit",u=>{u.preventDefault();const r=e.querySelector("#cfg-fantasia").value,y=e.querySelector("#cfg-razao").value,P=e.querySelector("#cfg-cnpj").value,_=e.querySelector("#cfg-ie").value,O=e.querySelector("#cfg-tel").value,N=e.querySelector("#cfg-email").value,C=e.querySelector("#cfg-site").value,T=e.querySelector("#cfg-cep").value,D=e.querySelector("#cfg-logradouro").value,q=e.querySelector("#cfg-numero").value,V=e.querySelector("#cfg-complemento").value,G=e.querySelector("#cfg-bairro").value,K=e.querySelector("#cfg-cidade").value,J=e.querySelector("#cfg-uf").value.toUpperCase();k.updateSettings({nomeEscola:r,nomeClinica:r,nomeFantasia:r,razaoSocial:y,cnpj:P,inscricaoEstadual:_,telefoneContato:O,emailContato:N,website:C,cep:T,logradouro:D,numero:q,complemento:V,bairro:G,cidade:K,estado:J},(t==null?void 0:t.nome)||"Administrador"),B("Dados da instituição salvos com sucesso!","success")}),e}class it{constructor(){re(this,"currentScreen","home");re(this,"appRoot");this.appRoot=document.getElementById("app"),this.init()}init(){if(!Y.isAuthenticated()){this.currentScreen="login",this.render();return}const e=Y.getCurrentUser(),t=window.location.hash.replace("#","");t&&["home","agenda","alunos","planos","financeiro","relatorios","user","auditoria","configuracoes"].includes(t)&&ie(e,t)?this.currentScreen=t:this.currentScreen=this.getFirstAllowedScreen(e),window.addEventListener("hashchange",()=>{const o=window.location.hash.replace("#","");o&&o!==this.currentScreen&&this.navigateTo(o)}),window.addEventListener("app-settings-updated",()=>{const o=k.getSettings(),s=document.querySelector(".sidebar-brand-name");s&&(s.textContent=o.nomeMenu||"Acusticamente");const d=document.querySelector(".sidebar-logo");d&&(d.innerHTML=ue(o.logotipoCustomizado,46))}),window.addEventListener("acusticamente:data-synced",()=>{Y.isAuthenticated()&&this.currentScreen!=="login"&&this.render()}),k.syncWithCloud(),this.render()}getFirstAllowedScreen(e){if(!e)return"login";const t=["home","agenda","alunos","planos","financeiro","relatorios","auditoria","configuracoes"];for(const o of t)if(ie(e,o))return o;return"home"}navigateTo(e){const t=Y.getCurrentUser();if(!ie(t,e)){B("Acesso bloqueado: você não possui permissão para acessar este formulário.","error");const o=this.getFirstAllowedScreen(t);this.currentScreen=o,window.location.hash=o,this.render();return}this.currentScreen=e,window.location.hash=e,this.render(),k.syncWithCloud()}render(){var i;if(this.appRoot.innerHTML="",!Y.isAuthenticated()||this.currentScreen==="login"){const p=Ye(()=>{const x=Y.getCurrentUser();this.navigateTo(this.getFirstAllowedScreen(x))});this.appRoot.appendChild(p);return}const e=document.createElement("div");e.className="app-container";const t=Y.getCurrentUser(),o=(t==null?void 0:t.papel)==="admin",s=k.getSettings(),d=s.nomeMenu||"Acusticamente";e.innerHTML=`
       <!-- Fundo translúcido para fechar sidebar no mobile -->
       <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
@@ -2918,73 +2879,73 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
             <div class="sidebar-logo">
               ${ue(s.logotipoCustomizado,46)}
             </div>
-            <span class="sidebar-brand-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${l}</span>
+            <span class="sidebar-brand-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${d}</span>
           </div>
           <button type="button" class="btn-sidebar-close" id="btn-sidebar-close" title="Fechar menu">
-            ${j.close}
+            ${R.close}
           </button>
         </div>
 
         <nav class="sidebar-nav">
-          ${le(t,"home")?`
+          ${ie(t,"home")?`
             <a class="nav-item ${this.currentScreen==="home"?"active":""}" data-screen="home">
-              <span class="nav-item-icon">${j.home}</span>
+              <span class="nav-item-icon">${R.home}</span>
               <span>Início</span>
             </a>
           `:""}
 
-          ${le(t,"agenda")?`
+          ${ie(t,"agenda")?`
             <a class="nav-item ${this.currentScreen==="agenda"?"active":""}" data-screen="agenda">
-              <span class="nav-item-icon">${j.agenda}</span>
+              <span class="nav-item-icon">${R.agenda}</span>
               <span>Agenda</span>
             </a>
           `:""}
 
-          ${le(t,"alunos")?`
+          ${ie(t,"alunos")?`
             <a class="nav-item ${this.currentScreen==="alunos"?"active":""}" data-screen="alunos">
-              <span class="nav-item-icon">${j.alunos}</span>
+              <span class="nav-item-icon">${R.alunos}</span>
               <span>Alunos</span>
             </a>
           `:""}
 
-          ${le(t,"planos")?`
+          ${ie(t,"planos")?`
             <a class="nav-item ${this.currentScreen==="planos"?"active":""}" data-screen="planos">
-              <span class="nav-item-icon">${j.planos}</span>
+              <span class="nav-item-icon">${R.planos}</span>
               <span>Planos de Ensino</span>
             </a>
           `:""}
 
-          ${le(t,"financeiro")?`
+          ${ie(t,"financeiro")?`
             <a class="nav-item ${this.currentScreen==="financeiro"?"active":""}" data-screen="financeiro">
-              <span class="nav-item-icon">${j.financeiro}</span>
+              <span class="nav-item-icon">${R.financeiro}</span>
               <span>Financeiro</span>
             </a>
           `:""}
 
-          ${le(t,"relatorios")?`
+          ${ie(t,"relatorios")?`
             <a class="nav-item ${this.currentScreen==="relatorios"?"active":""}" data-screen="relatorios">
-              <span class="nav-item-icon">${j.relatorios}</span>
+              <span class="nav-item-icon">${R.relatorios}</span>
               <span>Relatórios</span>
             </a>
           `:""}
 
           ${o?`
             <a class="nav-item ${this.currentScreen==="user"?"active":""}" data-screen="user">
-              <span class="nav-item-icon">${j.user}</span>
+              <span class="nav-item-icon">${R.user}</span>
               <span>Usuários</span>
             </a>
           `:""}
 
-          ${le(t,"auditoria")?`
+          ${ie(t,"auditoria")?`
             <a class="nav-item ${this.currentScreen==="auditoria"?"active":""}" data-screen="auditoria">
-              <span class="nav-item-icon">${j.auditoria}</span>
+              <span class="nav-item-icon">${R.auditoria}</span>
               <span>Auditoria</span>
             </a>
           `:""}
 
-          ${le(t,"configuracoes")?`
+          ${ie(t,"configuracoes")?`
             <a class="nav-item ${this.currentScreen==="configuracoes"?"active":""}" data-screen="configuracoes">
-              <span class="nav-item-icon">${j.configuracoes}</span>
+              <span class="nav-item-icon">${R.configuracoes}</span>
               <span>Configurações</span>
             </a>
           `:""}
@@ -3002,7 +2963,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           </div>
 
           <button class="btn-logout" id="btn-app-logout" title="Sair do sistema">
-            ${j.logout}
+            ${R.logout}
           </button>
         </div>
       </aside>
@@ -3013,7 +2974,7 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <div style="display: flex; align-items: center; gap: 14px;">
             <!-- Botão Hambúrguer Mobile -->
             <button type="button" class="btn-mobile-toggle" id="btn-mobile-menu-toggle" title="Abrir menu de navegação">
-              ${j.menu}
+              ${R.menu}
             </button>
 
             <div class="top-bar-title-group">
@@ -3033,4 +2994,4 @@ var _e=Object.defineProperty;var Ve=($,e,t)=>e in $?_e($,e,{enumerable:!0,config
           <!-- A tela ativa será inserida aqui -->
         </div>
       </main>
-    `;const E=e.querySelector("#app-sidebar"),a=e.querySelector("#sidebar-backdrop"),M=e.querySelector("#btn-mobile-menu-toggle"),g=e.querySelector("#btn-sidebar-close"),c=p=>{const x=p!==void 0?p:!E.classList.contains("open");E.classList.toggle("open",x),a.classList.toggle("open",x),document.body.style.overflow=x?"hidden":""};M==null||M.addEventListener("click",()=>c(!0)),g==null||g.addEventListener("click",()=>c(!1)),a==null||a.addEventListener("click",()=>c(!1)),e.querySelectorAll(".nav-item").forEach(p=>{p.addEventListener("click",x=>{const b=x.currentTarget.dataset.screen;c(!1),b&&this.navigateTo(b)})}),(r=e.querySelector("#btn-app-logout"))==null||r.addEventListener("click",()=>{fe({title:"Sair do Sistema",message:"Deseja realmente encerrar sua sessão no sistema Acusticamente?",confirmText:"Sair",confirmBtnClass:"btn-danger",onConfirm:()=>{Y.logout()}})});const A=e.querySelector("#screen-viewport"),P=this.createViewElement(this.currentScreen);A.appendChild(P),this.appRoot.appendChild(e)}createViewElement(e){const t=o=>this.navigateTo(o);switch(e){case"home":return Ne(t);case"agenda":return We();case"alunos":return Ke(t);case"user":return tt(t);case"planos":return at();case"financeiro":return ot();case"relatorios":return st();case"auditoria":return nt();case"configuracoes":return rt(t);default:return Ne(t)}}getScreenTitle(e){switch(e){case"home":return"Início";case"agenda":return"Agenda";case"alunos":return"Alunos";case"user":return"Usuários";case"planos":return"Planos de Ensino";case"financeiro":return"Financeiro & Mensalidades";case"relatorios":return"Relatórios Gerenciais";case"auditoria":return"Auditoria";case"configuracoes":return"Configurações";default:return"Acusticamente"}}getScreenSubtitle(e){switch(e){case"home":return"Visão geral das atividades e aulas agendadas para hoje";case"agenda":return"Calendário mensal com formato compacto e compromissos";case"alunos":return"Listagem, matrículas e acompanhamento de alunos";case"user":return"Gerenciamento de operadores e permissões de acesso";case"planos":return"Estruturação de planos pedagógicos e seus módulos";case"financeiro":return"Controle de recebimentos, mensalidades e baixas";case"relatorios":return"Emissão de relatórios e exportação para PDF corporativo";case"auditoria":return"Histórico auditado de todas as alterações do sistema";case"configuracoes":return"Dados institucionais e conexão com o MongoDB";default:return""}}}document.addEventListener("DOMContentLoaded",()=>{new it});
+    `;const S=e.querySelector("#app-sidebar"),a=e.querySelector("#sidebar-backdrop"),M=e.querySelector("#btn-mobile-menu-toggle"),f=e.querySelector("#btn-sidebar-close"),c=p=>{const x=p!==void 0?p:!S.classList.contains("open");S.classList.toggle("open",x),a.classList.toggle("open",x),document.body.style.overflow=x?"hidden":""};M==null||M.addEventListener("click",()=>c(!0)),f==null||f.addEventListener("click",()=>c(!1)),a==null||a.addEventListener("click",()=>c(!1)),e.querySelectorAll(".nav-item").forEach(p=>{p.addEventListener("click",x=>{const g=x.currentTarget.dataset.screen;c(!1),g&&this.navigateTo(g)})}),(i=e.querySelector("#btn-app-logout"))==null||i.addEventListener("click",()=>{fe({title:"Sair do Sistema",message:"Deseja realmente encerrar sua sessão no sistema Acusticamente?",confirmText:"Sair",confirmBtnClass:"btn-danger",onConfirm:()=>{Y.logout()}})});const A=e.querySelector("#screen-viewport"),L=this.createViewElement(this.currentScreen);A.appendChild(L),this.appRoot.appendChild(e)}createViewElement(e){const t=o=>this.navigateTo(o);switch(e){case"home":return Ne(t);case"agenda":return We();case"alunos":return Ze(t);case"user":return tt(t);case"planos":return at();case"financeiro":return ot();case"relatorios":return st();case"auditoria":return nt();case"configuracoes":return rt();default:return Ne(t)}}getScreenTitle(e){switch(e){case"home":return"Início";case"agenda":return"Agenda";case"alunos":return"Alunos";case"user":return"Usuários";case"planos":return"Planos de Ensino";case"financeiro":return"Financeiro & Mensalidades";case"relatorios":return"Relatórios Gerenciais";case"auditoria":return"Auditoria";case"configuracoes":return"Configurações";default:return"Acusticamente"}}getScreenSubtitle(e){switch(e){case"home":return"Visão geral das atividades e aulas agendadas para hoje";case"agenda":return"Calendário mensal com formato compacto e compromissos";case"alunos":return"Listagem, matrículas e acompanhamento de alunos";case"user":return"Gerenciamento de operadores e permissões de acesso";case"planos":return"Estruturação de planos pedagógicos e seus módulos";case"financeiro":return"Controle de recebimentos, mensalidades e baixas";case"relatorios":return"Emissão de relatórios e exportação para PDF corporativo";case"auditoria":return"Histórico auditado de todas as alterações do sistema";case"configuracoes":return"Dados institucionais e conexão com o MongoDB";default:return""}}}document.addEventListener("DOMContentLoaded",()=>{new it});

@@ -15,15 +15,7 @@ class AuditService {
       if (saved) {
         this.logs = JSON.parse(saved);
       } else {
-        // Log inicial do sistema
-        this.log({
-          usuarioId: '1',
-          usuarioLogin: '1',
-          usuarioNome: 'Administrador',
-          tela: 'Sistema',
-          acao: 'Inicialização do Sistema',
-          detalhes: 'Base de dados inicializada com usuário administrador padrão (1).'
-        });
+        this.logs = [];
       }
     } catch (e) {
       this.logs = [];

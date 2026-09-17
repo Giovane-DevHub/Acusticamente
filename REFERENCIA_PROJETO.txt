@@ -21,7 +21,7 @@ Planos : Cursos oferecidos, valores e módulos de ensino
 Relatórios : Emissão e impressão de relatórios de alunos e finanças em PDF
 Usuários : Cadastro de professores e atendentes com controle de permissões
 Auditoria : Registro automático de quem fez cada alteração no sistema
-Configurações : Dados da escola (nome, logo, CNPJ) e conexão com banco de dados
+Configurações : Dados da escola (nome, logotipo, contatos e CNPJ)
 Login : Tela de entrada com usuário e senha
 
 

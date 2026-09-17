@@ -164,85 +164,7 @@ class StorageService {
         diaVencimento: typeof s.diaVencimento === 'number' ? s.diaVencimento : 10
       }));
     } else {
-      this.students = [
-        {
-          id: 'aluno_1',
-          nome: 'Lucas Silveira',
-          email: 'lucas@email.com',
-          telefone: '(11) 98231-1122',
-          dataNascimento: '2014-05-14',
-          instrumentoPrincipal: 'Bateria',
-          nivelMusical: 'iniciante',
-          responsavelNome: 'Cláudia Silveira',
-          responsavelTelefone: '(11) 98111-2233',
-          responsavelParentesco: 'Mãe',
-          planoId: 'plano_1',
-          moduloAtual: 'Módulo 2: Discriminação de Timbres',
-          saldoReposicoes: 1,
-          valorMensalidade: 280,
-          diaVencimento: 10,
-          status: 'ativo',
-          observacoes: 'Apresenta grande facilidade com ritmo.',
-          criadoEm: new Date().toISOString()
-        },
-        {
-          id: 'aluno_2',
-          nome: 'Mariana Duarte',
-          email: 'mariana.duarte@email.com',
-          telefone: '(11) 97123-4567',
-          dataNascimento: '2008-09-21',
-          instrumentoPrincipal: 'Violão',
-          nivelMusical: 'basico',
-          responsavelNome: 'Roberto Duarte',
-          responsavelTelefone: '(11) 97111-0000',
-          responsavelParentesco: 'Pai',
-          planoId: 'plano_2',
-          moduloAtual: 'Módulo 1: Primeiros Acordes e Levadas',
-          saldoReposicoes: 0,
-          valorMensalidade: 260,
-          diaVencimento: 20,
-          status: 'ativo',
-          observacoes: 'Iniciando estudos no violão popular.',
-          criadoEm: new Date().toISOString()
-        },
-        {
-          id: 'aluno_3',
-          nome: 'Gabriel Santos',
-          email: 'gabriel.s@email.com',
-          telefone: '(11) 99345-6789',
-          dataNascimento: '1998-03-10',
-          instrumentoPrincipal: 'Piano & Teclado',
-          nivelMusical: 'intermediario',
-          planoId: 'plano_3',
-          moduloAtual: 'Módulo 1: Digitação e Postura',
-          saldoReposicoes: 0,
-          valorMensalidade: 320,
-          diaVencimento: 10,
-          status: 'ativo',
-          observacoes: 'Excelente dedicação nas aulas de piano.',
-          criadoEm: new Date().toISOString()
-        },
-        {
-          id: 'aluno_4',
-          nome: 'Beatriz Costa',
-          email: 'beatriz.costa@email.com',
-          telefone: '(11) 96543-2109',
-          dataNascimento: '2015-11-05',
-          instrumentoPrincipal: 'Técnica Vocal / Canto',
-          nivelMusical: 'iniciante',
-          responsavelNome: 'Ana Costa',
-          responsavelTelefone: '(11) 96500-1122',
-          responsavelParentesco: 'Mãe',
-          planoId: 'plano_1',
-          moduloAtual: 'Módulo 3: Harmonia Básica e Canto',
-          saldoReposicoes: 2,
-          valorMensalidade: 250,
-          diaVencimento: 5,
-          status: 'ativo',
-          observacoes: 'Foco no canto coral.',
-          criadoEm: new Date().toISOString()
-        }
-      ];
+      this.students = [];
       this.saveStudents();
     }
 
@@ -251,57 +173,7 @@ class StorageService {
     if (savedAppointments) {
       this.appointments = JSON.parse(savedAppointments);
     } else {
-      const todayStr = this.getTodayDateString();
-      this.appointments = [
-        {
-          id: 'app_1',
-          titulo: 'Aula de Percepção Sonora',
-          alunoId: 'aluno_1',
-          planoId: 'plano_1',
-          data: todayStr,
-          horaInicio: '08:30',
-          horaFim: '09:30',
-          status: 'concluido',
-          observacoes: 'Exercícios rítmicos concluídos.',
-          criadoEm: new Date().toISOString()
-        },
-        {
-          id: 'app_2',
-          titulo: 'Aula Prática de Violão',
-          alunoId: 'aluno_2',
-          planoId: 'plano_2',
-          data: todayStr,
-          horaInicio: '10:00',
-          horaFim: '11:00',
-          status: 'agendado',
-          observacoes: 'Praticar transição entre acordes maiores.',
-          criadoEm: new Date().toISOString()
-        },
-        {
-          id: 'app_3',
-          titulo: 'Prática de Piano Módulo 1',
-          alunoId: 'aluno_3',
-          planoId: 'plano_3',
-          data: todayStr,
-          horaInicio: '14:00',
-          horaFim: '15:00',
-          status: 'agendado',
-          observacoes: 'Início da escala de Dó Maior.',
-          criadoEm: new Date().toISOString()
-        },
-        {
-          id: 'app_4',
-          titulo: 'Percepção e Harmonia',
-          alunoId: 'aluno_4',
-          planoId: 'plano_1',
-          data: todayStr,
-          horaInicio: '16:30',
-          horaFim: '17:30',
-          status: 'agendado',
-          observacoes: 'Preparação para apresentação musical.',
-          criadoEm: new Date().toISOString()
-        }
-      ];
+      this.appointments = [];
       this.saveAppointments();
     }
 
@@ -316,80 +188,7 @@ class StorageService {
     if (savedPayments) {
       this.payments = JSON.parse(savedPayments);
     } else {
-      this.payments = [
-        {
-          id: 'pag_1',
-          alunoId: 'aluno_1',
-          descricao: 'Mensalidade Agosto/2026',
-          mesReferencia: '2026-08',
-          valor: 280,
-          dataVencimento: '2026-08-10',
-          dataPagamento: '2026-08-08',
-          formaPagamento: 'pix',
-          status: 'pago',
-          observacoes: 'Pago pontualmente via Chave Pix',
-          criadoEm: '2026-08-01T10:00:00.000Z'
-        },
-        {
-          id: 'pag_2',
-          alunoId: 'aluno_1',
-          descricao: 'Mensalidade Setembro/2026',
-          mesReferencia: '2026-09',
-          valor: 280,
-          dataVencimento: '2026-09-10',
-          status: 'atrasado',
-          observacoes: 'Venceu dia 10 e aguarda regularização',
-          criadoEm: '2026-09-01T10:00:00.000Z'
-        },
-        {
-          id: 'pag_3',
-          alunoId: 'aluno_2',
-          descricao: 'Mensalidade Setembro/2026',
-          mesReferencia: '2026-09',
-          valor: 260,
-          dataVencimento: '2026-09-20',
-          status: 'pendente',
-          observacoes: 'A vencer no dia 20',
-          criadoEm: '2026-09-01T10:00:00.000Z'
-        },
-        {
-          id: 'pag_4',
-          alunoId: 'aluno_3',
-          descricao: 'Mensalidade Setembro/2026',
-          mesReferencia: '2026-09',
-          valor: 320,
-          dataVencimento: '2026-09-10',
-          dataPagamento: '2026-09-10',
-          formaPagamento: 'cartao_credito',
-          status: 'pago',
-          observacoes: 'Pago no balcão da escola',
-          criadoEm: '2026-09-01T10:00:00.000Z'
-        },
-        {
-          id: 'pag_5',
-          alunoId: 'aluno_4',
-          descricao: 'Mensalidade Agosto/2026',
-          mesReferencia: '2026-08',
-          valor: 250,
-          dataVencimento: '2026-08-05',
-          dataPagamento: '2026-08-05',
-          formaPagamento: 'dinheiro',
-          status: 'pago',
-          observacoes: 'Comprovante emitido',
-          criadoEm: '2026-08-01T10:00:00.000Z'
-        },
-        {
-          id: 'pag_6',
-          alunoId: 'aluno_4',
-          descricao: 'Mensalidade Setembro/2026',
-          mesReferencia: '2026-09',
-          valor: 250,
-          dataVencimento: '2026-09-05',
-          status: 'atrasado',
-          observacoes: 'Mensalidade vencida dia 05',
-          criadoEm: '2026-09-01T10:00:00.000Z'
-        }
-      ];
+      this.payments = [];
       this.savePayments();
     }
 
