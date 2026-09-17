@@ -168,6 +168,7 @@ export interface AuditLog {
 }
 
 export type AppScreen =
+  | 'site'
   | 'login'
   | 'home'
   | 'agenda'

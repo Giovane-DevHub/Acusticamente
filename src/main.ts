@@ -6,6 +6,7 @@ import { AppScreen, User } from './types';
 
 // Telas da aplicação com nomes fáceis
 import { renderLogin } from './views/login';
+import { renderSite } from './views/site';
 import { renderHome } from './views/home';
 import { renderAgenda } from './views/agenda';
 import { renderAlunos } from './views/alunos';
@@ -17,7 +18,7 @@ import { renderAuditoria } from './views/auditoria';
 import { renderConfiguracoes } from './views/configuracoes';
 
 class AppRouter {
-  private currentScreen: AppScreen = 'home';
+  private currentScreen: AppScreen = 'site';
   private appRoot: HTMLElement;
 
   constructor() {
@@ -26,31 +27,33 @@ class AppRouter {
   }
 
   public init(): void {
-    // Se não estiver logado, força tela de login
-    if (!authService.isAuthenticated()) {
-      this.currentScreen = 'login';
-      this.render();
-      return;
-    }
-
+    const rawHash = window.location.hash.replace('#', '').trim() as AppScreen;
     const currentUser = authService.getCurrentUser();
 
-    // Carrega rota da hash caso exista e valida se o usuário tem permissão
-    const hash = window.location.hash.replace('#', '') as AppScreen;
-    if (
-      hash &&
-      ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'relatorios', 'user', 'auditoria', 'configuracoes'].includes(hash) &&
-      hasPermission(currentUser, hash)
-    ) {
-      this.currentScreen = hash;
+    // Sempre abre no site por padrão se a URL for a raiz ou #site
+    if (!rawHash || rawHash === 'site') {
+      this.currentScreen = 'site';
+    } else if (rawHash === 'login') {
+      this.currentScreen = 'login';
+    } else if (authService.isAuthenticated()) {
+      if (
+        ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'relatorios', 'user', 'auditoria', 'configuracoes'].includes(rawHash) &&
+        hasPermission(currentUser, rawHash)
+      ) {
+        this.currentScreen = rawHash;
+      } else {
+        this.currentScreen = this.getFirstAllowedScreen(currentUser);
+      }
     } else {
-      this.currentScreen = this.getFirstAllowedScreen(currentUser);
+      // Não autenticado tentando acessar tela restrita -> vai para login
+      this.currentScreen = 'login';
     }
 
     window.addEventListener('hashchange', () => {
-      const newHash = window.location.hash.replace('#', '') as AppScreen;
-      if (newHash && newHash !== this.currentScreen) {
-        this.navigateTo(newHash);
+      const newHash = window.location.hash.replace('#', '').trim() as AppScreen;
+      const targetScreen = (!newHash || newHash === 'site') ? 'site' : newHash;
+      if (targetScreen !== this.currentScreen) {
+        this.navigateTo(targetScreen);
       }
     });
 
@@ -69,7 +72,7 @@ class AppRouter {
 
     // Atualiza a tela automaticamente quando chegam dados novos da nuvem (MongoDB Atlas)
     window.addEventListener('acusticamente:data-synced', () => {
-      if (authService.isAuthenticated() && this.currentScreen !== 'login') {
+      if (authService.isAuthenticated() && !['login', 'site'].includes(this.currentScreen)) {
         this.render();
       }
     });
@@ -90,6 +93,30 @@ class AppRouter {
   }
 
   public navigateTo(screen: AppScreen): void {
+    if (screen === 'site') {
+      this.currentScreen = 'site';
+      window.location.hash = 'site';
+      this.render();
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    if (screen === 'login') {
+      this.currentScreen = 'login';
+      window.location.hash = 'login';
+      this.render();
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    // Verificação de autenticação para telas internas
+    if (!authService.isAuthenticated()) {
+      this.currentScreen = 'login';
+      window.location.hash = 'login';
+      this.render();
+      return;
+    }
+
     const currentUser = authService.getCurrentUser();
 
     // Verificação de permissões do usuário
@@ -113,12 +140,26 @@ class AppRouter {
   private render(): void {
     this.appRoot.innerHTML = '';
 
-    // 1. Tela de Login (não exibe sidebar nem topbar)
-    if (!authService.isAuthenticated() || this.currentScreen === 'login') {
-      const loginView = renderLogin(() => {
-        const user = authService.getCurrentUser();
-        this.navigateTo(this.getFirstAllowedScreen(user));
+    // 1. Tela do Site Institucional (Público, sem sidebar nem topbar do painel)
+    if (this.currentScreen === 'site') {
+      const siteView = renderSite((targetScreen) => {
+        this.navigateTo(targetScreen as AppScreen);
       });
+      this.appRoot.appendChild(siteView);
+      return;
+    }
+
+    // 2. Tela de Login (não exibe sidebar nem topbar)
+    if (this.currentScreen === 'login' || !authService.isAuthenticated()) {
+      const loginView = renderLogin(
+        () => {
+          const user = authService.getCurrentUser();
+          this.navigateTo(this.getFirstAllowedScreen(user));
+        },
+        () => {
+          this.navigateTo('site');
+        }
+      );
       this.appRoot.appendChild(loginView);
       return;
     }
@@ -213,6 +254,19 @@ class AppRouter {
               <span>Configurações</span>
             </a>
           ` : ''}
+
+          <div style="margin: 10px 0; border-top: 1px solid var(--border-subtle);"></div>
+
+          <a class="nav-item" data-screen="site" title="Abrir o site institucional da Acusticamente">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </span>
+            <span>Ver Site</span>
+          </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -295,6 +349,7 @@ class AppRouter {
         confirmBtnClass: 'btn-danger',
         onConfirm: () => {
           authService.logout();
+          this.navigateTo('site');
         }
       });
     });

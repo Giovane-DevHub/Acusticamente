@@ -6,7 +6,7 @@ import { showToast } from '../utils/ui';
 const REMEMBER_KEY = 'acusticamente_auth_remember';
 const MANUAL_LOGOUT_KEY = 'acusticamente_manual_logout';
 
-export function renderLogin(onLoginSuccess: () => void): HTMLElement {
+export function renderLogin(onLoginSuccess: () => void, onBackToSite?: () => void): HTMLElement {
   const container = document.createElement('div');
   container.className = 'login-page';
 
@@ -51,6 +51,13 @@ export function renderLogin(onLoginSuccess: () => void): HTMLElement {
     <!-- Lado Direito Formulário de Acesso -->
     <div class="login-form-side">
       <div class="login-card">
+        <div style="display: flex; justify-content: flex-start; margin-bottom: 14px;">
+          <button type="button" id="btn-back-to-site" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); padding: 6px 14px; border-radius: 9999px; font-size: 0.8rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Voltar ao Site
+          </button>
+        </div>
+
         <div class="login-card-header">
           <div style="display: flex; justify-content: center; margin-bottom: 10px;">
             ${renderBrandLogo(settings.logotipoCustomizado, 58)}
@@ -119,6 +126,15 @@ export function renderLogin(onLoginSuccess: () => void): HTMLElement {
 
   const rememberChk = container.querySelector('#login-remember') as HTMLInputElement;
   const autologinChk = container.querySelector('#login-autologin') as HTMLInputElement;
+  const btnBackToSite = container.querySelector('#btn-back-to-site') as HTMLElement;
+
+  btnBackToSite?.addEventListener('click', () => {
+    if (onBackToSite) {
+      onBackToSite();
+    } else {
+      window.location.hash = 'site';
+    }
+  });
 
   // Se marcar entrar automaticamente, força a marcar lembrar senha
   autologinChk?.addEventListener('change', () => {
