@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Student, MusicalLevel, Payment, PaymentMethod } from '../types';
-import { ICONS, openModal, closeModal, showToast, confirmAction } from '../utils/ui';
+import { ICONS, openModal, closeModal, showToast, confirmAction, maskCPF, maskPhone, isValidEmail, applyInputMask } from '../utils/ui';
 
 const INSTRUMENTOS_COMUNS = [
   'Violão',
@@ -871,7 +871,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
     const planOptions = plans
       .map(
-        p => `<option value="${p.id}" ${existingStudent?.planoId === p.id ? 'selected' : ''}>${p.nome}</option>`
+        p => `<option value="${p.id}" ${existingStudent?.planoId === p.id ? 'selected' : ''} data-valor="${p.valor ?? 280}">${p.nome} - R$ ${(p.valor ?? 280).toFixed(2)}</option>`
       )
       .join('');
 
@@ -884,12 +884,12 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
     const bodyHtml = `
       <form id="student-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         
-        <!-- Seletor de Abas Organizado em 2 Níveis -->
+        <!-- Seletor de Abas Enxuto -->
         <div class="student-modal-tabs-wrapper">
           <div class="student-modal-tabs-row row-top">
             <button type="button" class="student-tab-pill btn-form-tab active" data-tab="tab-pessoal">
               <span class="student-tab-pill-dot"></span>
-              <span>Pessoal</span>
+              <span>Aluno</span>
             </button>
             <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-resp">
               <span class="student-tab-pill-dot"></span>
@@ -904,7 +904,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           <div class="student-modal-tabs-row row-bottom">
             <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-financeiro">
               <span class="student-tab-pill-dot"></span>
-              <span>Mensalidades</span>
+              <span>Financeiro</span>
             </button>
             <button type="button" class="student-tab-pill btn-form-tab" data-tab="tab-obs">
               <span class="student-tab-pill-dot"></span>
@@ -913,221 +913,182 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           </div>
         </div>
 
-        <!-- PAINEL 1: DADOS PESSOAIS -->
+        <!-- ABA 1: ALUNO -->
         <div id="form-panel-tab-pessoal" class="form-tab-panel" style="display: flex; flex-direction: column; gap: 12px;">
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-nome">Nome Completo do Aluno <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
+            <label class="form-label" for="student-nome">Nome *</label>
             <input type="text" id="student-nome" class="form-input" placeholder="Ex: Clara Mendes" value="${existingStudent?.nome || ''}" required />
           </div>
 
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-telefone">Telefone / WhatsApp</label>
-            <input type="text" id="student-telefone" class="form-input" placeholder="(11) 99999-9999" value="${existingStudent?.telefone || ''}" />
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-telefone">Celular *</label>
+              <input type="text" id="student-telefone" class="form-input" placeholder="(00) 00000-0000" value="${existingStudent?.telefone || ''}" maxlength="15" required />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-cpf">CPF</label>
+              <input type="text" id="student-cpf" class="form-input" placeholder="000.000.000-00" value="${existingStudent?.cpf || ''}" maxlength="14" />
+            </div>
           </div>
 
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-nascimento">Data de Nascimento</label>
-            <input type="date" id="student-nascimento" class="form-input" value="${existingStudent?.dataNascimento || ''}" />
-          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-nascimento">Nascimento *</label>
+              <input type="date" id="student-nascimento" class="form-input" value="${existingStudent?.dataNascimento || ''}" required />
+            </div>
 
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-email">E-mail</label>
-            <input type="email" id="student-email" class="form-input" placeholder="aluno@email.com" value="${existingStudent?.email || ''}" />
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-email">E-mail</label>
+              <input type="email" id="student-email" class="form-input" placeholder="aluno@email.com" value="${existingStudent?.email || ''}" />
+            </div>
           </div>
         </div>
 
-        <!-- PAINEL 2: DADOS DO RESPONSÁVEL -->
+        <!-- ABA 2: RESPONSÁVEL -->
         <div id="form-panel-tab-resp" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
           <div id="student-resp-alert" style="display: none; background: rgba(234, 67, 53, 0.12); border: 1px solid rgba(234, 67, 53, 0.35); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.76rem; color: #fca5a5; margin-bottom: 2px;">
-            ⚠️ <strong>Aluno menor de 18 anos detectado.</strong> O preenchimento do responsável é obrigatório.
+            ⚠️ <strong>Aluno menor de 18 anos.</strong> Dados do responsável são obrigatórios.
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
             <label class="form-label" for="student-resp-nome">
-              Nome do Responsável <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
+              Nome <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
             </label>
-            <input type="text" id="student-resp-nome" class="form-input" placeholder="Ex: Patrícia Mendes" value="${existingStudent?.responsavelNome || ''}" />
+            <input type="text" id="student-resp-nome" class="form-input" placeholder="Nome do responsável" value="${existingStudent?.responsavelNome || ''}" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-resp-parentesco">
+                Parentesco <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
+              </label>
+              <select id="student-resp-parentesco" class="form-select">
+                <option value="">Selecione...</option>
+                <option value="Mãe" ${existingStudent?.responsavelParentesco === 'Mãe' ? 'selected' : ''}>Mãe</option>
+                <option value="Pai" ${existingStudent?.responsavelParentesco === 'Pai' ? 'selected' : ''}>Pai</option>
+                <option value="Avô/Avó" ${existingStudent?.responsavelParentesco === 'Avô/Avó' ? 'selected' : ''}>Avô/Avó</option>
+                <option value="Cônjuge" ${existingStudent?.responsavelParentesco === 'Cônjuge' ? 'selected' : ''}>Cônjuge</option>
+                <option value="Outro" ${existingStudent?.responsavelParentesco === 'Outro' ? 'selected' : ''}>Outro</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-resp-tel">
+                Celular <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
+              </label>
+              <input type="text" id="student-resp-tel" class="form-input" placeholder="(00) 00000-0000" value="${existingStudent?.responsavelTelefone || ''}" maxlength="15" />
+            </div>
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-resp-parentesco">
-              Parentesco <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
-            </label>
-            <select id="student-resp-parentesco" class="form-select">
-              <option value="">Selecione...</option>
-              <option value="Mãe" ${existingStudent?.responsavelParentesco === 'Mãe' ? 'selected' : ''}>Mãe</option>
-              <option value="Pai" ${existingStudent?.responsavelParentesco === 'Pai' ? 'selected' : ''}>Pai</option>
-              <option value="Avô/Avó" ${existingStudent?.responsavelParentesco === 'Avô/Avó' ? 'selected' : ''}>Avô/Avó</option>
-              <option value="Cônjuge" ${existingStudent?.responsavelParentesco === 'Cônjuge' ? 'selected' : ''}>Cônjuge</option>
-              <option value="Outro" ${existingStudent?.responsavelParentesco === 'Outro' ? 'selected' : ''}>Outro</option>
-            </select>
+            <label class="form-label" for="student-resp-cpf">CPF</label>
+            <input type="text" id="student-resp-cpf" class="form-input" placeholder="000.000.000-00" value="${existingStudent?.responsavelCpf || ''}" maxlength="14" />
           </div>
-
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-resp-tel">
-              Telefone / WhatsApp do Responsável <span class="resp-req-star" style="color: var(--color-coral); font-weight: 700; display: none;">*</span>
-            </label>
-            <input type="text" id="student-resp-tel" class="form-input" placeholder="(11) 98888-8888" value="${existingStudent?.responsavelTelefone || ''}" />
-          </div>
-
-          <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
-            * Obrigatório para alunos menores de 18 anos ou para contato de emergência.
-          </p>
         </div>
 
-        <!-- PAINEL 3: DADOS MUSICAIS E PEDAGÓGICOS -->
+        <!-- ABA 3: PEDAGÓGICO -->
         <div id="form-panel-tab-musica" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-instrumento">Instrumento Principal</label>
-            <select id="student-instrumento" class="form-select">
-              <option value="">Selecione...</option>
-              ${instrumentOptions}
-            </select>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-instrumento">Instrumento</label>
+              <select id="student-instrumento" class="form-select">
+                <option value="">Selecione...</option>
+                ${instrumentOptions}
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-nivel">Nível</label>
+              <select id="student-nivel" class="form-select">
+                <option value="iniciante" ${existingStudent?.nivelMusical === 'iniciante' ? 'selected' : ''}>Iniciante</option>
+                <option value="basico" ${existingStudent?.nivelMusical === 'basico' ? 'selected' : ''}>Básico</option>
+                <option value="intermediario" ${existingStudent?.nivelMusical === 'intermediario' ? 'selected' : ''}>Intermediário</option>
+                <option value="avancado" ${existingStudent?.nivelMusical === 'avancado' ? 'selected' : ''}>Avançado</option>
+              </select>
+            </div>
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-nivel">Nível Musical</label>
-            <select id="student-nivel" class="form-select">
-              <option value="iniciante" ${existingStudent?.nivelMusical === 'iniciante' ? 'selected' : ''}>Iniciante</option>
-              <option value="basico" ${existingStudent?.nivelMusical === 'basico' ? 'selected' : ''}>Básico</option>
-              <option value="intermediario" ${existingStudent?.nivelMusical === 'intermediario' ? 'selected' : ''}>Intermediário</option>
-              <option value="avancado" ${existingStudent?.nivelMusical === 'avancado' ? 'selected' : ''}>Avançado</option>
-            </select>
-          </div>
-
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-status">Status da Matrícula <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
-            <select id="student-status" class="form-select">
-              <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-              <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
-            </select>
-          </div>
-
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-plano">Plano de Ensino</label>
+            <label class="form-label" for="student-plano">Plano (com valor fixo)</label>
             <select id="student-plano" class="form-select">
               <option value="">Selecione um plano...</option>
               ${planOptions}
             </select>
           </div>
 
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-modulo">Módulo Atual</label>
-            <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Teoria" value="${existingStudent?.moduloAtual || ''}" />
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-modulo">Módulo</label>
+              <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Teoria" value="${existingStudent?.moduloAtual || ''}" />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="student-status">Status *</label>
+              <select id="student-status" class="form-select">
+                <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+              </select>
+            </div>
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-saldo-reposicoes" title="Aulas que o aluno tem direito a repor">
-              Créditos de Reposição
-            </label>
+            <label class="form-label" for="student-saldo-reposicoes">Reposições Disponíveis</label>
             <input type="number" id="student-saldo-reposicoes" class="form-input" min="0" max="20" value="${existingStudent?.saldoReposicoes ?? 0}" />
           </div>
         </div>
 
-        <!-- PAINEL 4: MENSALIDADE E FINANCEIRO -->
+        <!-- ABA 4: FINANCEIRO -->
         <div id="form-panel-tab-financeiro" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 12px;">
             <div style="font-weight: 700; font-size: 0.85rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
               <span>💰</span> Parâmetros da Mensalidade
             </div>
 
-            <div class="form-group" style="margin: 0; width: 100%;">
-              <label class="form-label" for="student-valor-mensalidade">Valor da Mensalidade (R$) <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
-              <input type="number" id="student-valor-mensalidade" class="form-input" min="0" step="10" placeholder="280.00" value="${existingStudent?.valorMensalidade ?? 280}" required />
-            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" for="student-valor-mensalidade">Mensalidade (R$) *</label>
+                <input type="number" id="student-valor-mensalidade" class="form-input" min="0" step="10" placeholder="280.00" value="${existingStudent?.valorMensalidade ?? 280}" required />
+              </div>
 
-            <div class="form-group" style="margin: 0; width: 100%;">
-              <label class="form-label" for="student-dia-vencimento">Dia de Vencimento Padrão (1 a 31) <span style="color: var(--color-coral); font-weight: 700;">*</span></label>
-              <input type="number" id="student-dia-vencimento" class="form-input" min="1" max="31" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" for="student-dia-vencimento">Dia do Vencimento *</label>
+                <input type="number" id="student-dia-vencimento" class="form-input" min="1" max="31" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
+              </div>
             </div>
 
             <div style="font-size: 0.74rem; color: var(--text-secondary); line-height: 1.3;">
-              ℹ️ Estes valores são a base para geração das cobranças de mensalidade e controle de pontualidade.
-            </div>
-          </div>
-
-          <!-- Grid Pequena: Histórico Financeiro do Aluno -->
-          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 6px;">
-                <span>📋</span> Histórico Financeiro
-              </span>
-              ${
-                studentPayments.length > 0
-                  ? `<span style="font-size: 0.72rem; color: var(--text-muted);">${studentPayments.length} lançamento(s)</span>`
-                  : ''
-              }
-            </div>
-
-            <div style="max-height: 155px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface);">
-              ${
-                !existingStudent
-                  ? `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">O histórico financeiro estará disponível após o cadastro do aluno.</div>`
-                  : studentPayments.length === 0
-                  ? `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">Nenhum lançamento financeiro registrado para este aluno.</div>`
-                  : `
-                    <table class="data-table" style="margin: 0; font-size: 0.76rem; width: 100%;">
-                      <thead>
-                        <tr style="background: rgba(0, 0, 0, 0.25); position: sticky; top: 0; z-index: 1;">
-                          <th style="padding: 6px 10px;">Valor</th>
-                          <th style="padding: 6px 10px;">Data Vencimento</th>
-                          <th class="col-hide-sm" style="padding: 6px 10px;">Data Pagamento</th>
-                          <th style="padding: 6px 10px; text-align: center;">Situação</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${studentPayments.map(p => {
-                          const dtVenc = p.dataVencimento.split('-').reverse().join('/');
-                          const dtPag = p.dataPagamento ? p.dataPagamento.split('-').reverse().join('/') : '-';
-                          let sitBadge = '';
-                          if (p.status === 'pago') {
-                            sitBadge = `<span class="badge badge-success" style="font-size: 0.65rem; padding: 2px 6px;">Pago</span>`;
-                          } else if (p.status === 'atrasado') {
-                            sitBadge = `<span class="badge badge-coral" style="font-size: 0.65rem; padding: 2px 6px; font-weight: 700;">Atrasado</span>`;
-                          } else {
-                            sitBadge = `<span class="badge badge-warning" style="font-size: 0.65rem; padding: 2px 6px;">Pendente</span>`;
-                          }
-                          return `
-                            <tr>
-                              <td style="padding: 6px 10px; font-weight: 600; color: var(--text-white);">R$ ${p.valor.toFixed(2)}</td>
-                              <td style="padding: 6px 10px;">${dtVenc}</td>
-                              <td class="col-hide-sm" style="padding: 6px 10px; color: ${p.dataPagamento ? 'var(--text-white)' : 'var(--text-muted)'};">${dtPag}</td>
-                              <td style="padding: 6px 10px; text-align: center;">${sitBadge}</td>
-                            </tr>
-                          `;
-                        }).join('')}
-                      </tbody>
-                    </table>
-                  `
-              }
+              ℹ️ Ao selecionar um plano pedagógico, o valor da mensalidade é preenchido automaticamente.
             </div>
           </div>
         </div>
 
-        <!-- PAINEL 5: OBSERVAÇÕES -->
+        <!-- ABA 5: OBSERVAÇÕES -->
         <div id="form-panel-tab-obs" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
           <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="student-obs">Observações Pedagógicas / Preferências Musicais</label>
-            <textarea id="student-obs" class="form-textarea" rows="3" placeholder="Gostos musicais, objetivos do aluno, pontos de atenção pedagógica...">${existingStudent?.observacoes || ''}</textarea>
+            <label class="form-label" for="student-obs">Observações</label>
+            <textarea id="student-obs" class="form-textarea" rows="3" placeholder="Anotações gerais, preferências e histórico...">${existingStudent?.observacoes || ''}</textarea>
           </div>
         </div>
       </form>
     `;
 
     openModal({
-      title: isEditing ? `Editar Aluno: ${existingStudent.nome}` : 'Cadastrar Novo Aluno',
+      title: isEditing ? `Editar: ${existingStudent.nome}` : 'Cadastrar Aluno',
       bodyHtml,
       modalClass: 'modal-lg',
-      confirmText: isEditing ? 'Salvar Alterações' : 'Cadastrar Aluno',
+      confirmText: isEditing ? 'Salvar' : 'Cadastrar',
       onConfirm: () => {
         const nome = (document.getElementById('student-nome') as HTMLInputElement).value.trim();
         const dataNascimento = (document.getElementById('student-nascimento') as HTMLInputElement).value;
         const email = (document.getElementById('student-email') as HTMLInputElement).value.trim();
         const telefone = (document.getElementById('student-telefone') as HTMLInputElement).value.trim();
+        const cpf = (document.getElementById('student-cpf') as HTMLInputElement)?.value.trim() || undefined;
 
         const responsavelNome = (document.getElementById('student-resp-nome') as HTMLInputElement).value.trim();
         const responsavelParentesco = (document.getElementById('student-resp-parentesco') as HTMLSelectElement).value;
         const responsavelTelefone = (document.getElementById('student-resp-tel') as HTMLInputElement).value.trim();
+        const responsavelCpf = (document.getElementById('student-resp-cpf') as HTMLInputElement)?.value.trim() || undefined;
 
         const instrumentoPrincipal = (document.getElementById('student-instrumento') as HTMLSelectElement).value;
         const nivelMusical = (document.getElementById('student-nivel') as HTMLSelectElement).value as MusicalLevel;
@@ -1158,51 +1119,78 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         // 1. Nome Completo (obrigatório)
         if (!nome) {
           pendingErrors.push({
-            label: 'Nome Completo do Aluno',
+            label: 'Nome do Aluno',
             fieldId: 'student-nome',
             tabId: 'tab-pessoal'
           });
         }
 
-        // 2. Responsável Obrigatório caso Aluno seja Menor de Idade
+        // 2. Data de Nascimento
+        if (!dataNascimento) {
+          pendingErrors.push({
+            label: 'Data de Nascimento',
+            fieldId: 'student-nascimento',
+            tabId: 'tab-pessoal'
+          });
+        }
+
+        // 3. Celular
+        if (!telefone) {
+          pendingErrors.push({
+            label: 'Celular do Aluno',
+            fieldId: 'student-telefone',
+            tabId: 'tab-pessoal'
+          });
+        }
+
+        // 4. Validação de E-mail se preenchido
+        if (email && !isValidEmail(email)) {
+          pendingErrors.push({
+            label: 'E-mail em formato inválido',
+            fieldId: 'student-email',
+            tabId: 'tab-pessoal'
+          });
+        }
+
+        // 5. Responsável Obrigatório caso Aluno seja Menor de 18 Anos
         const alunoIdade = getNumericAge(dataNascimento);
         const isMenor = alunoIdade !== null && alunoIdade < 18;
 
         if (isMenor) {
           if (!responsavelNome) {
             pendingErrors.push({
-              label: `Nome do Responsável (Aluno possui ${alunoIdade} anos - Menor de Idade)`,
+              label: `Nome do Responsável (Aluno menor de idade: ${alunoIdade} anos)`,
               fieldId: 'student-resp-nome',
               tabId: 'tab-resp'
             });
           }
           if (!responsavelParentesco) {
             pendingErrors.push({
-              label: `Parentesco do Responsável (Aluno possui ${alunoIdade} anos - Menor de Idade)`,
+              label: `Parentesco do Responsável (Aluno menor de idade: ${alunoIdade} anos)`,
               fieldId: 'student-resp-parentesco',
               tabId: 'tab-resp'
             });
           }
           if (!responsavelTelefone) {
             pendingErrors.push({
-              label: `Telefone / WhatsApp do Responsável (Aluno possui ${alunoIdade} anos - Menor de Idade)`,
+              label: `Celular do Responsável (Aluno menor de idade: ${alunoIdade} anos)`,
               fieldId: 'student-resp-tel',
               tabId: 'tab-resp'
             });
           }
         }
 
-        // 3. Status da Matrícula (obrigatório)
+        // 6. Status
         if (!status) {
           pendingErrors.push({
-            label: 'Status da Matrícula (Ativo ou Inativo)',
+            label: 'Status da Matrícula',
             fieldId: 'student-status',
             tabId: 'tab-musica'
           });
         }
 
-        // 4. Valor da Mensalidade (obrigatório)
-        if (!valorMensalidadeInput || isNaN(parseFloat(valorMensalidadeInput)) || parseFloat(valorMensalidadeInput) < 0) {
+        // 7. Valor da Mensalidade
+        if (!valorMensalidadeInput || isNaN(parseFloat(valorMensalidadeInput)) || parseFloat(valorMensalidadeInput) <= 0) {
           pendingErrors.push({
             label: 'Valor da Mensalidade (R$)',
             fieldId: 'student-valor-mensalidade',
@@ -1210,11 +1198,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           });
         }
 
-        // 5. Dia de Vencimento (obrigatório de 1 a 31)
+        // 8. Dia de Vencimento
         const diaNum = parseInt(diaVencimentoInput, 10);
         if (!diaVencimentoInput || isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
           pendingErrors.push({
-            label: 'Dia de Vencimento Padrão (deve ser entre 1 e 31)',
+            label: 'Dia de Vencimento (deve ser entre 1 e 31)',
             fieldId: 'student-dia-vencimento',
             tabId: 'tab-financeiro'
           });
@@ -1306,7 +1294,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             }, 100);
           });
 
-          return false; // Bloqueia fechamento do modal
+          return false;
         }
 
         const currentUserName = user?.nome || 'Administrador';
@@ -1319,9 +1307,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               dataNascimento,
               email,
               telefone,
+              cpf,
               responsavelNome,
               responsavelParentesco,
               responsavelTelefone,
+              responsavelCpf,
               instrumentoPrincipal,
               nivelMusical,
               planoId,
@@ -1342,9 +1332,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               dataNascimento,
               email,
               telefone,
+              cpf,
               responsavelNome,
               responsavelParentesco,
               responsavelTelefone,
+              responsavelCpf,
               instrumentoPrincipal,
               nivelMusical,
               planoId,
@@ -1365,7 +1357,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       }
     });
 
-    // Conectar alternância de abas do formulário e verificação dinâmica de menor de idade
+    // Conectar alternância de abas, máscaras de input e preenchimento de valor do plano
     setTimeout(() => {
       const tabBtns = document.querySelectorAll('.btn-form-tab');
       const panels = document.querySelectorAll('.form-tab-panel') as NodeListOf<HTMLElement>;
@@ -1384,6 +1376,32 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         });
       });
 
+      // Máscaras nos campos de CPF e Celular
+      const cpfAluno = document.getElementById('student-cpf') as HTMLInputElement;
+      if (cpfAluno) applyInputMask(cpfAluno, maskCPF);
+
+      const telAluno = document.getElementById('student-telefone') as HTMLInputElement;
+      if (telAluno) applyInputMask(telAluno, maskPhone);
+
+      const cpfResp = document.getElementById('student-resp-cpf') as HTMLInputElement;
+      if (cpfResp) applyInputMask(cpfResp, maskCPF);
+
+      const telResp = document.getElementById('student-resp-tel') as HTMLInputElement;
+      if (telResp) applyInputMask(telResp, maskPhone);
+
+      // Preenchimento automático do valor ao selecionar o plano
+      const planoSelect = document.getElementById('student-plano') as HTMLSelectElement;
+      planoSelect?.addEventListener('change', () => {
+        const selectedOpt = planoSelect.selectedOptions[0];
+        if (selectedOpt) {
+          const val = selectedOpt.getAttribute('data-valor');
+          const valorInput = document.getElementById('student-valor-mensalidade') as HTMLInputElement;
+          if (val && valorInput) {
+            valorInput.value = val;
+          }
+        }
+      });
+
       // Monitora data de nascimento para sinalizar menor de idade em tempo real
       const birthInput = document.getElementById('student-nascimento') as HTMLInputElement;
       const respAlert = document.getElementById('student-resp-alert');
@@ -1397,7 +1415,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         if (respAlert) {
           respAlert.style.display = menor ? 'block' : 'none';
           if (menor) {
-            respAlert.innerHTML = `⚠️ <strong>Aluno menor de 18 anos (${idade} anos).</strong> O preenchimento do responsável é obrigatório.`;
+            respAlert.innerHTML = `⚠️ <strong>Aluno menor de 18 anos (${idade} anos).</strong> Dados do responsável são obrigatórios.`;
           }
         }
 

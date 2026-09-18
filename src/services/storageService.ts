@@ -109,43 +109,146 @@ class StorageService {
       this.saveUsers();
     }
 
-    // 2. Planos de Ensino de Música com módulos aninhados
+    // 2. Planos de Ensino de Música com módulos e aulas aninhadas
     const savedPlans = localStorage.getItem(PLANS_KEY);
     if (savedPlans) {
-      this.plans = JSON.parse(savedPlans);
+      try {
+        const parsed = JSON.parse(savedPlans);
+        this.plans = parsed.map((p: any) => ({
+          ...p,
+          valor: typeof p.valor === 'number' ? p.valor : 280,
+          modulos: (p.modulos || []).map((m: any, mIdx: number) => ({
+            ...m,
+            aulas: Array.isArray(m.aulas) && m.aulas.length > 0 ? m.aulas : [
+              { id: `aul_${m.id || mIdx + 1}_1`, ordem: 1, titulo: `Aula 1: Fundamentos e Introdução` },
+              { id: `aul_${m.id || mIdx + 1}_2`, ordem: 2, titulo: `Aula 2: Desenvolvimento Prático` },
+              { id: `aul_${m.id || mIdx + 1}_3`, ordem: 3, titulo: `Aula 3: Exercícios de Fixação` },
+              { id: `aul_${m.id || mIdx + 1}_4`, ordem: 4, titulo: `Aula 4: Revisão e Repertório` }
+            ]
+          }))
+        }));
+      } catch (e) {
+        this.plans = [];
+      }
     } else {
       this.plans = [
         {
           id: 'plano_1',
           nome: 'Percepção e Musicalização',
           descricao: 'Desenvolvimento do ouvido musical, ritmo e afinação básica.',
+          valor: 260,
           criadoEm: new Date().toISOString(),
           modulos: [
-            { id: 'mod_1_1', ordem: 1, titulo: 'Módulo 1: Consciência Sonora e Pulsação' },
-            { id: 'mod_1_2', ordem: 2, titulo: 'Módulo 2: Discriminação de Timbres e Alturas' },
-            { id: 'mod_1_3', ordem: 3, titulo: 'Módulo 3: Harmonia Básica e Canto' }
+            {
+              id: 'mod_1_1',
+              ordem: 1,
+              titulo: 'Módulo 1: Consciência Sonora e Pulsação',
+              aulas: [
+                { id: 'aul_1_1_1', ordem: 1, titulo: 'Aula 1: Exploração Sonora e Alturas' },
+                { id: 'aul_1_1_2', ordem: 2, titulo: 'Aula 2: Pulso, Tempo e Ritmo Corporal' },
+                { id: 'aul_1_1_3', ordem: 3, titulo: 'Aula 3: Dinâmica e Intensidade' },
+                { id: 'aul_1_1_4', ordem: 4, titulo: 'Aula 4: Jogos Musicais e Percepção' }
+              ]
+            },
+            {
+              id: 'mod_1_2',
+              ordem: 2,
+              titulo: 'Módulo 2: Discriminação de Timbres e Alturas',
+              aulas: [
+                { id: 'aul_1_2_1', ordem: 1, titulo: 'Aula 1: Família dos Instrumentos' },
+                { id: 'aul_1_2_2', ordem: 2, titulo: 'Aula 2: Escuta Ativa e Melodia' },
+                { id: 'aul_1_2_3', ordem: 3, titulo: 'Aula 3: Canto Coletivo e Afinação' }
+              ]
+            },
+            {
+              id: 'mod_1_3',
+              ordem: 3,
+              titulo: 'Módulo 3: Harmonia Básica e Canto',
+              aulas: [
+                { id: 'aul_1_3_1', ordem: 1, titulo: 'Aula 1: Estruturas Harmônicas Iniciais' },
+                { id: 'aul_1_3_2', ordem: 2, titulo: 'Aula 2: Solfejo Rítmico' },
+                { id: 'aul_1_3_3', ordem: 3, titulo: 'Aula 3: Apresentação Pedagógica' }
+              ]
+            }
           ]
         },
         {
           id: 'plano_2',
           nome: 'Violão e Harmonia Prática',
           descricao: 'Estudo de acordes, levadas rítmicas, dedilhados e repertório no violão.',
+          valor: 280,
           criadoEm: new Date().toISOString(),
           modulos: [
-            { id: 'mod_2_1', ordem: 1, titulo: 'Módulo 1: Primeiros Acordes e Levadas' },
-            { id: 'mod_2_2', ordem: 2, titulo: 'Módulo 2: Dedilhados e Transição de Acordes' },
-            { id: 'mod_2_3', ordem: 3, titulo: 'Módulo 3: Escalas e Harmonia Prática' }
+            {
+              id: 'mod_2_1',
+              ordem: 1,
+              titulo: 'Módulo 1: Primeiros Acordes e Levadas',
+              aulas: [
+                { id: 'aul_2_1_1', ordem: 1, titulo: 'Aula 1: Postura, Afinação e Mão Direita' },
+                { id: 'aul_2_1_2', ordem: 2, titulo: 'Aula 2: Acordes Maiores Básicos (E, A, D)' },
+                { id: 'aul_2_1_3', ordem: 3, titulo: 'Aula 3: Levada Pop/Rock e Troca de Acordes' },
+                { id: 'aul_2_1_4', ordem: 4, titulo: 'Aula 4: Primeira Música Completa' }
+              ]
+            },
+            {
+              id: 'mod_2_2',
+              ordem: 2,
+              titulo: 'Módulo 2: Dedilhados e Transição de Acordes',
+              aulas: [
+                { id: 'aul_2_2_1', ordem: 1, titulo: 'Aula 1: Padrões de Dedilhado (P-I-M-A)' },
+                { id: 'aul_2_2_2', ordem: 2, titulo: 'Aula 2: Acordes Menores e com Sétima' },
+                { id: 'aul_2_2_3', ordem: 3, titulo: 'Aula 3: Repertório com Dedilhado' }
+              ]
+            },
+            {
+              id: 'mod_2_3',
+              ordem: 3,
+              titulo: 'Módulo 3: Escalas e Harmonia Prática',
+              aulas: [
+                { id: 'aul_2_3_1', ordem: 1, titulo: 'Aula 1: Escala Pentatônica no Braço' },
+                { id: 'aul_2_3_2', ordem: 2, titulo: 'Aula 2: Pestanas sem Esforço Excesso' },
+                { id: 'aul_2_3_3', ordem: 3, titulo: 'Aula 3: Aplicação de Solos e Improviso' }
+              ]
+            }
           ]
         },
         {
           id: 'plano_3',
           nome: 'Prática de Instrumento - Piano & Teclado',
           descricao: 'Estudo prático postural, leitura de partituras e repertório.',
+          valor: 320,
           criadoEm: new Date().toISOString(),
           modulos: [
-            { id: 'mod_3_1', ordem: 1, titulo: 'Módulo 1: Digitação e Postura' },
-            { id: 'mod_3_2', ordem: 2, titulo: 'Módulo 2: Leitura Rítmica e Clave de Sol' },
-            { id: 'mod_3_3', ordem: 3, titulo: 'Módulo 3: Repertório Clássico e Popular' }
+            {
+              id: 'mod_3_1',
+              ordem: 1,
+              titulo: 'Módulo 1: Digitação e Postura',
+              aulas: [
+                { id: 'aul_3_1_1', ordem: 1, titulo: 'Aula 1: Postura ao Teclado e Numeração dos Dedos' },
+                { id: 'aul_3_1_2', ordem: 2, titulo: 'Aula 2: Localização das Notas e Escala de Dó Maior' },
+                { id: 'aul_3_1_3', ordem: 3, titulo: 'Aula 3: Exercícios de Hanon para Independência' }
+              ]
+            },
+            {
+              id: 'mod_3_2',
+              ordem: 2,
+              titulo: 'Módulo 2: Leitura Rítmica e Clave de Sol',
+              aulas: [
+                { id: 'aul_3_2_1', ordem: 1, titulo: 'Aula 1: Leitura na Clave de Sol e Fá Básica' },
+                { id: 'aul_3_2_2', ordem: 2, titulo: 'Aula 2: Coordenação Bimanual' },
+                { id: 'aul_3_2_3', ordem: 3, titulo: 'Aula 3: Pequenas Peças ao Piano' }
+              ]
+            },
+            {
+              id: 'mod_3_3',
+              ordem: 3,
+              titulo: 'Módulo 3: Repertório Clássico e Popular',
+              aulas: [
+                { id: 'aul_3_3_1', ordem: 1, titulo: 'Aula 1: Acompanhamento em Cifras e Acordes' },
+                { id: 'aul_3_3_2', ordem: 2, titulo: 'Aula 2: Dinâmica e Pedal de Sustentação' },
+                { id: 'aul_3_3_3', ordem: 3, titulo: 'Aula 3: Montagem de Repertório Escolhido' }
+              ]
+            }
           ]
         }
       ];
@@ -207,9 +310,9 @@ class StorageService {
         p.nome = 'Violão e Harmonia Prática';
         p.descricao = 'Estudo de acordes, levadas rítmicas, dedilhados e repertório no violão.';
         p.modulos = [
-          { id: 'mod_2_1', ordem: 1, titulo: 'Módulo 1: Primeiros Acordes e Levadas' },
-          { id: 'mod_2_2', ordem: 2, titulo: 'Módulo 2: Dedilhados e Transição de Acordes' },
-          { id: 'mod_2_3', ordem: 3, titulo: 'Módulo 3: Escalas e Harmonia Prática' }
+          { id: 'mod_2_1', ordem: 1, titulo: 'Módulo 1: Primeiros Acordes e Levadas', aulas: [] },
+          { id: 'mod_2_2', ordem: 2, titulo: 'Módulo 2: Dedilhados e Transição de Acordes', aulas: [] },
+          { id: 'mod_2_3', ordem: 3, titulo: 'Módulo 3: Escalas e Harmonia Prática', aulas: [] }
         ];
       }
     });
@@ -713,6 +816,75 @@ class StorageService {
     return newApp;
   }
 
+  // Geração Automática de Aulas Regulares a partir do Plano Pedagógico
+  public generateAppointmentsFromPlan(
+    studentId: string,
+    planoId: string,
+    dataInicio: string,
+    horaInicio: string,
+    horaFim: string,
+    currentUserName: string
+  ): Appointment[] {
+    const student = this.students.find(s => s.id === studentId);
+    const plan = this.plans.find(p => p.id === planoId);
+    if (!student || !plan) return [];
+
+    const allLessons: { moduloId: string; moduloTitulo: string; aulaTitulo: string; aulaId: string }[] = [];
+    (plan.modulos || []).forEach(mod => {
+      (mod.aulas || []).forEach(aul => {
+        allLessons.push({
+          moduloId: mod.id,
+          moduloTitulo: mod.titulo,
+          aulaTitulo: aul.titulo,
+          aulaId: aul.id
+        });
+      });
+    });
+
+    if (allLessons.length === 0) return [];
+
+    const created: Appointment[] = [];
+    let currentDate = new Date(dataInicio + 'T12:00:00');
+
+    allLessons.forEach((item, idx) => {
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const dateStr = `${currentDate.getFullYear()}-${pad(currentDate.getMonth() + 1)}-${pad(currentDate.getDate())}`;
+
+      const appointment: Appointment = {
+        id: `app_${Date.now()}_${idx}_${Math.random().toString(36).substr(2, 4)}`,
+        alunoId: student.id,
+        planoId: plan.id,
+        moduloId: item.moduloId,
+        aulaId: item.aulaId,
+        titulo: `${item.aulaTitulo}`,
+        data: dateStr,
+        horaInicio,
+        horaFim,
+        status: 'agendado',
+        tipoAula: 'regular',
+        observacoes: `${plan.nome} • ${item.moduloTitulo}`,
+        criadoEm: new Date().toISOString()
+      };
+
+      this.appointments.push(appointment);
+      created.push(appointment);
+
+      // Próxima aula na semana seguinte (+7 dias)
+      currentDate.setDate(currentDate.getDate() + 7);
+    });
+
+    this.saveAppointments();
+
+    auditService.log({
+      tela: 'Agenda',
+      acao: 'Geração de Aulas por Plano',
+      usuarioNome: currentUserName,
+      detalhes: `Geradas ${created.length} aulas regulares para "${student.nome}" com base no plano "${plan.nome}".`
+    });
+
+    return created;
+  }
+
   // Histórico de Aulas de um Aluno
   public getStudentAppointments(studentId: string): Appointment[] {
     return this.appointments
@@ -729,11 +901,14 @@ class StorageService {
     const todayStr = this.getTodayDateString();
     let changed = false;
 
-    // Atualiza dinamicamente status pendente que já venceu para atrasado
+    // Atualiza dinamicamente status entre pendente e atrasado conforme vencimento atual
     this.payments.forEach(p => {
-      if (p.status === 'pendente' && p.dataVencimento < todayStr) {
-        p.status = 'atrasado';
-        changed = true;
+      if (p.status !== 'pago') {
+        const correctStatus: PaymentStatus = p.dataVencimento < todayStr ? 'atrasado' : 'pendente';
+        if (p.status !== correctStatus) {
+          p.status = correctStatus;
+          changed = true;
+        }
       }
     });
 
@@ -825,8 +1000,9 @@ class StorageService {
     let updatedStatus = updates.status || this.payments[index].status;
     const vencimento = updates.dataVencimento || this.payments[index].dataVencimento;
 
-    if (updatedStatus === 'pendente' && vencimento < todayStr) {
-      updatedStatus = 'atrasado';
+    // Se o pagamento não estiver pago, recalcula dinamicamente com base no vencimento
+    if (updatedStatus !== 'pago') {
+      updatedStatus = vencimento < todayStr ? 'atrasado' : 'pendente';
     }
 
     this.payments[index] = {

@@ -16,10 +16,10 @@ Multi-dispositivo com sincronização em tempo real na nuvem via MongoDB Atlas e
 2. TELAS DO SISTEMA
 --------------------------------------------------------------------------------
 Início : Visão geral com resumo do dia e próximas aulas
-Agenda : Calendário com horários de aulas e controle de reposições
-Alunos : Cadastro de alunos, ficha pedagógica e histórico
-Financeiro : Controle de mensalidades, cobranças e baixas de pagamento
-Planos : Cursos oferecidos, valores e módulos de ensino
+Agenda : Calendário de aulas com opção de gerar aulas semanais em lote a partir do plano pedagógico
+Alunos : Cadastro enxuto, seleção de plano com valor automático, máscaras (CPF/celular) e validação de menor de 18 anos
+Financeiro : Gestão de faturas com filtros rápidos (Inadimplentes/A Vencer/Pagos) e painel responsivo para cobrança via WhatsApp
+Planos : Estrutura em 3 níveis (Plano com valor fixo R$ -> Módulos -> Aulas do módulo)
 Relatórios : Emissão e exportação corporativa de dados em PDF
 Usuários : Cadastro de operadores com controle fino de permissões
 Auditoria : Rastreabilidade integral (quem fez, quando, tela e alteração)

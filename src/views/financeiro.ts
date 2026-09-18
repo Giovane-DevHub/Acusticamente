@@ -169,9 +169,25 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         </div>
       </div>
 
+      <!-- Barra de Filtros Rápidos por Botão -->
+      <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+        <button type="button" class="btn btn-sm ${statusFilter === 'todos' ? 'btn-primary' : 'btn-secondary'} btn-quick-filter" data-status="todos" style="font-size: 0.76rem; padding: 6px 12px;">
+          Todos (${allPayments.length})
+        </button>
+        <button type="button" class="btn btn-sm ${statusFilter === 'atrasado' ? 'btn-danger' : 'btn-secondary'} btn-quick-filter" data-status="atrasado" style="font-size: 0.76rem; padding: 6px 12px; ${statusFilter !== 'atrasado' ? 'color: #f87171; border-color: rgba(239, 68, 68, 0.3);' : ''}">
+          ⚠️ Inadimplentes (${alunosInadimplentes.length})
+        </button>
+        <button type="button" class="btn btn-sm ${statusFilter === 'pendente' ? 'btn-primary' : 'btn-secondary'} btn-quick-filter" data-status="pendente" style="font-size: 0.76rem; padding: 6px 12px; ${statusFilter !== 'pendente' ? 'color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);' : ''}">
+          ⏳ A Vencer (${allPayments.filter(p => p.status === 'pendente').length})
+        </button>
+        <button type="button" class="btn btn-sm ${statusFilter === 'pago' ? 'btn-primary' : 'btn-secondary'} btn-quick-filter" data-status="pago" style="font-size: 0.76rem; padding: 6px 12px; ${statusFilter !== 'pago' ? 'color: #34d399; border-color: rgba(16, 185, 129, 0.3);' : ''}">
+          ✓ Pagos (${allPayments.filter(p => p.status === 'pago').length})
+        </button>
+      </div>
+
       <!-- Filtros e Barra de Busca -->
       <div style="margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <div style="position: relative; flex: 1; min-width: 260px;">
+        <div style="position: relative; flex: 1; min-width: 240px;">
           <input 
             type="text" 
             id="fin-search-input" 
@@ -191,7 +207,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
             : ''
         }
 
-        <div style="min-width: 150px;">
+        <div style="min-width: 140px;">
           <select id="fin-status-filter" class="form-select">
             <option value="todos" ${statusFilter === 'todos' ? 'selected' : ''}>Todos os Status</option>
             <option value="pago" ${statusFilter === 'pago' ? 'selected' : ''}>✓ Pagos</option>
@@ -199,17 +215,63 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
             <option value="atrasado" ${statusFilter === 'atrasado' ? 'selected' : ''}>⚠️ Atrasados</option>
           </select>
         </div>
-
-        ${
-          statusFilter !== 'todos'
-            ? `
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-limpar-status" title="Limpar filtro de status">
-                ✕ Todos os Status
-              </button>
-            `
-            : ''
-        }
       </div>
+
+      ${
+        statusFilter === 'atrasado' && alunosInadimplentes.length > 0
+          ? `
+            <!-- Painel de Inadimplência Responsivo e Otimizado -->
+            <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: var(--radius-md); padding: 14px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #f87171; display: flex; align-items: center; gap: 8px;">
+                  <span>⚠️</span> Painel de Alunos Inadimplentes (${alunosInadimplentes.length})
+                </div>
+                <span style="font-size: 0.74rem; color: var(--text-muted);">
+                  Acesso rápido para contato e regularização
+                </span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+                ${alunosInadimplentes
+                  .map(al => {
+                    const overduePayments = allPayments.filter(p => p.alunoId === al.id && p.status === 'atrasado');
+                    const totalDevido = overduePayments.reduce((s, p) => s + p.valor, 0);
+                    const phoneDigits = (al.telefone || '').replace(/\D/g, '');
+                    const waNum = phoneDigits.length <= 11 ? `55${phoneDigits}` : phoneDigits;
+                    const waMsg = encodeURIComponent(`Olá, ${al.nome}! Identificamos pendência de mensalidade na Acusticamente. Segue a chave PIX para regularização.`);
+                    const waLink = phoneDigits ? `https://wa.me/${waNum}?text=${waMsg}` : '';
+
+                    return `
+                      <div style="background: var(--bg-surface); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <div style="min-width: 0; flex: 1;">
+                          <div style="font-weight: 600; color: var(--text-white); font-size: 0.84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${al.nome}
+                          </div>
+                          <div style="font-size: 0.74rem; color: #f87171; font-weight: 700; margin-top: 2px;">
+                            ${overduePayments.length} fatura(s) atrasada(s) &bull; R$ ${totalDevido.toFixed(2)}
+                          </div>
+                          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 1px;">
+                            ${al.telefone || 'Sem telefone'}
+                          </div>
+                        </div>
+                        ${
+                          waLink
+                            ? `
+                              <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; padding: 4px 8px; flex-shrink: 0; color: #34d399; border-color: rgba(16, 185, 129, 0.3);">
+                                ${ICONS.whatsapp} Cobrar
+                              </a>
+                            `
+                            : ''
+                        }
+                      </div>
+                    `;
+                  })
+                  .join('')}
+              </div>
+            </div>
+          `
+          : ''
+      }
 
       <!-- Tabela Principal de Pagamentos -->
       <div class="panel-card">
@@ -379,6 +441,14 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
     statusSel?.addEventListener('change', () => {
       statusFilter = statusSel.value as any;
       render();
+    });
+
+    container.querySelectorAll('.btn-quick-filter').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const status = (e.currentTarget as HTMLElement).dataset.status as any;
+        statusFilter = status;
+        render();
+      });
     });
 
     container.querySelector('#btn-limpar-status')?.addEventListener('click', () => {
@@ -692,6 +762,11 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
 
         const currentUserName = user?.nome || 'Administrador';
 
+        let finalStatus = status;
+        if (finalStatus !== 'pago') {
+          finalStatus = dataVencimento < todayStr ? 'atrasado' : 'pendente';
+        }
+
         if (isEditing && existingPayment) {
           storageService.updatePayment(
             existingPayment.id,
@@ -700,9 +775,9 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
               mesReferencia,
               valor,
               dataVencimento,
-              status,
+              status: finalStatus,
               formaPagamento,
-              dataPagamento: status === 'pago' ? (existingPayment.dataPagamento || todayStr) : undefined,
+              dataPagamento: finalStatus === 'pago' ? (existingPayment.dataPagamento || todayStr) : undefined,
               observacoes
             },
             currentUserName
@@ -716,9 +791,9 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
               mesReferencia,
               valor,
               dataVencimento,
-              status,
+              status: finalStatus,
               formaPagamento,
-              dataPagamento: status === 'pago' ? todayStr : undefined,
+              dataPagamento: finalStatus === 'pago' ? todayStr : undefined,
               observacoes
             },
             currentUserName
@@ -731,9 +806,19 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
       }
     });
 
-    // Se aluno for selecionado no cadastro de novo pagamento, preenche valor padrão
-    if (!isEditing) {
-      setTimeout(() => {
+    setTimeout(() => {
+      // Recalcula o status no formulário dinamicamente ao mudar a data de vencimento
+      const vencInput = document.getElementById('pay-vencimento') as HTMLInputElement;
+      const statusSelect = document.getElementById('pay-status') as HTMLSelectElement;
+
+      vencInput?.addEventListener('change', () => {
+        if (statusSelect && statusSelect.value !== 'pago') {
+          statusSelect.value = vencInput.value < todayStr ? 'atrasado' : 'pendente';
+        }
+      });
+
+      // Se aluno for selecionado no cadastro de novo pagamento, preenche valor padrão
+      if (!isEditing) {
         const selAluno = document.getElementById('pay-aluno') as HTMLSelectElement;
         selAluno?.addEventListener('change', () => {
           const st = students.find(s => s.id === selAluno.value);
@@ -744,8 +829,8 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
             }
           }
         });
-      }, 50);
-    }
+      }
+    }, 50);
   }
 
   render();

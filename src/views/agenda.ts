@@ -545,100 +545,164 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
 
     const studentOptions = students
       .map(
-        s => `<option value="${s.id}" ${selectedStudentId === s.id ? 'selected' : ''}>${s.nome} (${s.instrumentoPrincipal || 'Geral'}) - Saldo: ${s.saldoReposicoes || 0} rep.</option>`
+        s => `<option value="${s.id}" ${selectedStudentId === s.id ? 'selected' : ''} data-planoid="${s.planoId || ''}">${s.nome} (${s.instrumentoPrincipal || 'Geral'})</option>`
       )
       .join('');
 
     const planOptions = plans
-      .map(
-        p => `<option value="${p.id}" ${existingApp?.planoId === p.id ? 'selected' : ''}>${p.nome}</option>`
-      )
+      .map(p => {
+        const totalAulas = (p.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0);
+        return `<option value="${p.id}" ${existingApp?.planoId === p.id ? 'selected' : ''} data-total-aulas="${totalAulas}">${p.nome} (${totalAulas} aulas)</option>`;
+      })
       .join('');
+
+    let activeTab: 'plano' | 'manual' = isEditing || isReposicao ? 'manual' : 'plano';
 
     const bodyHtml = `
       <form id="app-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         
-        <!-- Tipo de Aula -->
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
-          <label class="form-label" style="margin: 0; font-weight: 600; color: var(--text-white);">Tipo de Aula:</label>
-          <div style="display: flex; gap: 14px;">
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 0.85rem; color: var(--text-white);">
-              <input type="radio" name="app-tipo-aula" value="regular" ${!isReposicao ? 'checked' : ''} style="accent-color: var(--color-coral);" />
-              Aula Regular
-            </label>
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 0.85rem; color: #4ade80;">
-              <input type="radio" name="app-tipo-aula" value="reposicao" ${isReposicao ? 'checked' : ''} style="accent-color: #22c55e;" />
-              🔄 Aula de Reposição
-            </label>
-          </div>
-        </div>
+        ${
+          !isEditing && !isReposicao
+            ? `
+              <!-- Seletor de Modo de Agendamento -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 4px; display: flex; gap: 4px;">
+                <button type="button" class="btn btn-sm ${activeTab === 'plano' ? 'btn-primary' : 'btn-secondary'} btn-app-mode" data-mode="plano" style="flex: 1; font-size: 0.8rem; padding: 6px 10px;">
+                  📚 Gerar pelo Plano Pedagógico
+                </button>
+                <button type="button" class="btn btn-sm ${activeTab === 'manual' ? 'btn-primary' : 'btn-secondary'} btn-app-mode" data-mode="manual" style="flex: 1; font-size: 0.8rem; padding: 6px 10px;">
+                  ✏️ Agendamento Manual
+                </button>
+              </div>
+            `
+            : ''
+        }
 
-        <div class="form-group" style="margin: 0;">
-          <label class="form-label" for="app-title">Título da Aula / Conteúdo Previsto</label>
-          <input type="text" id="app-title" class="form-input" placeholder="Ex: Aula de Violão - Módulo 2" value="${existingApp?.titulo || options?.titulo || ''}" required />
-        </div>
-
-        <div class="form-group" style="margin: 0;">
-          <label class="form-label" for="app-student">Aluno Matriculado</label>
-          <select id="app-student" class="form-select" required>
-            <option value="">Selecione o Aluno...</option>
-            ${studentOptions}
-          </select>
-        </div>
-
-        <div class="form-group" style="margin: 0;">
-          <label class="form-label" for="app-plan">Plano de Ensino (Opcional)</label>
-          <select id="app-plan" class="form-select">
-            <option value="">Selecione o Plano...</option>
-            ${planOptions}
-          </select>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-          <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="app-date">Data</label>
-            <input type="date" id="app-date" class="form-input" value="${modalDate}" required />
+        <!-- PAINEL 1: GERAR PELO PLANO PEDAGÓGICO -->
+        <div id="panel-app-plano" style="display: ${activeTab === 'plano' ? 'flex' : 'none'}; flex-direction: column; gap: 12px;">
+          <div style="background: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.25); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.78rem; color: #fca5a5;">
+            💡 <strong>Geração Automática:</strong> As aulas serão agendadas semanalmente na agenda a partir da data de início, cobrindo todos os módulos do plano selecionado.
           </div>
 
           <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="app-time-start">Início</label>
-            <input type="time" id="app-time-start" class="form-input" value="${existingApp?.horaInicio || '09:00'}" required />
-          </div>
-
-          <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="app-time-end">Término</label>
-            <input type="time" id="app-time-end" class="form-input" value="${existingApp?.horaFim || '10:00'}" required />
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="app-status">Status da Aula</label>
-            <select id="app-status" class="form-select">
-              <option value="agendado" ${existingApp?.status === 'agendado' ? 'selected' : ''}>⏳ Agendado</option>
-              <option value="concluido" ${existingApp?.status === 'concluido' ? 'selected' : ''}>✓ Concluído / Presente</option>
-              <option value="falta_justificada" ${existingApp?.status === 'falta_justificada' ? 'selected' : ''}>⚠️ Falta Justificada (+1 Reposição)</option>
-              <option value="falta_injustificada" ${existingApp?.status === 'falta_injustificada' ? 'selected' : ''}>✕ Falta Injustificada</option>
-              <option value="cancelado" ${existingApp?.status === 'cancelado' ? 'selected' : ''}>🚫 Cancelado</option>
+            <label class="form-label" for="app-plan-student">Aluno *</label>
+            <select id="app-plan-student" class="form-select" required>
+              <option value="">Selecione o Aluno...</option>
+              ${studentOptions}
             </select>
           </div>
 
-          <div class="form-group" style="margin: 0;" id="box-justificativa">
-            <label class="form-label" for="app-justificativa">Justificativa da Falta (se houver)</label>
-            <input type="text" id="app-justificativa" class="form-input" placeholder="Ex: Atestado, viagem, imprevisto..." value="${existingApp?.justificativaFalta || ''}" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" for="app-plan-select">Plano Pedagógico *</label>
+            <select id="app-plan-select" class="form-select" required>
+              <option value="">Selecione o Plano...</option>
+              ${planOptions}
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-plan-date-start">Data da 1ª Aula *</label>
+              <input type="date" id="app-plan-date-start" class="form-input" value="${modalDate}" required />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-plan-time-start">Início *</label>
+              <input type="time" id="app-plan-time-start" class="form-input" value="14:00" required />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-plan-time-end">Fim *</label>
+              <input type="time" id="app-plan-time-end" class="form-input" value="15:00" required />
+            </div>
           </div>
         </div>
 
-        <div class="form-group" style="margin: 0;">
-          <label class="form-label" for="app-obs">Observações / Orientações</label>
-          <textarea id="app-obs" class="form-textarea" rows="2" placeholder="Repertório trabalhado, exercícios para casa...">${existingApp?.observacoes || ''}</textarea>
+        <!-- PAINEL 2: AGENDAMENTO MANUAL / EDIÇÃO -->
+        <div id="panel-app-manual" style="display: ${activeTab === 'manual' ? 'flex' : 'none'}; flex-direction: column; gap: 12px;">
+          <!-- Tipo de Aula -->
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+            <label class="form-label" style="margin: 0; font-size: 0.82rem; font-weight: 600;">Tipo:</label>
+            <div style="display: flex; gap: 14px;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 0.82rem; color: var(--text-white);">
+                <input type="radio" name="app-tipo-aula" value="regular" ${!isReposicao ? 'checked' : ''} style="accent-color: var(--color-coral);" />
+                Regular
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 0.82rem; color: #4ade80;">
+                <input type="radio" name="app-tipo-aula" value="reposicao" ${isReposicao ? 'checked' : ''} style="accent-color: #22c55e;" />
+                🔄 Reposição
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" for="app-title">Título *</label>
+            <input type="text" id="app-title" class="form-input" placeholder="Ex: Aula de Violão - Introdução" value="${existingApp?.titulo || options?.titulo || ''}" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-student">Aluno *</label>
+              <select id="app-student" class="form-select">
+                <option value="">Selecione...</option>
+                ${studentOptions}
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-plan">Plano</label>
+              <select id="app-plan" class="form-select">
+                <option value="">Sem plano fixo</option>
+                ${planOptions}
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-date">Data *</label>
+              <input type="date" id="app-date" class="form-input" value="${modalDate}" />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-time-start">Início *</label>
+              <input type="time" id="app-time-start" class="form-input" value="${existingApp?.horaInicio || '09:00'}" />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-time-end">Fim *</label>
+              <input type="time" id="app-time-end" class="form-input" value="${existingApp?.horaFim || '10:00'}" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="app-status">Status *</label>
+              <select id="app-status" class="form-select">
+                <option value="agendado" ${existingApp?.status === 'agendado' ? 'selected' : ''}>⏳ Agendado</option>
+                <option value="concluido" ${existingApp?.status === 'concluido' ? 'selected' : ''}>✓ Presente</option>
+                <option value="falta_justificada" ${existingApp?.status === 'falta_justificada' ? 'selected' : ''}>⚠️ Falta Justificada (+1 Reposição)</option>
+                <option value="falta_injustificada" ${existingApp?.status === 'falta_injustificada' ? 'selected' : ''}>✕ Falta Injustificada</option>
+                <option value="cancelado" ${existingApp?.status === 'cancelado' ? 'selected' : ''}>🚫 Cancelado</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;" id="box-justificativa">
+              <label class="form-label" for="app-justificativa">Justificativa</label>
+              <input type="text" id="app-justificativa" class="form-input" placeholder="Motivo da falta..." value="${existingApp?.justificativaFalta || ''}" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" for="app-obs">Observações</label>
+            <textarea id="app-obs" class="form-textarea" rows="2" placeholder="Orientações e conteúdo...">${existingApp?.observacoes || ''}</textarea>
+          </div>
         </div>
 
         ${
           isEditing
             ? `<div style="padding-top: 10px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between;">
                  <button type="button" class="btn btn-danger" id="btn-delete-app" style="padding: 6px 14px; font-size: 0.8rem;">
-                   ${ICONS.trash} Excluir Compromisso
+                   ${ICONS.trash} Excluir Aula
                  </button>
                </div>`
             : ''
@@ -647,10 +711,53 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
     `;
 
     openModal({
-      title: isEditing ? 'Editar Aula / Compromisso' : isReposicao ? '🔄 Agendar Aula de Reposição' : 'Cadastrar Nova Aula',
+      title: isEditing ? 'Editar Aula' : isReposicao ? '🔄 Agendar Reposição' : 'Cadastrar Nova Aula',
       bodyHtml,
-      confirmText: isEditing ? 'Salvar Alterações' : 'Confirmar Agendamento',
+      confirmText: isEditing ? 'Salvar' : 'Confirmar',
       onConfirm: () => {
+        const currentUserName = user?.nome || 'Administrador';
+
+        // 1. GERAÇÃO AUTOMÁTICA PELO PLANO
+        if (activeTab === 'plano' && !isEditing) {
+          const studentId = (document.getElementById('app-plan-student') as HTMLSelectElement).value;
+          const planId = (document.getElementById('app-plan-select') as HTMLSelectElement).value;
+          const dateStart = (document.getElementById('app-plan-date-start') as HTMLInputElement).value;
+          const timeStart = (document.getElementById('app-plan-time-start') as HTMLInputElement).value;
+          const timeEnd = (document.getElementById('app-plan-time-end') as HTMLInputElement).value;
+
+          if (!studentId) {
+            showToast('Selecione o aluno.', 'error');
+            return false;
+          }
+          if (!planId) {
+            showToast('Selecione o plano pedagógico.', 'error');
+            return false;
+          }
+          if (!dateStart || !timeStart || !timeEnd) {
+            showToast('Informe data de início e horários.', 'error');
+            return false;
+          }
+
+          const created = storageService.generateAppointmentsFromPlan(
+            studentId,
+            planId,
+            dateStart,
+            timeStart,
+            timeEnd,
+            currentUserName
+          );
+
+          if (created.length === 0) {
+            showToast('O plano selecionado não possui aulas cadastradas em seus módulos.', 'info');
+            return false;
+          }
+
+          showToast(`Sucesso! ${created.length} aulas regulares foram geradas na agenda.`, 'success');
+          buildCalendarView();
+          return true;
+        }
+
+        // 2. AGENDAMENTO MANUAL OU EDIÇÃO
         const title = (document.getElementById('app-title') as HTMLInputElement).value.trim();
         const studentId = (document.getElementById('app-student') as HTMLSelectElement).value;
         const planId = (document.getElementById('app-plan') as HTMLSelectElement).value;
@@ -668,8 +775,6 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
           showToast('Preencha os campos obrigatórios (Título, Aluno, Data e Início).', 'error');
           return false;
         }
-
-        const currentUserName = user?.nome || 'Administrador';
 
         if (isEditing && existingApp) {
           storageService.updateAppointment(
@@ -706,7 +811,7 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
               options?.aulaOriginalId,
               currentUserName
             );
-            showToast('Aula de reposição agendada com sucesso (1 crédito abatido)!', 'success');
+            showToast('Aula de reposição agendada (1 crédito abatido)!', 'success');
           } else {
             storageService.addAppointment(
               {
@@ -732,22 +837,55 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
       }
     });
 
-    if (isEditing && existingApp) {
-      setTimeout(() => {
+    setTimeout(() => {
+      // Alternância de modo (Plano vs Manual)
+      const modeBtns = document.querySelectorAll('.btn-app-mode');
+      const panelPlano = document.getElementById('panel-app-plano');
+      const panelManual = document.getElementById('panel-app-manual');
+
+      modeBtns.forEach(btn => {
+        btn.addEventListener('click', e => {
+          const mode = (e.currentTarget as HTMLElement).dataset.mode as 'plano' | 'manual';
+          activeTab = mode;
+          modeBtns.forEach(b => {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-secondary');
+          });
+          (e.currentTarget as HTMLElement).classList.remove('btn-secondary');
+          (e.currentTarget as HTMLElement).classList.add('btn-primary');
+
+          if (panelPlano) panelPlano.style.display = mode === 'plano' ? 'flex' : 'none';
+          if (panelManual) panelManual.style.display = mode === 'manual' ? 'flex' : 'none';
+        });
+      });
+
+      // Auto-seleciona plano ao escolher aluno no modo plano
+      const planStudentSelect = document.getElementById('app-plan-student') as HTMLSelectElement;
+      planStudentSelect?.addEventListener('change', () => {
+        const selectedOpt = planStudentSelect.selectedOptions[0];
+        const studentPlanId = selectedOpt?.getAttribute('data-planoid');
+        if (studentPlanId) {
+          const planSelect = document.getElementById('app-plan-select') as HTMLSelectElement;
+          if (planSelect) planSelect.value = studentPlanId;
+        }
+      });
+
+      // Exclusão de aula
+      if (isEditing && existingApp) {
         document.getElementById('btn-delete-app')?.addEventListener('click', () => {
           confirmAction({
-            title: 'Excluir Compromisso',
-            message: `Deseja realmente excluir o compromisso "<strong>${existingApp.titulo}</strong>"?`,
+            title: 'Excluir Aula',
+            message: `Deseja realmente excluir a aula "<strong>${existingApp.titulo}</strong>"?`,
             onConfirm: () => {
               storageService.deleteAppointment(existingApp.id, user?.nome || 'Administrador');
-              showToast('Compromisso removido.', 'info');
+              showToast('Aula removida.', 'info');
               closeModal();
               buildCalendarView();
             }
           });
         });
-      }, 50);
-    }
+      }
+    }, 50);
   }
 
   buildCalendarView();

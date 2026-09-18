@@ -80,11 +80,13 @@ export interface Student {
   nome: string;
   email: string;
   telefone: string;
+  cpf?: string;
   dataNascimento?: string;
   instrumentoPrincipal?: string;
   nivelMusical?: MusicalLevel;
   responsavelNome?: string;
   responsavelTelefone?: string;
+  responsavelCpf?: string;
   responsavelParentesco?: string;
   planoId: string;
   moduloAtual?: string;
@@ -96,17 +98,29 @@ export interface Student {
   criadoEm: string;
 }
 
+export interface PlanLesson {
+  id: string;
+  ordem: number;
+  titulo: string;
+  conteudo?: string;
+  duracaoMinutos?: number;
+}
+
 export interface PlanModule {
   id: string;
   ordem: number;
   titulo: string;
   descricao?: string;
+  aulas: PlanLesson[];
 }
 
 export interface TeachingPlan {
   id: string;
   nome: string;
   descricao: string;
+  valor?: number;
+  instrumento?: string;
+  nivel?: MusicalLevel;
   modulos: PlanModule[];
   criadoEm: string;
 }
@@ -126,6 +140,7 @@ export interface Appointment {
   alunoId: string;
   planoId?: string;
   moduloId?: string;
+  aulaId?: string;
   data: string; // YYYY-MM-DD
   horaInicio: string; // HH:mm
   horaFim: string; // HH:mm
