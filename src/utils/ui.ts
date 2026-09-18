@@ -167,6 +167,28 @@ export function maskPhone(value: string): string {
     .replace(/(\d{5})(\d{1,4})$/, '$1-$2');
 }
 
+export function maskCNPJ(value: string): string {
+  const v = value.replace(/\D/g, '').slice(0, 14);
+  if (v.length > 12) {
+    return v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/, '$1.$2.$3/$4-$5');
+  } else if (v.length > 8) {
+    return v.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/, '$1.$2.$3/$4');
+  } else if (v.length > 5) {
+    return v.replace(/^(\d{2})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+  } else if (v.length > 2) {
+    return v.replace(/^(\d{2})(\d{1,3})$/, '$1.$2');
+  }
+  return v;
+}
+
+export function maskCEP(value: string): string {
+  const v = value.replace(/\D/g, '').slice(0, 8);
+  if (v.length > 5) {
+    return v.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
+  }
+  return v;
+}
+
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

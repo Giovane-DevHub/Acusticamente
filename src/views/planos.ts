@@ -223,36 +223,15 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
   function openPlanModal(existingPlan?: TeachingPlan): void {
     const isEditing = !!existingPlan;
 
-    // Cópia clonada dos módulos para manipulação reativa
+    // Cópia clonada dos módulos para manipulação reativa (novo plano sempre inicia vazio)
     let currentModules: PlanModule[] = existingPlan
       ? JSON.parse(JSON.stringify(existingPlan.modulos || []))
-      : [
-          {
-            id: 'm1',
-            ordem: 1,
-            titulo: 'Módulo 1: Fundamentos',
-            aulas: [
-              { id: 'a1_1', ordem: 1, titulo: 'Aula 1: Introdução e Postura' },
-              { id: 'a1_2', ordem: 2, titulo: 'Aula 2: Primeiros Exercícios' }
-            ]
-          },
-          {
-            id: 'm2',
-            ordem: 2,
-            titulo: 'Módulo 2: Prática e Repertório',
-            aulas: [
-              { id: 'a2_1', ordem: 1, titulo: 'Aula 1: Exercícios Rítmicos' },
-              { id: 'a2_2', ordem: 2, titulo: 'Aula 2: Montagem de Música' }
-            ]
-          }
-        ];
+      : [];
 
-    // Garante que cada módulo tenha a propriedade aulas
-    currentModules.forEach((m, idx) => {
+    // Garante que cada módulo existente tenha a propriedade aulas como array
+    currentModules.forEach(m => {
       if (!Array.isArray(m.aulas)) {
-        m.aulas = [
-          { id: `aul_${m.id || idx}_1`, ordem: 1, titulo: 'Aula 1: Fundamentos' }
-        ];
+        m.aulas = [];
       }
     });
 
@@ -326,6 +305,9 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
                   Aulas deste Módulo (${m.aulas.length}):
                 </div>
 
+                ${m.aulas.length === 0
+                  ? `<div style="font-size: 0.74rem; color: var(--text-muted); font-style: italic; padding: 2px 0;">Nenhuma aula cadastrada neste módulo.</div>`
+                  : ''}
                 ${m.aulas
                   .map(
                     (aul, aIdx) => `
@@ -411,10 +393,10 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
                 type="number" 
                 id="plan-valor" 
                 class="form-input" 
-                placeholder="280.00" 
+                placeholder="Ex: 280.00" 
                 step="5" 
                 min="0" 
-                value="${existingPlan?.valor ?? 280}" 
+                value="${existingPlan?.valor !== undefined ? existingPlan.valor : ''}" 
                 required 
                 style="padding: 7px 10px; font-size: 0.84rem;"
               />
@@ -487,7 +469,8 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       onConfirm: () => {
         const nome = (document.getElementById('plan-nome') as HTMLInputElement).value.trim();
         const valorInput = (document.getElementById('plan-valor') as HTMLInputElement).value;
-        const valor = parseFloat(valorInput) || 280;
+        const valorParsed = parseFloat(valorInput);
+        const valor = !isNaN(valorParsed) ? valorParsed : 0;
         const desc = (document.getElementById('plan-desc') as HTMLInputElement).value.trim();
 
         // Validar e sanitizar módulos e suas aulas
@@ -512,6 +495,11 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
 
         if (!nome) {
           showToast('Informe o nome do plano de ensino.', 'error');
+          return false;
+        }
+
+        if (isNaN(valorParsed) || valorParsed <= 0) {
+          showToast('Informe o valor fixo da mensalidade do plano.', 'error');
           return false;
         }
 
@@ -681,9 +669,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
         id: 'mod_' + nextOrder + '_' + Date.now(),
         ordem: nextOrder,
         titulo: val,
-        aulas: [
-          { id: `aul_m${nextOrder}_1`, ordem: 1, titulo: 'Aula 1: Fundamentos' }
-        ]
+        aulas: []
       });
 
       inputEl.value = '';

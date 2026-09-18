@@ -2,7 +2,7 @@ import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { MongoConnectionService } from '../services/mongoService';
 import { renderBrandLogo } from '../assets/logo';
-import { showToast, confirmAction } from '../utils/ui';
+import { showToast, confirmAction, applyInputMask, maskCNPJ, maskCEP, maskPhone, isValidEmail } from '../utils/ui';
 
 export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -85,7 +85,7 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
                   class="form-input" 
                   placeholder="00.000.000/0001-00" 
                   maxlength="18"
-                  value="${settings.cnpj || ''}" 
+                  value="${maskCNPJ(settings.cnpj || '')}" 
                 />
               </div>
 
@@ -106,8 +106,9 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
                   type="text" 
                   id="cfg-tel" 
                   class="form-input" 
-                  placeholder="(11) 98765-4321"
-                  value="${settings.telefoneContato}" 
+                  placeholder="(00) 00000-0000"
+                  maxlength="15"
+                  value="${maskPhone(settings.telefoneContato || '')}" 
                   required 
                 />
               </div>
@@ -147,7 +148,7 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
                   class="form-input" 
                   placeholder="00000-000" 
                   maxlength="9"
-                  value="${settings.cep || ''}" 
+                  value="${maskCEP(settings.cep || '')}" 
                 />
               </div>
 
@@ -500,30 +501,15 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
     showToast('Configurações gerais salvas com sucesso!', 'success');
   });
 
-  // Máscaras visuais automáticas para campos de tamanho fixo (CNPJ, CEP e UF)
+  // Máscaras de entrada padronizadas
   const inputCnpj = container.querySelector('#cfg-cnpj') as HTMLInputElement;
-  inputCnpj?.addEventListener('input', (e) => {
-    let v = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 14);
-    if (v.length > 12) {
-      v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/, '$1.$2.$3/$4-$5');
-    } else if (v.length > 8) {
-      v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/, '$1.$2.$3/$4');
-    } else if (v.length > 5) {
-      v = v.replace(/^(\d{2})(\d{3})(\d{1,3})$/, '$1.$2.$3');
-    } else if (v.length > 2) {
-      v = v.replace(/^(\d{2})(\d{1,3})$/, '$1.$2');
-    }
-    (e.target as HTMLInputElement).value = v;
-  });
+  if (inputCnpj) applyInputMask(inputCnpj, maskCNPJ);
+
+  const inputTel = container.querySelector('#cfg-tel') as HTMLInputElement;
+  if (inputTel) applyInputMask(inputTel, maskPhone);
 
   const inputCep = container.querySelector('#cfg-cep') as HTMLInputElement;
-  inputCep?.addEventListener('input', (e) => {
-    let v = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 8);
-    if (v.length > 5) {
-      v = v.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
-    }
-    (e.target as HTMLInputElement).value = v;
-  });
+  if (inputCep) applyInputMask(inputCep, maskCEP);
 
   const inputUf = container.querySelector('#cfg-uf') as HTMLInputElement;
   inputUf?.addEventListener('input', (e) => {
@@ -534,21 +520,49 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
   const formInstitucional = container.querySelector('#form-settings-institucional') as HTMLFormElement;
   formInstitucional?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const nomeFantasia = (container.querySelector('#cfg-fantasia') as HTMLInputElement).value;
-    const razaoSocial = (container.querySelector('#cfg-razao') as HTMLInputElement).value;
-    const cnpj = (container.querySelector('#cfg-cnpj') as HTMLInputElement).value;
-    const ie = (container.querySelector('#cfg-ie') as HTMLInputElement).value;
-    const tel = (container.querySelector('#cfg-tel') as HTMLInputElement).value;
-    const email = (container.querySelector('#cfg-email') as HTMLInputElement).value;
-    const site = (container.querySelector('#cfg-site') as HTMLInputElement).value;
+    const nomeFantasia = (container.querySelector('#cfg-fantasia') as HTMLInputElement).value.trim();
+    const razaoSocial = (container.querySelector('#cfg-razao') as HTMLInputElement).value.trim();
+    const cnpj = (container.querySelector('#cfg-cnpj') as HTMLInputElement).value.trim();
+    const ie = (container.querySelector('#cfg-ie') as HTMLInputElement).value.trim();
+    const tel = (container.querySelector('#cfg-tel') as HTMLInputElement).value.trim();
+    const email = (container.querySelector('#cfg-email') as HTMLInputElement).value.trim();
+    const site = (container.querySelector('#cfg-site') as HTMLInputElement).value.trim();
 
-    const cep = (container.querySelector('#cfg-cep') as HTMLInputElement).value;
-    const logradouro = (container.querySelector('#cfg-logradouro') as HTMLInputElement).value;
-    const numero = (container.querySelector('#cfg-numero') as HTMLInputElement).value;
-    const complemento = (container.querySelector('#cfg-complemento') as HTMLInputElement).value;
-    const bairro = (container.querySelector('#cfg-bairro') as HTMLInputElement).value;
-    const cidade = (container.querySelector('#cfg-cidade') as HTMLInputElement).value;
-    const uf = (container.querySelector('#cfg-uf') as HTMLInputElement).value.toUpperCase();
+    const cep = (container.querySelector('#cfg-cep') as HTMLInputElement).value.trim();
+    const logradouro = (container.querySelector('#cfg-logradouro') as HTMLInputElement).value.trim();
+    const numero = (container.querySelector('#cfg-numero') as HTMLInputElement).value.trim();
+    const complemento = (container.querySelector('#cfg-complemento') as HTMLInputElement).value.trim();
+    const bairro = (container.querySelector('#cfg-bairro') as HTMLInputElement).value.trim();
+    const cidade = (container.querySelector('#cfg-cidade') as HTMLInputElement).value.trim();
+    const uf = (container.querySelector('#cfg-uf') as HTMLInputElement).value.trim().toUpperCase();
+
+    if (!nomeFantasia) {
+      showToast('Informe o Nome Fantasia da instituição.', 'error');
+      return;
+    }
+
+    if (email && !isValidEmail(email)) {
+      showToast('Informe um endereço de e-mail válido.', 'error');
+      return;
+    }
+
+    const cnpjDigits = cnpj.replace(/\D/g, '');
+    if (cnpjDigits.length > 0 && cnpjDigits.length !== 14) {
+      showToast('CNPJ incompleto (deve conter 14 dígitos).', 'error');
+      return;
+    }
+
+    const telDigits = tel.replace(/\D/g, '');
+    if (telDigits.length > 0 && telDigits.length < 10) {
+      showToast('Telefone/WhatsApp incompleto.', 'error');
+      return;
+    }
+
+    const cepDigits = cep.replace(/\D/g, '');
+    if (cepDigits.length > 0 && cepDigits.length !== 8) {
+      showToast('CEP incompleto (deve conter 8 dígitos).', 'error');
+      return;
+    }
 
     storageService.updateSettings(
       {
