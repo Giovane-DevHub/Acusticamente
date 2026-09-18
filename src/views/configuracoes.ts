@@ -2,7 +2,7 @@ import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { MongoConnectionService } from '../services/mongoService';
 import { renderBrandLogo } from '../assets/logo';
-import { showToast, confirmAction, applyInputMask, maskCNPJ, maskCEP, maskPhone, isValidEmail } from '../utils/ui';
+import { showToast, confirmAction, applyInputMask, maskCNPJ, maskCEP, maskPhone, maskIE, isValidEmail } from '../utils/ui';
 
 export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -96,7 +96,7 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
                   id="cfg-ie" 
                   class="form-input" 
                   placeholder="Isento ou nº"
-                  value="${settings.inscricaoEstadual || ''}" 
+                  value="${maskIE(settings.inscricaoEstadual || '')}" 
                 />
               </div>
 
@@ -504,6 +504,9 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
   // Máscaras de entrada padronizadas
   const inputCnpj = container.querySelector('#cfg-cnpj') as HTMLInputElement;
   if (inputCnpj) applyInputMask(inputCnpj, maskCNPJ);
+
+  const inputIe = container.querySelector('#cfg-ie') as HTMLInputElement;
+  if (inputIe) applyInputMask(inputIe, maskIE);
 
   const inputTel = container.querySelector('#cfg-tel') as HTMLInputElement;
   if (inputTel) applyInputMask(inputTel, maskPhone);

@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Payment, PaymentMethod, PaymentStatus, Student } from '../types';
-import { ICONS, openModal, closeModal, showToast, confirmAction } from '../utils/ui';
+import { ICONS, openModal, closeModal, showToast, confirmAction, applyInputMask, maskYearMonth, maskMoney, parseMoney } from '../utils/ui';
 import { openReceiptModal } from './alunos';
 
 export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElement {
@@ -678,15 +678,15 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
           </div>
 
           <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="pay-mes">Mês Ref. (YYYY-MM)</label>
-            <input type="text" id="pay-mes" class="form-input" placeholder="2026-10" value="${existingPayment?.mesReferencia || ''}" />
+            <label class="form-label" for="pay-mes">Mês Ref. (AAAA-MM)</label>
+            <input type="text" id="pay-mes" class="form-input" placeholder="2026-10" maxlength="7" value="${existingPayment?.mesReferencia || ''}" />
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <div class="form-group" style="margin: 0;">
             <label class="form-label" for="pay-valor">Valor (R$)</label>
-            <input type="number" id="pay-valor" class="form-input" min="0" step="5" placeholder="280.00" value="${existingPayment?.valor ?? 280}" required />
+            <input type="text" id="pay-valor" class="form-input" placeholder="0,00" value="${existingPayment ? maskMoney(existingPayment.valor) : '280,00'}" required />
           </div>
 
           <div class="form-group" style="margin: 0;">
@@ -710,9 +710,9 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
             <select id="pay-forma" class="form-select">
               <option value="">Não informada</option>
               <option value="pix" ${existingPayment?.formaPagamento === 'pix' ? 'selected' : ''}>PIX</option>
-              <option value="dinheiro" ${existingPayment?.formaPagamento === 'dinheiro' ? 'selected' : ''}>Dinheiro</option>
               <option value="cartao_credito" ${existingPayment?.formaPagamento === 'cartao_credito' ? 'selected' : ''}>Cartão de Crédito</option>
               <option value="cartao_debito" ${existingPayment?.formaPagamento === 'cartao_debito' ? 'selected' : ''}>Cartão de Débito</option>
+              <option value="dinheiro" ${existingPayment?.formaPagamento === 'dinheiro' ? 'selected' : ''}>Dinheiro</option>
               <option value="boleto" ${existingPayment?.formaPagamento === 'boleto' ? 'selected' : ''}>Boleto</option>
               <option value="transferencia" ${existingPayment?.formaPagamento === 'transferencia' ? 'selected' : ''}>Transferência</option>
             </select>
@@ -720,14 +720,14 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         </div>
 
         <div class="form-group" style="margin: 0;">
-          <label class="form-label" for="pay-obs">Observações Adicionais</label>
+          <label class="form-label" for="pay-obs">Observações</label>
           <input type="text" id="pay-obs" class="form-input" placeholder="Detalhes opcionais sobre o lançamento..." value="${existingPayment?.observacoes || ''}" />
         </div>
       </form>
     `;
 
     openModal({
-      title: isEditing ? `Editar Lançamento: ${existingPayment.descricao}` : 'Novo Lançamento Financeiro',
+      title: isEditing ? 'Editar Lançamento' : 'Novo Lançamento Financeiro',
       bodyHtml,
       modalClass: 'modal-md',
       confirmText: isEditing ? 'Salvar Alterações' : 'Cadastrar Lançamento',
@@ -737,7 +737,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         const descricao = (document.getElementById('pay-desc') as HTMLInputElement).value.trim();
         const mesReferencia = (document.getElementById('pay-mes') as HTMLInputElement).value.trim() || undefined;
         const valorInput = (document.getElementById('pay-valor') as HTMLInputElement).value;
-        const valor = parseFloat(valorInput) || 0;
+        const valor = parseMoney(valorInput);
         const dataVencimento = (document.getElementById('pay-vencimento') as HTMLInputElement).value;
         const status = (document.getElementById('pay-status') as HTMLSelectElement).value as PaymentStatus;
         const formaPagamento = ((document.getElementById('pay-forma') as HTMLSelectElement).value as PaymentMethod) || undefined;
@@ -749,6 +749,10 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
         }
         if (!descricao) {
           showToast('Informe a descrição do lançamento.', 'error');
+          return false;
+        }
+        if (mesReferencia && !/^\d{4}-\d{2}$/.test(mesReferencia)) {
+          showToast('Mês de referência deve estar no formato AAAA-MM (Ex: 2026-10).', 'error');
           return false;
         }
         if (valor <= 0) {
@@ -807,6 +811,13 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
     });
 
     setTimeout(() => {
+      // Aplica máscaras aos inputs do modal
+      const inpMes = document.getElementById('pay-mes') as HTMLInputElement;
+      if (inpMes) applyInputMask(inpMes, maskYearMonth);
+
+      const inpValor = document.getElementById('pay-valor') as HTMLInputElement;
+      if (inpValor) applyInputMask(inpValor, maskMoney);
+
       // Recalcula o status no formulário dinamicamente ao mudar a data de vencimento
       const vencInput = document.getElementById('pay-vencimento') as HTMLInputElement;
       const statusSelect = document.getElementById('pay-status') as HTMLSelectElement;
@@ -825,7 +836,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
           if (st) {
             const inpValor = document.getElementById('pay-valor') as HTMLInputElement;
             if (inpValor && typeof st.valorMensalidade === 'number') {
-              inpValor.value = st.valorMensalidade.toString();
+              inpValor.value = maskMoney(st.valorMensalidade);
             }
           }
         });

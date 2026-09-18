@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { TeachingPlan, PlanModule, PlanLesson } from '../types';
-import { ICONS, openModal, showToast, confirmAction } from '../utils/ui';
+import { ICONS, openModal, showToast, confirmAction, applyInputMask, maskMoney, parseMoney } from '../utils/ui';
 
 export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -390,13 +390,11 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
             <div class="form-group" style="margin: 0;">
               <label class="form-label" for="plan-valor" style="font-size: 0.78rem;">Valor Fixo (R$) *</label>
               <input 
-                type="number" 
+                type="text" 
                 id="plan-valor" 
                 class="form-input" 
-                placeholder="Ex: 280.00" 
-                step="5" 
-                min="0" 
-                value="${existingPlan?.valor !== undefined ? existingPlan.valor : ''}" 
+                placeholder="0,00" 
+                value="${existingPlan?.valor !== undefined ? maskMoney(existingPlan.valor) : ''}" 
                 required 
                 style="padding: 7px 10px; font-size: 0.84rem;"
               />
@@ -469,8 +467,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       onConfirm: () => {
         const nome = (document.getElementById('plan-nome') as HTMLInputElement).value.trim();
         const valorInput = (document.getElementById('plan-valor') as HTMLInputElement).value;
-        const valorParsed = parseFloat(valorInput);
-        const valor = !isNaN(valorParsed) ? valorParsed : 0;
+        const valor = parseMoney(valorInput);
         const desc = (document.getElementById('plan-desc') as HTMLInputElement).value.trim();
 
         // Validar e sanitizar módulos e suas aulas
@@ -498,7 +495,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
           return false;
         }
 
-        if (isNaN(valorParsed) || valorParsed <= 0) {
+        if (valor <= 0) {
           showToast('Informe o valor fixo da mensalidade do plano.', 'error');
           return false;
         }
@@ -685,6 +682,9 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
     setTimeout(() => {
       const quickAddBtn = document.getElementById('btn-quick-add-module');
       const quickAddInput = document.getElementById('quick-add-module-input') as HTMLInputElement;
+
+      const inpValor = document.getElementById('plan-valor') as HTMLInputElement;
+      if (inpValor) applyInputMask(inpValor, maskMoney);
 
       quickAddBtn?.addEventListener('click', () => {
         addModuleFromInput();

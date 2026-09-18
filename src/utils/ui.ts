@@ -193,8 +193,54 @@ export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+export function maskYearMonth(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 6);
+  if (digits.length <= 4) return digits;
+  const year = digits.slice(0, 4);
+  let month = digits.slice(4, 6);
+  if (parseInt(month, 10) > 12) month = '12';
+  if (month.length === 2 && month === '00') month = '01';
+  return `${year}-${month}`;
+}
+
+export function maskDayOfMonth(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 2);
+  if (!digits) return '';
+  const num = parseInt(digits, 10);
+  if (num > 31) return '31';
+  if (num === 0) return '1';
+  return digits;
+}
+
+export function maskIE(value: string): string {
+  const clean = value.trim().toUpperCase();
+  if (clean.startsWith('I') || clean.startsWith('IS') || clean.startsWith('ISE') || clean.startsWith('ISEN') || clean.startsWith('ISENT') || clean === 'ISENTO') {
+    return 'ISENTO'.slice(0, clean.length);
+  }
+  return value.replace(/\D/g, '').slice(0, 14);
+}
+
+export function maskMoney(value: string | number): string {
+  if (typeof value === 'number') {
+    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  const clean = value.replace(/\D/g, '');
+  if (!clean) return '';
+  const intVal = parseInt(clean, 10);
+  const floatVal = intVal / 100;
+  return floatVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+export function parseMoney(value: string): number {
+  if (!value) return 0;
+  const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 export function applyInputMask(input: HTMLInputElement, maskFn: (val: string) => string): void {
   input.addEventListener('input', () => {
     input.value = maskFn(input.value);
   });
 }
+

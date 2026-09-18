@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Student, MusicalLevel, Payment, PaymentMethod } from '../types';
-import { ICONS, openModal, closeModal, showToast, confirmAction, maskCPF, maskPhone, isValidEmail, applyInputMask } from '../utils/ui';
+import { ICONS, openModal, closeModal, showToast, confirmAction, maskCPF, maskPhone, isValidEmail, applyInputMask, maskMoney, parseMoney, maskDayOfMonth } from '../utils/ui';
 
 const INSTRUMENTOS_COMUNS = [
   'Violão',
@@ -1048,12 +1048,12 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div class="form-group" style="margin: 0;">
                 <label class="form-label" for="student-valor-mensalidade">Mensalidade (R$) *</label>
-                <input type="number" id="student-valor-mensalidade" class="form-input" min="0" step="10" placeholder="280.00" value="${existingStudent?.valorMensalidade ?? 280}" required />
+                <input type="text" id="student-valor-mensalidade" class="form-input" placeholder="0,00" value="${existingStudent?.valorMensalidade !== undefined ? maskMoney(existingStudent.valorMensalidade) : '280,00'}" required />
               </div>
 
               <div class="form-group" style="margin: 0;">
                 <label class="form-label" for="student-dia-vencimento">Dia do Vencimento *</label>
-                <input type="number" id="student-dia-vencimento" class="form-input" min="1" max="31" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
+                <input type="text" id="student-dia-vencimento" class="form-input" maxlength="2" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
               </div>
             </div>
 
@@ -1099,7 +1099,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         const saldoReposicoes = Math.max(0, parseInt(saldoInput, 10) || 0);
 
         const valorMensalidadeInput = (document.getElementById('student-valor-mensalidade') as HTMLInputElement)?.value;
-        const valorMensalidade = Math.max(0, parseFloat(valorMensalidadeInput) || 280);
+        const valorMensalidade = parseMoney(valorMensalidadeInput);
         const diaVencimentoInput = (document.getElementById('student-dia-vencimento') as HTMLInputElement)?.value;
         const diaVencimento = Math.min(31, Math.max(1, parseInt(diaVencimentoInput, 10) || 10));
 
@@ -1141,6 +1141,21 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             fieldId: 'student-telefone',
             tabId: 'tab-pessoal'
           });
+        } else if (telefone.replace(/\D/g, '').length < 10) {
+          pendingErrors.push({
+            label: 'Celular do Aluno incompleto',
+            fieldId: 'student-telefone',
+            tabId: 'tab-pessoal'
+          });
+        }
+
+        // CPF do Aluno se preenchido
+        if (cpf && cpf.replace(/\D/g, '').length !== 11) {
+          pendingErrors.push({
+            label: 'CPF do Aluno incompleto (11 dígitos)',
+            fieldId: 'student-cpf',
+            tabId: 'tab-pessoal'
+          });
         }
 
         // 4. Validação de E-mail se preenchido
@@ -1177,6 +1192,19 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               fieldId: 'student-resp-tel',
               tabId: 'tab-resp'
             });
+          } else if (responsavelTelefone.replace(/\D/g, '').length < 10) {
+            pendingErrors.push({
+              label: 'Celular do Responsável incompleto',
+              fieldId: 'student-resp-tel',
+              tabId: 'tab-resp'
+            });
+          }
+          if (responsavelCpf && responsavelCpf.replace(/\D/g, '').length !== 11) {
+            pendingErrors.push({
+              label: 'CPF do Responsável incompleto (11 dígitos)',
+              fieldId: 'student-resp-cpf',
+              tabId: 'tab-resp'
+            });
           }
         }
 
@@ -1190,7 +1218,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         }
 
         // 7. Valor da Mensalidade
-        if (!valorMensalidadeInput || isNaN(parseFloat(valorMensalidadeInput)) || parseFloat(valorMensalidadeInput) <= 0) {
+        if (!valorMensalidadeInput || valorMensalidade <= 0) {
           pendingErrors.push({
             label: 'Valor da Mensalidade (R$)',
             fieldId: 'student-valor-mensalidade',
@@ -1389,6 +1417,12 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       const telResp = document.getElementById('student-resp-tel') as HTMLInputElement;
       if (telResp) applyInputMask(telResp, maskPhone);
 
+      const valorMensalidadeEl = document.getElementById('student-valor-mensalidade') as HTMLInputElement;
+      if (valorMensalidadeEl) applyInputMask(valorMensalidadeEl, maskMoney);
+
+      const diaVencEl = document.getElementById('student-dia-vencimento') as HTMLInputElement;
+      if (diaVencEl) applyInputMask(diaVencEl, maskDayOfMonth);
+
       // Preenchimento automático do valor ao selecionar o plano
       const planoSelect = document.getElementById('student-plano') as HTMLSelectElement;
       planoSelect?.addEventListener('change', () => {
@@ -1397,7 +1431,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           const val = selectedOpt.getAttribute('data-valor');
           const valorInput = document.getElementById('student-valor-mensalidade') as HTMLInputElement;
           if (val && valorInput) {
-            valorInput.value = val;
+            valorInput.value = maskMoney(parseFloat(val) || 0);
           }
         }
       });
