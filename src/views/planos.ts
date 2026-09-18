@@ -1,11 +1,12 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
-import { TeachingPlan, PlanModule, PlanLesson } from '../types';
+import { TeachingPlan, PlanModule, PlanLesson, PaymentPlan, PaymentPlanModalidade, PaymentPlanPeriodicidade } from '../types';
 import { ICONS, openModal, showToast, confirmAction, applyInputMask, maskMoney, parseMoney } from '../utils/ui';
 
 export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
   const user = authService.getCurrentUser();
+  let currentTab: 'ensino' | 'pagamento' = 'ensino';
   let searchTerm = '';
 
   const canCreate = hasActionPermission(user, 'planos', 'cadastrar');
@@ -14,7 +15,9 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
 
   function renderList(): void {
     const allPlans = storageService.getPlans();
-    const plans = allPlans.filter(p => {
+    const allPaymentPlans = storageService.getPaymentPlans();
+
+    const filteredTeachingPlans = allPlans.filter(p => {
       const term = searchTerm.toLowerCase();
       return (
         p.nome.toLowerCase().includes(term) ||
@@ -22,27 +25,59 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       );
     });
 
+    const filteredPaymentPlans = allPaymentPlans.filter(p => {
+      const term = searchTerm.toLowerCase();
+      return (
+        p.nome.toLowerCase().includes(term) ||
+        p.modalidade.toLowerCase().includes(term) ||
+        p.periodicidade.toLowerCase().includes(term) ||
+        (p.descricao && p.descricao.toLowerCase().includes(term))
+      );
+    });
+
     container.innerHTML = `
-      <!-- Cabeçalho -->
-      <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <!-- Cabeçalho Principal -->
+      <div style="margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
           <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700;">
-            Planos de Ensino
+            ${currentTab === 'ensino' ? 'Planos de Ensino (Pedagógico)' : 'Planos de Pagamento (Financeiro)'}
           </h2>
           <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-            Estrutura pedagógica em 3 níveis: Planos &bull; Módulos &bull; Aulas.
+            ${
+              currentTab === 'ensino'
+                ? 'Estrutura 100% pedagógica: Plano &bull; Módulos &bull; Aulas.'
+                : 'Tabela de cobrança para matrículas: Modalidades (Individual/Turma), Periodicidades (Mensal/Trimestral/Semestral) e Regra de Desconto (20% na 2ª matrícula).'
+            }
           </p>
         </div>
 
-        ${
-          canCreate
-            ? `
-              <button class="btn btn-primary" id="btn-new-plan" style="display: flex; align-items: center; gap: 6px;">
-                ${ICONS.plus} Novo Plano
-              </button>
-            `
-            : ''
-        }
+        <div style="display: flex; gap: 8px;">
+          ${
+            canCreate
+              ? currentTab === 'ensino'
+                ? `
+                  <button class="btn btn-primary" id="btn-new-plan" style="display: flex; align-items: center; gap: 6px;">
+                    ${ICONS.plus} Novo Plano de Ensino
+                  </button>
+                `
+                : `
+                  <button class="btn btn-primary" id="btn-new-payment-plan" style="display: flex; align-items: center; gap: 6px;">
+                    ${ICONS.plus} Novo Plano de Pagamento
+                  </button>
+                `
+              : ''
+          }
+        </div>
+      </div>
+
+      <!-- Abas de Navegação (Ensino vs Pagamento) -->
+      <div style="display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px;">
+        <button type="button" class="btn ${currentTab === 'ensino' ? 'btn-primary' : 'btn-secondary'} btn-tab-plan" data-tab="ensino" style="font-size: 0.82rem; padding: 7px 16px;">
+          🎼 Planos de Ensino (${allPlans.length})
+        </button>
+        <button type="button" class="btn ${currentTab === 'pagamento' ? 'btn-primary' : 'btn-secondary'} btn-tab-plan" data-tab="pagamento" style="font-size: 0.82rem; padding: 7px 16px;">
+          💰 Planos de Pagamento (${allPaymentPlans.length})
+        </button>
       </div>
 
       <!-- Barra de Filtro / Busca -->
@@ -52,7 +87,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
             type="text" 
             id="plan-search-input" 
             class="form-input" 
-            placeholder="Buscar plano..." 
+            placeholder="${currentTab === 'ensino' ? 'Buscar plano de ensino...' : 'Buscar plano de pagamento...'}" 
             value="${searchTerm}"
             style="padding-left: 36px;"
           />
@@ -67,111 +102,225 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
         }
       </div>
 
-      <!-- Tabela Padronizada -->
-      <div class="panel-card" style="margin-bottom: 0;">
-        <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="panel-card-title">Planos Cadastrados (${plans.length})</h3>
-        </div>
+      <!-- TABELA: PLANOS DE ENSINO -->
+      ${
+        currentTab === 'ensino'
+          ? `
+            <div class="panel-card" style="margin-bottom: 0;">
+              <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="panel-card-title">Planos Pedagógicos Cadastrados (${filteredTeachingPlans.length})</h3>
+              </div>
 
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th style="min-width: 140px;">Plano</th>
-                <th style="width: 130px;">Valor Fixo</th>
-                <th class="col-hide-sm" style="width: 160px; text-align: center;">Estrutura</th>
-                <th class="col-hide-md">Descrição</th>
-                <th style="width: 100px; text-align: right;">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${
-                plans.length === 0
-                  ? `
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
                     <tr>
-                      <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 36px;">
-                        ${searchTerm ? 'Nenhum plano encontrado.' : 'Nenhum plano cadastrado.'}
-                      </td>
+                      <th style="min-width: 160px;">Plano de Ensino</th>
+                      <th class="col-hide-sm" style="width: 160px; text-align: center;">Estrutura</th>
+                      <th class="col-hide-md">Descrição</th>
+                      <th style="width: 100px; text-align: right;">Ações</th>
                     </tr>
-                  `
-                  : plans
-                      .map(plan => {
-                        const totalModulos = (plan.modulos || []).length;
-                        const totalAulas = (plan.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0);
-                        const valorFormatado = typeof plan.valor === 'number' ? `R$ ${plan.valor.toFixed(2)}` : 'R$ 280,00';
-
-                        return `
+                  </thead>
+                  <tbody>
+                    ${
+                      filteredTeachingPlans.length === 0
+                        ? `
                           <tr>
-                            <td>
-                              <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: rgba(234, 67, 53, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-coral); flex-shrink: 0;">
-                                  ${ICONS.planos}
-                                </div>
-                                <div>
-                                  <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
-                                    ${plan.nome}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <span style="font-weight: 700; color: #34d399; font-size: 0.88rem;">
-                                ${valorFormatado}
-                              </span>
-                              <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">/mês</span>
-                            </td>
-                            <td class="col-hide-sm" style="text-align: center;">
-                              <div style="display: inline-flex; gap: 4px; align-items: center;">
-                                <span class="badge" style="background: rgba(234, 67, 53, 0.12); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
-                                  ${totalModulos} ${totalModulos === 1 ? 'módulo' : 'módulos'}
-                                </span>
-                                <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
-                                  ${totalAulas} ${totalAulas === 1 ? 'aula' : 'aulas'}
-                                </span>
-                              </div>
-                            </td>
-                            <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
-                              ${plan.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição</span>'}
-                            </td>
-                            <td style="text-align: right;">
-                              <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                                ${
-                                  canEdit
-                                    ? `
-                                      <button class="btn btn-secondary btn-icon-only btn-edit-plan" data-id="${plan.id}" title="Editar Plano, Módulos e Aulas">
-                                        ${ICONS.edit}
-                                      </button>
-                                    `
-                                    : ''
-                                }
-                                ${
-                                  canDelete
-                                    ? `
-                                      <button class="btn btn-danger btn-icon-only btn-delete-plan" data-id="${plan.id}" title="Excluir Plano">
-                                        ${ICONS.trash}
-                                      </button>
-                                    `
-                                    : ''
-                                }
-                                ${!canEdit && !canDelete ? `<span style="font-size: 0.72rem; color: var(--text-muted);">Visualização</span>` : ''}
-                              </div>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">
+                              ${searchTerm ? 'Nenhum plano de ensino encontrado.' : 'Nenhum plano de ensino cadastrado.'}
                             </td>
                           </tr>
-                        `;
-                      })
-                      .join('')
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
+                        `
+                        : filteredTeachingPlans
+                            .map(plan => {
+                              const totalModulos = (plan.modulos || []).length;
+                              const totalAulas = (plan.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0);
+
+                              return `
+                                <tr>
+                                  <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                      <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: rgba(234, 67, 53, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-coral); flex-shrink: 0;">
+                                        ${ICONS.planos}
+                                      </div>
+                                      <div>
+                                        <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
+                                          ${plan.nome}
+                                        </div>
+                                        ${plan.instrumento ? `<span style="font-size: 0.72rem; color: var(--text-muted);">${plan.instrumento}</span>` : ''}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td class="col-hide-sm" style="text-align: center;">
+                                    <div style="display: inline-flex; gap: 4px; align-items: center;">
+                                      <span class="badge" style="background: rgba(234, 67, 53, 0.12); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
+                                        ${totalModulos} ${totalModulos === 1 ? 'módulo' : 'módulos'}
+                                      </span>
+                                      <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
+                                        ${totalAulas} ${totalAulas === 1 ? 'aula' : 'aulas'}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
+                                    ${plan.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição</span>'}
+                                  </td>
+                                  <td style="text-align: right;">
+                                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                      ${
+                                        canEdit
+                                          ? `
+                                            <button class="btn btn-secondary btn-icon-only btn-edit-plan" data-id="${plan.id}" title="Editar Plano e Módulos">
+                                              ${ICONS.edit}
+                                            </button>
+                                          `
+                                          : ''
+                                      }
+                                      ${
+                                        canDelete
+                                          ? `
+                                            <button class="btn btn-danger btn-icon-only btn-delete-plan" data-id="${plan.id}" title="Excluir Plano">
+                                              ${ICONS.trash}
+                                            </button>
+                                          `
+                                          : ''
+                                      }
+                                      ${!canEdit && !canDelete ? `<span style="font-size: 0.72rem; color: var(--text-muted);">Visualização</span>` : ''}
+                                    </div>
+                                  </td>
+                                </tr>
+                              `;
+                            })
+                            .join('')
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `
+          : `
+            <!-- TABELA: PLANOS DE PAGAMENTO -->
+            <div class="panel-card" style="margin-bottom: 0;">
+              <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="panel-card-title">Planos de Pagamento Cadastrados (${filteredPaymentPlans.length})</h3>
+              </div>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 160px;">Plano</th>
+                      <th style="width: 130px;">Modalidade</th>
+                      <th style="width: 130px;">Periodicidade</th>
+                      <th style="width: 140px;">Mensalidade</th>
+                      <th class="col-hide-sm" style="width: 180px;">2ª Matrícula (20% OFF)</th>
+                      <th class="col-hide-md">Descrição</th>
+                      <th style="width: 100px; text-align: right;">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${
+                      filteredPaymentPlans.length === 0
+                        ? `
+                          <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 36px;">
+                              ${searchTerm ? 'Nenhum plano de pagamento encontrado.' : 'Nenhum plano de pagamento cadastrado.'}
+                            </td>
+                          </tr>
+                        `
+                        : filteredPaymentPlans
+                            .map(pp => {
+                              const valorComDesconto = pp.valorMensal * (1 - (pp.descontoSegundaMatricula || 20) / 100);
+
+                              return `
+                                <tr>
+                                  <td>
+                                    <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
+                                      ${pp.nome}
+                                    </div>
+                                    <span class="badge ${pp.ativo ? 'badge-success' : 'badge-secondary'}" style="font-size: 0.65rem; padding: 2px 6px; margin-top: 2px;">
+                                      ${pp.ativo ? 'Ativo' : 'Inativo'}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.74rem; padding: 3px 8px;">
+                                      ${pp.modalidade === 'individual' ? '👤 Individual' : '👥 Turma'}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span class="badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 0.74rem; padding: 3px 8px; text-transform: capitalize;">
+                                      ${pp.periodicidade}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span style="font-weight: 700; color: #34d399; font-size: 0.92rem;">
+                                      R$ ${pp.valorMensal.toFixed(2)}
+                                    </span>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">/mês</span>
+                                  </td>
+                                  <td class="col-hide-sm">
+                                    <span style="font-weight: 700; color: #fbbf24; font-size: 0.86rem;">
+                                      R$ ${valorComDesconto.toFixed(2)}
+                                    </span>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">(-${pp.descontoSegundaMatricula || 20}% familiar/aluno)</span>
+                                  </td>
+                                  <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
+                                    ${pp.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição</span>'}
+                                  </td>
+                                  <td style="text-align: right;">
+                                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                      ${
+                                        canEdit
+                                          ? `
+                                            <button class="btn btn-secondary btn-icon-only btn-edit-payment-plan" data-id="${pp.id}" title="Editar Plano de Pagamento">
+                                              ${ICONS.edit}
+                                            </button>
+                                          `
+                                          : ''
+                                      }
+                                      ${
+                                        canDelete
+                                          ? `
+                                            <button class="btn btn-danger btn-icon-only btn-delete-payment-plan" data-id="${pp.id}" title="Excluir Plano de Pagamento">
+                                              ${ICONS.trash}
+                                            </button>
+                                          `
+                                          : ''
+                                      }
+                                    </div>
+                                  </td>
+                                </tr>
+                              `;
+                            })
+                            .join('')
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `
+      }
     `;
 
-    // Eventos da Listagem
+    // Eventos de Abas
+    container.querySelectorAll('.btn-tab-plan').forEach(btn => {
+      btn.addEventListener('click', e => {
+        currentTab = (e.currentTarget as HTMLElement).dataset.tab as any;
+        searchTerm = '';
+        renderList();
+      });
+    });
+
+    // Evento: Novo Plano de Ensino
     container.querySelector('#btn-new-plan')?.addEventListener('click', () => {
       openPlanModal();
     });
 
+    // Evento: Novo Plano de Pagamento
+    container.querySelector('#btn-new-payment-plan')?.addEventListener('click', () => {
+      openPaymentPlanModal();
+    });
+
+    // Filtro de Busca
     const searchInput = container.querySelector('#plan-search-input') as HTMLInputElement;
     if (searchInput) {
       searchInput.addEventListener('input', e => {
@@ -190,6 +339,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       renderList();
     });
 
+    // Ações de Plano de Ensino
     container.querySelectorAll('.btn-edit-plan').forEach(btn => {
       btn.addEventListener('click', e => {
         const id = (e.currentTarget as HTMLElement).dataset.id;
@@ -204,11 +354,38 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
         const plan = storageService.getPlans().find(p => p.id === id);
         if (plan) {
           confirmAction({
-            title: 'Excluir Plano',
+            title: 'Excluir Plano de Ensino',
             message: `Tem certeza que deseja excluir o plano "<strong>${plan.nome}</strong>" e todos os seus módulos e aulas?`,
             onConfirm: () => {
               storageService.deletePlan(plan.id, user?.nome || 'Administrador');
-              showToast(`Plano "${plan.nome}" excluído.`, 'info');
+              showToast(`Plano de ensino "${plan.nome}" excluído.`, 'info');
+              renderList();
+            }
+          });
+        }
+      });
+    });
+
+    // Ações de Plano de Pagamento
+    container.querySelectorAll('.btn-edit-payment-plan').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        const pp = storageService.getPaymentPlans().find(p => p.id === id);
+        if (pp) openPaymentPlanModal(pp);
+      });
+    });
+
+    container.querySelectorAll('.btn-delete-payment-plan').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        const pp = storageService.getPaymentPlans().find(p => p.id === id);
+        if (pp) {
+          confirmAction({
+            title: 'Excluir Plano de Pagamento',
+            message: `Deseja realmente excluir o plano de pagamento "<strong>${pp.nome}</strong>"?`,
+            onConfirm: () => {
+              storageService.deletePaymentPlan(pp.id, user?.nome || 'Administrador');
+              showToast(`Plano de pagamento "${pp.nome}" excluído.`, 'info');
               renderList();
             }
           });
@@ -218,17 +395,15 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
   }
 
   // ========================================================
-  // MODAL: PLANOS DE ENSINO EM 3 NÍVEIS (PLANO -> MÓDULOS -> AULAS)
+  // MODAL: PLANO DE ENSINO (100% PEDAGÓGICO: PLANO -> MÓDULOS -> AULAS)
   // ========================================================
   function openPlanModal(existingPlan?: TeachingPlan): void {
     const isEditing = !!existingPlan;
 
-    // Cópia clonada dos módulos para manipulação reativa (novo plano sempre inicia vazio)
     let currentModules: PlanModule[] = existingPlan
       ? JSON.parse(JSON.stringify(existingPlan.modulos || []))
       : [];
 
-    // Garante que cada módulo existente tenha a propriedade aulas como array
     currentModules.forEach(m => {
       if (!Array.isArray(m.aulas)) {
         m.aulas = [];
@@ -238,149 +413,122 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
     function renderModulesHtml(): string {
       if (currentModules.length === 0) {
         return `
-          <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.82rem; border: 1px dashed var(--border-subtle); border-radius: var(--radius-sm); background: rgba(0, 0, 0, 0.1);">
-            🎵 Nenhum módulo cadastrado ainda.<br/>
-            <span style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 4px; display: inline-block;">
-              Digite o nome do módulo acima e clique em "+ Adicionar Módulo".
-            </span>
+          <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem; border: 1px dashed var(--border-subtle); border-radius: var(--radius-sm); margin-top: 8px;">
+            Nenhum módulo adicionado ainda. Digite o nome do módulo acima e clique em "Adicionar Módulo".
           </div>
         `;
       }
 
       return currentModules
-        .map(
-          (m, mIdx) => `
-            <div class="module-card-item" data-midx="${mIdx}" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 8px;">
-              <!-- Cabeçalho do Módulo (Nível 2) -->
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <div style="width: 26px; height: 26px; border-radius: 6px; background: rgba(234, 67, 53, 0.15); color: var(--color-coral); font-weight: 700; font-size: 0.74rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(234, 67, 53, 0.3);">
-                  ${String(mIdx + 1).padStart(2, '0')}
+        .map((mod, modIdx) => {
+          const modAulas = mod.aulas || [];
+
+          return `
+            <div class="module-card-item" data-mod-idx="${modIdx}" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px;">
+              <!-- Cabeçalho do Módulo -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
+                  <span class="badge" style="background: rgba(234, 67, 53, 0.15); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.3); font-size: 0.72rem; padding: 2px 7px;">
+                    Módulo ${modIdx + 1}
+                  </span>
+                  <input 
+                    type="text" 
+                    class="form-input input-module-title" 
+                    data-mod-idx="${modIdx}" 
+                    value="${mod.titulo}" 
+                    placeholder="Título do módulo" 
+                    style="font-size: 0.84rem; font-weight: 600; padding: 4px 8px; background: transparent; border-color: transparent; border-bottom: 1px dashed var(--border-subtle); width: 100%;"
+                  />
                 </div>
 
-                <input 
-                  type="text" 
-                  class="module-title-input" 
-                  data-midx="${mIdx}" 
-                  value="${m.titulo}" 
-                  placeholder="Título do módulo..." 
-                  style="flex: 1; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); color: var(--text-white); font-size: 0.84rem; padding: 6px 10px; outline: none;" 
-                />
-
-                <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-                  <button 
-                    type="button" 
-                    class="btn btn-secondary btn-icon-only btn-move-up" 
-                    data-midx="${mIdx}" 
-                    title="Mover para Cima" 
-                    style="width: 26px; height: 26px; padding: 0; font-size: 0.7rem;"
-                    ${mIdx === 0 ? 'disabled style="opacity: 0.25; cursor: not-allowed; width: 26px; height: 26px; padding: 0;"' : ''}
-                  >
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <button type="button" class="btn btn-secondary btn-icon-only btn-move-module-up" data-mod-idx="${modIdx}" title="Mover para cima" ${modIdx === 0 ? 'disabled' : ''} style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;">
                     ▲
                   </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-secondary btn-icon-only btn-move-down" 
-                    data-midx="${mIdx}" 
-                    title="Mover para Baixo" 
-                    style="width: 26px; height: 26px; padding: 0; font-size: 0.7rem;"
-                    ${mIdx === currentModules.length - 1 ? 'disabled style="opacity: 0.25; cursor: not-allowed; width: 26px; height: 26px; padding: 0;"' : ''}
-                  >
+                  <button type="button" class="btn btn-secondary btn-icon-only btn-move-module-down" data-mod-idx="${modIdx}" title="Mover para baixo" ${modIdx === currentModules.length - 1 ? 'disabled' : ''} style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;">
                     ▼
                   </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-danger btn-icon-only btn-remove-module" 
-                    data-midx="${mIdx}" 
-                    title="Excluir Módulo" 
-                    style="width: 26px; height: 26px; padding: 0; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);"
-                  >
+                  <button type="button" class="btn btn-danger btn-icon-only btn-remove-module" data-mod-idx="${modIdx}" title="Excluir Módulo" style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;">
                     ${ICONS.trash}
                   </button>
                 </div>
               </div>
 
-              <!-- Lista de Aulas do Módulo (Nível 3) -->
-              <div style="padding-left: 20px; border-left: 2px solid rgba(234, 67, 53, 0.2); display: flex; flex-direction: column; gap: 6px;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 2px;">
-                  Aulas deste Módulo (${m.aulas.length}):
-                </div>
+              <!-- Lista de Aulas do Módulo -->
+              <div class="lessons-container" style="display: flex; flex-direction: column; gap: 5px; margin-left: 14px; border-left: 2px solid rgba(234, 67, 53, 0.2); padding-left: 10px;">
+                ${
+                  modAulas.length === 0
+                    ? `<div style="font-size: 0.74rem; color: var(--text-muted); font-style: italic; padding: 4px 0;">Nenhuma aula cadastrada neste módulo.</div>`
+                    : modAulas
+                        .map(
+                          (aula, aulaIdx) => `
+                            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 4px 8px;">
+                              <span style="font-size: 0.72rem; color: var(--text-muted); min-width: 44px;">Aula ${aulaIdx + 1}:</span>
+                              <input 
+                                type="text" 
+                                class="form-input input-lesson-title" 
+                                data-mod-idx="${modIdx}" 
+                                data-aula-idx="${aulaIdx}" 
+                                value="${aula.titulo}" 
+                                placeholder="Título da aula" 
+                                style="flex: 1; font-size: 0.78rem; padding: 2px 6px; background: transparent; border: none;"
+                              />
+                              <button type="button" class="btn btn-secondary btn-icon-only btn-move-lesson-up" data-mod-idx="${modIdx}" data-aula-idx="${aulaIdx}" title="Mover aula acima" ${aulaIdx === 0 ? 'disabled' : ''} style="width: 20px; height: 20px; padding: 0; font-size: 0.65rem;">
+                                ▲
+                              </button>
+                              <button type="button" class="btn btn-secondary btn-icon-only btn-move-lesson-down" data-mod-idx="${modIdx}" data-aula-idx="${aulaIdx}" title="Mover aula abaixo" ${aulaIdx === modAulas.length - 1 ? 'disabled' : ''} style="width: 20px; height: 20px; padding: 0; font-size: 0.65rem;">
+                                ▼
+                              </button>
+                              <button type="button" class="btn btn-danger btn-icon-only btn-remove-lesson" data-mod-idx="${modIdx}" data-aula-idx="${aulaIdx}" title="Excluir Aula" style="width: 20px; height: 20px; padding: 0; font-size: 0.65rem;">
+                                ✕
+                              </button>
+                            </div>
+                          `
+                        )
+                        .join('')
+                }
 
-                ${m.aulas.length === 0
-                  ? `<div style="font-size: 0.74rem; color: var(--text-muted); font-style: italic; padding: 2px 0;">Nenhuma aula cadastrada neste módulo.</div>`
-                  : ''}
-                ${m.aulas
-                  .map(
-                    (aul, aIdx) => `
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 0.72rem; color: #60a5fa; font-weight: 700; width: 44px; flex-shrink: 0;">
-                          Aula ${aIdx + 1}:
-                        </span>
-                        <input 
-                          type="text" 
-                          class="lesson-title-input" 
-                          data-midx="${mIdx}" 
-                          data-aidx="${aIdx}" 
-                          value="${aul.titulo}" 
-                          placeholder="Título da aula..." 
-                          style="flex: 1; background: rgba(0, 0, 0, 0.15); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 4px; color: var(--text-white); font-size: 0.8rem; padding: 4px 8px;"
-                        />
-                        <button 
-                          type="button" 
-                          class="btn btn-secondary btn-icon-only btn-remove-lesson" 
-                          data-midx="${mIdx}" 
-                          data-aidx="${aIdx}" 
-                          title="Excluir Aula" 
-                          style="width: 22px; height: 22px; padding: 0; font-size: 0.65rem; color: #f87171; border-color: rgba(239, 68, 68, 0.2);"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    `
-                  )
-                  .join('')}
-
-                <!-- Adicionar Aula Rápida no Módulo -->
+                <!-- Adicionar Aula ao Módulo -->
                 <div style="display: flex; gap: 6px; margin-top: 4px;">
                   <input 
                     type="text" 
-                    class="quick-add-lesson-input" 
-                    data-midx="${mIdx}" 
-                    placeholder="Título da nova aula..." 
-                    style="flex: 1; background: rgba(0, 0, 0, 0.15); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 4px; color: var(--text-white); font-size: 0.78rem; padding: 4px 8px;"
+                    class="form-input input-new-lesson" 
+                    data-mod-idx="${modIdx}" 
+                    placeholder="Título da nova aula (ex: Acorde Dó Maior)..." 
+                    style="flex: 1; font-size: 0.76rem; padding: 4px 8px;"
                   />
                   <button 
                     type="button" 
-                    class="btn btn-secondary btn-sm btn-quick-add-lesson" 
-                    data-midx="${mIdx}" 
-                    style="padding: 4px 10px; font-size: 0.74rem;"
+                    class="btn btn-secondary btn-sm btn-add-lesson" 
+                    data-mod-idx="${modIdx}" 
+                    style="font-size: 0.72rem; padding: 4px 10px; white-space: nowrap;"
                   >
                     + Aula
                   </button>
                 </div>
               </div>
             </div>
-          `
-        )
+          `;
+        })
         .join('');
     }
 
     const bodyHtml = `
-      <form id="plan-modal-form" style="display: flex; flex-direction: column; gap: 12px;">
-        
+      <form id="plan-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
         <!-- Nível 1: Plano -->
         <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 14px;">
           <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--color-coral); letter-spacing: 0.05em; margin-bottom: 10px;">
-            🎼 1. Informações do Plano
+            🎼 1. Informações do Plano Pedagógico
           </div>
 
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
             <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="plan-nome" style="font-size: 0.78rem;">Nome *</label>
+              <label class="form-label" for="plan-nome" style="font-size: 0.78rem;">Nome do Plano *</label>
               <input 
                 type="text" 
                 id="plan-nome" 
                 class="form-input" 
-                placeholder="Ex: Violão Popular" 
+                placeholder="Ex: Violão Popular e Canto" 
                 value="${existingPlan?.nome || ''}" 
                 required 
                 style="padding: 7px 10px; font-size: 0.84rem;"
@@ -388,26 +536,25 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
             </div>
 
             <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="plan-valor" style="font-size: 0.78rem;">Valor Fixo (R$) *</label>
+              <label class="form-label" for="plan-instrumento" style="font-size: 0.78rem;">Instrumento</label>
               <input 
                 type="text" 
-                id="plan-valor" 
+                id="plan-instrumento" 
                 class="form-input" 
-                placeholder="0,00" 
-                value="${existingPlan?.valor !== undefined ? maskMoney(existingPlan.valor) : ''}" 
-                required 
+                placeholder="Ex: Violão / Teclado" 
+                value="${existingPlan?.instrumento || ''}" 
                 style="padding: 7px 10px; font-size: 0.84rem;"
               />
             </div>
           </div>
 
           <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
-            <label class="form-label" for="plan-desc" style="font-size: 0.78rem;">Descrição</label>
+            <label class="form-label" for="plan-desc" style="font-size: 0.78rem;">Descrição Pedagógica</label>
             <input 
               type="text" 
               id="plan-desc" 
               class="form-input" 
-              placeholder="Ex: Prática instrumental do básico ao intermediário" 
+              placeholder="Ex: Formação instrumental prática do básico ao avançado" 
               value="${existingPlan?.descricao || ''}" 
               style="padding: 7px 10px; font-size: 0.84rem;"
             />
@@ -434,7 +581,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
               type="text" 
               id="quick-add-module-input" 
               class="form-input" 
-              placeholder="Nome do novo módulo (ex: Módulo 3: Escalas e Solo)..." 
+              placeholder="Nome do novo módulo (ex: Módulo 1: Primeiros Acordes)..." 
               style="flex: 1; padding: 7px 12px; font-size: 0.82rem;"
             />
             <button 
@@ -448,62 +595,41 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
           </div>
 
           <!-- Lista de Módulos e Aulas -->
-          <div 
-            id="modules-list-container" 
-            style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 2px;"
-          >
+          <div id="plan-modules-list-container" style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
             ${renderModulesHtml()}
           </div>
         </div>
-
       </form>
     `;
 
     openModal({
-      title: isEditing ? `Editar: ${existingPlan.nome}` : 'Cadastrar Plano de Ensino',
+      title: isEditing ? `Editar Plano de Ensino: ${existingPlan.nome}` : 'Novo Plano de Ensino',
       bodyHtml,
       modalClass: 'modal-lg',
-      confirmText: isEditing ? 'Salvar' : 'Cadastrar',
+      confirmText: isEditing ? 'Salvar Plano' : 'Criar Plano',
       onConfirm: () => {
-        const nome = (document.getElementById('plan-nome') as HTMLInputElement).value.trim();
-        const valorInput = (document.getElementById('plan-valor') as HTMLInputElement).value;
-        const valor = parseMoney(valorInput);
-        const desc = (document.getElementById('plan-desc') as HTMLInputElement).value.trim();
-
-        // Validar e sanitizar módulos e suas aulas
-        const validModules: PlanModule[] = currentModules
-          .map((m, mIndex) => {
-            const sanitizedAulas: PlanLesson[] = (m.aulas || [])
-              .map((a, aIndex) => ({
-                id: a.id || `aul_${mIndex + 1}_${aIndex + 1}_${Date.now()}`,
-                ordem: aIndex + 1,
-                titulo: a.titulo.trim()
-              }))
-              .filter(a => a.titulo.length > 0);
-
-            return {
-              id: m.id || 'mod_' + (mIndex + 1) + '_' + Date.now(),
-              ordem: mIndex + 1,
-              titulo: m.titulo.trim(),
-              aulas: sanitizedAulas
-            };
-          })
-          .filter(m => m.titulo.length > 0);
+        const nome = (document.getElementById('plan-nome') as HTMLInputElement)?.value.trim();
+        const instrumento = (document.getElementById('plan-instrumento') as HTMLInputElement)?.value.trim();
+        const desc = (document.getElementById('plan-desc') as HTMLInputElement)?.value.trim();
 
         if (!nome) {
-          showToast('Informe o nome do plano de ensino.', 'error');
+          showToast('Preencha o nome do plano de ensino.', 'error');
           return false;
         }
 
-        if (valor <= 0) {
-          showToast('Informe o valor fixo da mensalidade do plano.', 'error');
-          return false;
-        }
-
-        if (validModules.length === 0) {
-          showToast('Adicione pelo menos um módulo ao plano.', 'error');
-          return false;
-        }
+        const modulosFinais: PlanModule[] = currentModules.map((mod, idx) => ({
+          id: mod.id || `mod_${Date.now()}_${idx}`,
+          ordem: idx + 1,
+          titulo: mod.titulo.trim() || `Módulo ${idx + 1}`,
+          descricao: mod.descricao,
+          aulas: (mod.aulas || []).map((aula, aIdx) => ({
+            id: aula.id || `aul_${Date.now()}_${idx}_${aIdx}`,
+            ordem: aIdx + 1,
+            titulo: aula.titulo.trim() || `Aula ${aIdx + 1}`,
+            conteudo: aula.conteudo,
+            duracaoMinutos: aula.duracaoMinutos
+          }))
+        }));
 
         const currentUserName = user?.nome || 'Administrador';
 
@@ -513,23 +639,23 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
             {
               nome,
               descricao: desc,
-              valor,
-              modulos: validModules
+              instrumento: instrumento || undefined,
+              modulos: modulosFinais
             },
             currentUserName
           );
-          showToast('Plano atualizado com sucesso!', 'success');
+          showToast(`Plano de ensino "${nome}" atualizado!`, 'success');
         } else {
           storageService.addPlan(
             {
               nome,
               descricao: desc,
-              valor,
-              modulos: validModules
+              instrumento: instrumento || undefined,
+              modulos: modulosFinais
             },
             currentUserName
           );
-          showToast('Plano cadastrado com sucesso!', 'success');
+          showToast(`Plano de ensino "${nome}" cadastrado com sucesso!`, 'success');
         }
 
         renderList();
@@ -537,167 +663,325 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       }
     });
 
-    // ==========================================
-    // CONTROLES REATIVOS DE MÓDULOS E AULAS
-    // ==========================================
-    function attachModuleEvents(): void {
-      const containerEl = document.getElementById('modules-list-container');
+    setTimeout(() => {
+      attachModuleListEvents();
+    }, 50);
+
+    function attachModuleListEvents(): void {
+      const containerList = document.getElementById('plan-modules-list-container');
       const counterBadge = document.getElementById('modules-counter-badge');
-      if (!containerEl) return;
+      if (!containerList) return;
 
-      if (counterBadge) {
-        counterBadge.textContent = `${currentModules.length} ${currentModules.length === 1 ? 'módulo' : 'módulos'}`;
-      }
+      const refreshModulesList = () => {
+        containerList.innerHTML = renderModulesHtml();
+        if (counterBadge) {
+          counterBadge.textContent = `${currentModules.length} módulos`;
+        }
+        attachModuleListEvents();
+      };
 
-      containerEl.innerHTML = renderModulesHtml();
+      const btnAddModule = document.getElementById('btn-quick-add-module');
+      const inputAddModule = document.getElementById('quick-add-module-input') as HTMLInputElement;
 
-      // Sincronização do Título do Módulo
-      containerEl.querySelectorAll('.module-title-input').forEach(inp => {
-        inp.addEventListener('input', e => {
-          const mIdx = parseInt((e.target as HTMLElement).getAttribute('data-midx') || '0', 10);
-          if (currentModules[mIdx]) {
-            currentModules[mIdx].titulo = (e.target as HTMLInputElement).value;
-          }
-        });
-      });
-
-      // Sincronização do Título da Aula
-      containerEl.querySelectorAll('.lesson-title-input').forEach(inp => {
-        inp.addEventListener('input', e => {
-          const mIdx = parseInt((e.target as HTMLElement).getAttribute('data-midx') || '0', 10);
-          const aIdx = parseInt((e.target as HTMLElement).getAttribute('data-aidx') || '0', 10);
-          if (currentModules[mIdx]?.aulas[aIdx]) {
-            currentModules[mIdx].aulas[aIdx].titulo = (e.target as HTMLInputElement).value;
-          }
-        });
-      });
-
-      // Mover Módulo para Cima
-      containerEl.querySelectorAll('.btn-move-up:not([disabled])').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const mIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-midx') || '0', 10);
-          if (mIdx > 0) {
-            const temp = currentModules[mIdx];
-            currentModules[mIdx] = currentModules[mIdx - 1];
-            currentModules[mIdx - 1] = temp;
-            currentModules.forEach((m, i) => (m.ordem = i + 1));
-            attachModuleEvents();
-          }
-        });
-      });
-
-      // Mover Módulo para Baixo
-      containerEl.querySelectorAll('.btn-move-down:not([disabled])').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const mIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-midx') || '0', 10);
-          if (mIdx < currentModules.length - 1) {
-            const temp = currentModules[mIdx];
-            currentModules[mIdx] = currentModules[mIdx + 1];
-            currentModules[mIdx + 1] = temp;
-            currentModules.forEach((m, i) => (m.ordem = i + 1));
-            attachModuleEvents();
-          }
-        });
-      });
-
-      // Excluir Módulo
-      containerEl.querySelectorAll('.btn-remove-module').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const mIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-midx') || '0', 10);
-          currentModules.splice(mIdx, 1);
-          currentModules.forEach((m, i) => (m.ordem = i + 1));
-          attachModuleEvents();
-        });
-      });
-
-      // Excluir Aula
-      containerEl.querySelectorAll('.btn-remove-lesson').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const mIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-midx') || '0', 10);
-          const aIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-aidx') || '0', 10);
-          if (currentModules[mIdx]?.aulas) {
-            currentModules[mIdx].aulas.splice(aIdx, 1);
-            currentModules[mIdx].aulas.forEach((a, i) => (a.ordem = i + 1));
-            attachModuleEvents();
-          }
-        });
-      });
-
-      // Adicionar Aula Rápida no Módulo
-      containerEl.querySelectorAll('.btn-quick-add-lesson').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const mIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-midx') || '0', 10);
-          const inputEl = containerEl.querySelector(`.quick-add-lesson-input[data-midx="${mIdx}"]`) as HTMLInputElement;
-          const val = inputEl?.value.trim();
+      if (btnAddModule && inputAddModule) {
+        btnAddModule.onclick = () => {
+          const val = inputAddModule.value.trim();
           if (!val) {
-            showToast('Informe o título da aula.', 'info');
-            inputEl?.focus();
+            showToast('Informe o nome do módulo.', 'error');
             return;
           }
-
-          if (!currentModules[mIdx].aulas) {
-            currentModules[mIdx].aulas = [];
-          }
-
-          const nextAulOrder = currentModules[mIdx].aulas.length + 1;
-          currentModules[mIdx].aulas.push({
-            id: `aul_${currentModules[mIdx].id}_${nextAulOrder}_${Date.now()}`,
-            ordem: nextAulOrder,
-            titulo: val
+          currentModules.push({
+            id: `mod_${Date.now()}`,
+            ordem: currentModules.length + 1,
+            titulo: val,
+            aulas: []
           });
+          inputAddModule.value = '';
+          refreshModulesList();
+        };
 
-          attachModuleEvents();
+        inputAddModule.onkeydown = e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            btnAddModule.click();
+          }
+        };
+      }
+
+      containerList.querySelectorAll('.input-module-title').forEach(input => {
+        input.addEventListener('input', e => {
+          const modIdx = parseInt((e.target as HTMLElement).dataset.modIdx || '0', 10);
+          if (currentModules[modIdx]) {
+            currentModules[modIdx].titulo = (e.target as HTMLInputElement).value;
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-move-module-up').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          if (modIdx > 0) {
+            const temp = currentModules[modIdx];
+            currentModules[modIdx] = currentModules[modIdx - 1];
+            currentModules[modIdx - 1] = temp;
+            refreshModulesList();
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-move-module-down').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          if (modIdx < currentModules.length - 1) {
+            const temp = currentModules[modIdx];
+            currentModules[modIdx] = currentModules[modIdx + 1];
+            currentModules[modIdx + 1] = temp;
+            refreshModulesList();
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-remove-module').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          currentModules.splice(modIdx, 1);
+          refreshModulesList();
+        });
+      });
+
+      containerList.querySelectorAll('.input-lesson-title').forEach(input => {
+        input.addEventListener('input', e => {
+          const modIdx = parseInt((e.target as HTMLElement).dataset.modIdx || '0', 10);
+          const aulaIdx = parseInt((e.target as HTMLElement).dataset.aulaIdx || '0', 10);
+          if (currentModules[modIdx]?.aulas[aulaIdx]) {
+            currentModules[modIdx].aulas[aulaIdx].titulo = (e.target as HTMLInputElement).value;
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-add-lesson').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          const lessonInput = containerList.querySelector(`.input-new-lesson[data-mod-idx="${modIdx}"]`) as HTMLInputElement;
+          const val = lessonInput?.value.trim();
+          if (!val) {
+            showToast('Informe o título da aula.', 'error');
+            return;
+          }
+          if (currentModules[modIdx]) {
+            currentModules[modIdx].aulas.push({
+              id: `aul_${Date.now()}`,
+              ordem: currentModules[modIdx].aulas.length + 1,
+              titulo: val
+            });
+            refreshModulesList();
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-move-lesson-up').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          const aulaIdx = parseInt((e.currentTarget as HTMLElement).dataset.aulaIdx || '0', 10);
+          if (currentModules[modIdx] && aulaIdx > 0) {
+            const aulas = currentModules[modIdx].aulas;
+            const temp = aulas[aulaIdx];
+            aulas[aulaIdx] = aulas[aulaIdx - 1];
+            aulas[aulaIdx - 1] = temp;
+            refreshModulesList();
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-move-lesson-down').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          const aulaIdx = parseInt((e.currentTarget as HTMLElement).dataset.aulaIdx || '0', 10);
+          if (currentModules[modIdx]) {
+            const aulas = currentModules[modIdx].aulas;
+            if (aulaIdx < aulas.length - 1) {
+              const temp = aulas[aulaIdx];
+              aulas[aulaIdx] = aulas[aulaIdx + 1];
+              aulas[aulaIdx + 1] = temp;
+              refreshModulesList();
+            }
+          }
+        });
+      });
+
+      containerList.querySelectorAll('.btn-remove-lesson').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const modIdx = parseInt((e.currentTarget as HTMLElement).dataset.modIdx || '0', 10);
+          const aulaIdx = parseInt((e.currentTarget as HTMLElement).dataset.aulaIdx || '0', 10);
+          if (currentModules[modIdx]) {
+            currentModules[modIdx].aulas.splice(aulaIdx, 1);
+            refreshModulesList();
+          }
         });
       });
     }
+  }
 
-    function addModuleFromInput(): void {
-      const inputEl = document.getElementById('quick-add-module-input') as HTMLInputElement;
-      if (!inputEl) return;
-      const val = inputEl.value.trim();
-      if (!val) {
-        showToast('Digite o nome do módulo para adicionar.', 'info');
-        inputEl.focus();
-        return;
+  // ========================================================
+  // MODAL: PLANO DE PAGAMENTO (COBRANÇA: MODALIDADES, CICLOS E DESCONTO)
+  // ========================================================
+  function openPaymentPlanModal(existingPlan?: PaymentPlan): void {
+    const isEditing = !!existingPlan;
+
+    const bodyHtml = `
+      <form id="payment-plan-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px;">
+          <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #34d399; letter-spacing: 0.05em; margin-bottom: 12px;">
+            💰 Parâmetros do Plano de Pagamento
+          </div>
+
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="pp-nome">Nome do Plano *</label>
+            <input 
+              type="text" 
+              id="pp-nome" 
+              class="form-input" 
+              placeholder="Ex: Individual - Mensal" 
+              value="${existingPlan?.nome || ''}" 
+              required 
+            />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="pp-modalidade">Modalidade *</label>
+              <select id="pp-modalidade" class="form-select">
+                <option value="individual" ${existingPlan?.modalidade === 'individual' ? 'selected' : ''}>👤 Individual</option>
+                <option value="turma" ${existingPlan?.modalidade === 'turma' ? 'selected' : ''}>👥 Turma (Grupo)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="pp-periodicidade">Periodicidade / Ciclo *</label>
+              <select id="pp-periodicidade" class="form-select">
+                <option value="mensal" ${existingPlan?.periodicidade === 'mensal' ? 'selected' : ''}>Mensal (1 mês)</option>
+                <option value="trimestral" ${existingPlan?.periodicidade === 'trimestral' ? 'selected' : ''}>Trimestral (3 meses)</option>
+                <option value="semestral" ${existingPlan?.periodicidade === 'semestral' ? 'selected' : ''}>Semestral (6 meses)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="pp-valor">Mensalidade Padrão (R$) *</label>
+              <input 
+                type="text" 
+                id="pp-valor" 
+                class="form-input" 
+                placeholder="0,00" 
+                value="${existingPlan?.valorMensal !== undefined ? maskMoney(existingPlan.valorMensal) : '280,00'}" 
+                required 
+              />
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="pp-desconto">Desconto 2ª Matrícula (%)</label>
+              <input 
+                type="number" 
+                id="pp-desconto" 
+                class="form-input" 
+                min="0" 
+                max="100" 
+                value="${existingPlan?.descontoSegundaMatricula ?? 20}" 
+              />
+              <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; display: block;">
+                Aplicado automaticamente para 2ª matrícula de familiar ou do aluno.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="pp-desc">Descrição / Benefícios</label>
+            <input 
+              type="text" 
+              id="pp-desc" 
+              class="form-input" 
+              placeholder="Ex: Aulas semanais individuais com acompanhamento personalizado." 
+              value="${existingPlan?.descricao || ''}" 
+            />
+          </div>
+
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" for="pp-ativo">Status do Plano</label>
+            <select id="pp-ativo" class="form-select">
+              <option value="true" ${existingPlan?.ativo !== false ? 'selected' : ''}>Ativo (Disponível para matrícula)</option>
+              <option value="false" ${existingPlan?.ativo === false ? 'selected' : ''}>Inativo (Arquivado)</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    `;
+
+    openModal({
+      title: isEditing ? `Editar Plano de Pagamento: ${existingPlan.nome}` : 'Novo Plano de Pagamento',
+      bodyHtml,
+      confirmText: isEditing ? 'Salvar' : 'Criar Plano',
+      onConfirm: () => {
+        const nome = (document.getElementById('pp-nome') as HTMLInputElement)?.value.trim();
+        const modalidade = (document.getElementById('pp-modalidade') as HTMLSelectElement)?.value as PaymentPlanModalidade;
+        const periodicidade = (document.getElementById('pp-periodicidade') as HTMLSelectElement)?.value as PaymentPlanPeriodicidade;
+        const valorInput = (document.getElementById('pp-valor') as HTMLInputElement)?.value;
+        const valorMensal = parseMoney(valorInput);
+        const desconto = parseInt((document.getElementById('pp-desconto') as HTMLInputElement)?.value, 10) || 20;
+        const desc = (document.getElementById('pp-desc') as HTMLInputElement)?.value.trim();
+        const ativo = (document.getElementById('pp-ativo') as HTMLSelectElement)?.value === 'true';
+
+        if (!nome) {
+          showToast('Informe o nome do plano de pagamento.', 'error');
+          return false;
+        }
+
+        if (valorMensal <= 0) {
+          showToast('Informe um valor de mensalidade válido.', 'error');
+          return false;
+        }
+
+        const currentUserName = user?.nome || 'Administrador';
+
+        if (isEditing && existingPlan) {
+          storageService.updatePaymentPlan(
+            existingPlan.id,
+            {
+              nome,
+              modalidade,
+              periodicidade,
+              valorMensal,
+              descontoSegundaMatricula: desconto,
+              descricao: desc || undefined,
+              ativo
+            },
+            currentUserName
+          );
+          showToast(`Plano de pagamento "${nome}" atualizado!`, 'success');
+        } else {
+          storageService.addPaymentPlan(
+            {
+              nome,
+              modalidade,
+              periodicidade,
+              valorMensal,
+              descontoSegundaMatricula: desconto,
+              descricao: desc || undefined,
+              ativo
+            },
+            currentUserName
+          );
+          showToast(`Plano de pagamento "${nome}" criado com sucesso!`, 'success');
+        }
+
+        renderList();
+        return true;
       }
-
-      const nextOrder = currentModules.length + 1;
-      currentModules.push({
-        id: 'mod_' + nextOrder + '_' + Date.now(),
-        ordem: nextOrder,
-        titulo: val,
-        aulas: []
-      });
-
-      inputEl.value = '';
-      attachModuleEvents();
-      inputEl.focus();
-
-      const containerEl = document.getElementById('modules-list-container');
-      if (containerEl) {
-        containerEl.scrollTop = containerEl.scrollHeight;
-      }
-    }
+    });
 
     setTimeout(() => {
-      const quickAddBtn = document.getElementById('btn-quick-add-module');
-      const quickAddInput = document.getElementById('quick-add-module-input') as HTMLInputElement;
-
-      const inpValor = document.getElementById('plan-valor') as HTMLInputElement;
-      if (inpValor) applyInputMask(inpValor, maskMoney);
-
-      quickAddBtn?.addEventListener('click', () => {
-        addModuleFromInput();
-      });
-
-      quickAddInput?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          addModuleFromInput();
-        }
-      });
-
-      attachModuleEvents();
+      const valorInput = document.getElementById('pp-valor') as HTMLInputElement;
+      if (valorInput) applyInputMask(valorInput, maskMoney);
     }, 50);
   }
 

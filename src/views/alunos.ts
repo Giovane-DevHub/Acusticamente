@@ -286,9 +286,16 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                             </td>
 
                             <td class="col-hide-sm">
-                              <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">
+                              <span style="font-size: 0.82rem; color: var(--text-white); white-space: nowrap; display: block;">
                                 ${plan?.nome || '<span style="color: var(--text-muted); font-style: italic;">Nenhum</span>'}
                               </span>
+                              ${
+                                (student.saldoReposicoes || 0) > 0
+                                  ? `<span class="badge" style="background: rgba(234, 67, 53, 0.12); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.3); font-size: 0.64rem; padding: 1px 5px; margin-top: 2px; display: inline-block;">
+                                      ⚡ ${student.saldoReposicoes} ${student.saldoReposicoes === 1 ? 'crédito' : 'créditos'} de remarcação
+                                     </span>`
+                                  : ''
+                              }
                             </td>
 
                             <td class="col-hide-xs">
@@ -397,7 +404,9 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
   // ==========================================
   function openStudentDetailsModal(student: Student): void {
     const plans = storageService.getPlans();
+    const paymentPlans = storageService.getPaymentPlans();
     const plan = plans.find(p => p.id === student.planoId);
+    const paymentPlan = paymentPlans.find(pp => pp.id === student.planoPagamentoId);
     const history = storageService.getStudentAppointments(student.id);
     const payments = storageService.getStudentPayments(student.id);
 
@@ -527,7 +536,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
               <div style="font-size: 1.05rem; font-weight: 700; color: var(--color-coral);">${saldo}</div>
-              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Reposições</div>
+              <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">Remarcações</div>
             </div>
           </div>
 
@@ -564,42 +573,38 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                         </tr>
                       </thead>
                       <tbody>
-                        ${history.map(app => {
-                          const dateFormatted = app.data.split('-').reverse().join('/');
-                          let statusBadge = '';
-                          if (app.status === 'concluido') {
-                            statusBadge = `<span class="badge badge-success" style="font-size: 0.62rem;">Presente</span>`;
-                          } else if (app.status === 'falta_justificada') {
-                            statusBadge = `<span class="badge badge-warning" style="font-size: 0.62rem;">Falta Just.</span>`;
-                          } else if (app.status === 'falta_injustificada') {
-                            statusBadge = `<span class="badge badge-danger" style="font-size: 0.62rem;">Falta</span>`;
-                          } else if (app.status === 'cancelado') {
-                            statusBadge = `<span class="badge badge-secondary" style="font-size: 0.62rem;">Cancelado</span>`;
-                          } else {
-                            statusBadge = `<span class="badge badge-secondary" style="font-size: 0.62rem;">Agendado</span>`;
-                          }
+                        ${history
+                          .map(app => {
+                            const isConcluido = app.status === 'concluido';
+                            const isFalta = app.status.startsWith('falta');
+                            const isAgendado = app.status === 'agendado';
+                            const statusBadge = isConcluido
+                              ? '<span class="badge badge-success" style="font-size: 0.65rem; padding: 1px 5px;">Presente</span>'
+                              : isFalta
+                              ? `<span class="badge ${app.status === 'falta_justificada' ? 'badge-coral' : 'badge-danger'}" style="font-size: 0.65rem; padding: 1px 5px;">${app.status === 'falta_justificada' ? 'Falta Justificada' : 'Falta Injustificada'}</span>`
+                              : isAgendado
+                              ? '<span class="badge badge-warning" style="font-size: 0.65rem; padding: 1px 5px;">Agendado</span>'
+                              : '<span class="badge badge-secondary" style="font-size: 0.65rem; padding: 1px 5px;">Cancelado</span>';
 
-                          const tipoBadge = app.tipoAula === 'reposicao'
-                            ? `<span class="badge" style="background: rgba(255, 255, 255, 0.08); font-size: 0.62rem;">Reposição</span>`
-                            : `<span style="color: var(--text-muted); font-size: 0.7rem;">Regular</span>`;
+                            const tipoBadge = app.tipoAula === 'reposicao'
+                              ? '<span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 0.65rem; padding: 1px 5px;">🔄 Reposição</span>'
+                              : '<span class="badge" style="background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); font-size: 0.65rem; padding: 1px 5px;">Regular</span>';
 
-                          return `
-                            <tr>
-                              <td style="white-space: nowrap;">
-                                <strong>${dateFormatted}</strong>
-                                <span style="font-size: 0.68rem; color: var(--text-muted); margin-left: 4px;">${app.horaInicio}</span>
-                              </td>
-                              <td><div style="color: var(--text-white); font-weight: 500;">${app.titulo}</div></td>
-                              <td class="col-hide-sm">${tipoBadge}</td>
-                              <td>${statusBadge}</td>
-                              <td class="col-hide-sm">
-                                <span style="color: var(--text-secondary); font-size: 0.72rem;">
-                                  ${app.justificativaFalta || app.observacoes || '-'}
-                                </span>
-                              </td>
-                            </tr>
-                          `;
-                        }).join('')}
+                            return `
+                              <tr>
+                                <td style="white-space: nowrap; font-weight: 500;">
+                                  ${app.data.split('-').reverse().join('/')} <span style="color: var(--text-muted); font-size: 0.7rem;">${app.horaInicio}</span>
+                                </td>
+                                <td>${app.titulo}</td>
+                                <td class="col-hide-sm">${tipoBadge}</td>
+                                <td>${statusBadge}</td>
+                                <td class="col-hide-sm" style="color: var(--text-muted); font-size: 0.72rem;">
+                                  ${app.justificativaFalta ? `<em>Motivo: ${app.justificativaFalta}</em>` : app.observacoes || '-'}
+                                </td>
+                              </tr>
+                            `;
+                          })
+                          .join('')}
                       </tbody>
                     </table>
                   `
@@ -620,6 +625,25 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
 
         <!-- CONTEÚDO DA ABA 2: FINANCEIRO -->
         <div id="panel-tab-financeiro" style="display: none; flex-direction: column; gap: 12px;">
+          <!-- Card do Plano de Pagamento e Desconto -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block;">
+                Plano de Pagamento Vinculado
+              </span>
+              <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-white); margin-top: 2px;">
+                ${paymentPlan ? `${paymentPlan.nome} (${paymentPlan.modalidade === 'individual' ? '👤 Individual' : '👥 Turma'} &bull; ${paymentPlan.periodicidade.toUpperCase()})` : 'Plano Padrão'}
+              </div>
+            </div>
+            ${
+              student.isSegundaMatricula
+                ? `<span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); font-size: 0.72rem; padding: 3px 8px;">
+                    🏷️ 2ª Matrícula (20% OFF)
+                   </span>`
+                : ''
+            }
+          </div>
+
           <!-- Status Sucinto -->
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;">
             <div style="font-size: 0.8rem; color: var(--text-white);">
@@ -866,12 +890,22 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
   // ==========================================
   function openStudentModal(existingStudent?: Student): void {
     const plans = storageService.getPlans();
+    const paymentPlans = storageService.getPaymentPlans();
     const isEditing = !!existingStudent;
     const studentPayments = existingStudent ? storageService.getStudentPayments(existingStudent.id) : [];
 
+    // Planos de Ensino (100% Pedagógico: Plano > Módulos > Aulas)
     const planOptions = plans
       .map(
-        p => `<option value="${p.id}" ${existingStudent?.planoId === p.id ? 'selected' : ''} data-valor="${p.valor ?? 280}">${p.nome} - R$ ${(p.valor ?? 280).toFixed(2)}</option>`
+        p => `<option value="${p.id}" ${existingStudent?.planoId === p.id ? 'selected' : ''}>${p.nome}${p.instrumento ? ` (${p.instrumento})` : ''}</option>`
+      )
+      .join('');
+
+    // Planos de Pagamento (Financeiro: Modalidade Individual/Turma, Ciclos e Desconto de 20%)
+    const paymentPlanOptions = paymentPlans
+      .filter(pp => pp.ativo)
+      .map(
+        pp => `<option value="${pp.id}" ${existingStudent?.planoPagamentoId === pp.id ? 'selected' : ''} data-valor="${pp.valorMensal}" data-desconto="${pp.descontoSegundaMatricula ?? 20}">${pp.nome} (${pp.modalidade === 'individual' ? '👤 Individual' : '👥 Turma'} - ${pp.periodicidade.toUpperCase()}) - R$ ${pp.valorMensal.toFixed(2)}/mês</option>`
       )
       .join('');
 
@@ -1010,17 +1044,17 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           </div>
 
           <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-plano">Plano (com valor fixo)</label>
-            <select id="student-plano" class="form-select">
-              <option value="">Selecione um plano...</option>
+            <label class="form-label" for="student-plano">Plano de Ensino (Pedagógico) *</label>
+            <select id="student-plano" class="form-select" required>
+              <option value="">Selecione um plano de ensino...</option>
               ${planOptions}
             </select>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-modulo">Módulo</label>
-              <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Teoria" value="${existingStudent?.moduloAtual || ''}" />
+              <label class="form-label" for="student-modulo">Módulo Atual</label>
+              <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Primeiros Acordes" value="${existingStudent?.moduloAtual || ''}" />
             </div>
 
             <div class="form-group" style="margin: 0;">
@@ -1032,22 +1066,71 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             </div>
           </div>
 
-          <div class="form-group" style="margin: 0; width: 100%;">
-            <label class="form-label" for="student-saldo-reposicoes">Reposições Disponíveis</label>
-            <input type="number" id="student-saldo-reposicoes" class="form-input" min="0" max="20" value="${existingStudent?.saldoReposicoes ?? 0}" />
+          <!-- SALDO DE REMARCAÇÃO (100% AUTOMÁTICO - SOMENTE LEITURA) -->
+          <div style="background: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.25); border-radius: var(--radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-white);">Créditos de Remarcação Disponíveis:</span>
+              <span class="badge" style="background: rgba(234, 67, 53, 0.2); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.4); font-size: 0.95rem; font-weight: 700; padding: 4px 10px;">
+                ${existingStudent?.saldoReposicoes || 0} ${ (existingStudent?.saldoReposicoes || 0) === 1 ? 'crédito' : 'créditos' }
+              </span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; margin-top: 4px;">
+              🔒 <strong>Saldo Automático:</strong> Os créditos são gerados automaticamente quando o aluno recebe falta justificada na agenda e consumidos ao agendar aulas de reposição. Não é permitida adição ou remoção manual.
+            </div>
           </div>
         </div>
 
-        <!-- ABA 4: FINANCEIRO -->
+        <!-- ABA 4: FINANCEIRO (PLANOS DE PAGAMENTO E DESCONTO 2ª MATRÍCULA) -->
         <div id="form-panel-tab-financeiro" class="form-tab-panel" style="display: none; flex-direction: column; gap: 12px;">
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 12px;">
-            <div style="font-weight: 700; font-size: 0.85rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
-              <span>💰</span> Parâmetros da Mensalidade
+            <div style="font-weight: 700; font-size: 0.85rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+              <span>💰</span> Plano de Pagamento & Cobrança
+            </div>
+
+            <!-- Seleção do Plano de Pagamento -->
+            <div class="form-group" style="margin: 0; width: 100%;">
+              <label class="form-label" for="student-plano-pagamento">Plano de Pagamento *</label>
+              <select id="student-plano-pagamento" class="form-select">
+                <option value="">Selecione o plano de pagamento...</option>
+                ${paymentPlanOptions}
+              </select>
+            </div>
+
+            <!-- Regra de Desconto: 2ª Matrícula (20% OFF) -->
+            <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+              <div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: #fbbf24;">
+                  Segunda Matrícula (Familiar ou Aluno)
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-secondary);">
+                  Aplica 20% de desconto automático na mensalidade deste plano.
+                </div>
+              </div>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                <input type="checkbox" id="student-segunda-matricula" ${existingStudent?.isSegundaMatricula ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: #fbbf24;" />
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-white);">20% OFF</span>
+              </label>
+            </div>
+
+            <!-- Resumo do Cálculo da Mensalidade -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Valor Base</div>
+                <div id="summary-plano-base" style="font-size: 0.85rem; font-weight: 600; color: var(--text-white); margin-top: 2px;">R$ 280,00</div>
+              </div>
+              <div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Desconto</div>
+                <div id="summary-plano-desc" style="font-size: 0.85rem; font-weight: 600; color: #fbbf24; margin-top: 2px;">R$ 0,00</div>
+              </div>
+              <div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Mensalidade</div>
+                <div id="summary-plano-final" style="font-size: 0.92rem; font-weight: 700; color: #34d399; margin-top: 2px;">R$ 280,00</div>
+              </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div class="form-group" style="margin: 0;">
-                <label class="form-label" for="student-valor-mensalidade">Mensalidade (R$) *</label>
+                <label class="form-label" for="student-valor-mensalidade">Valor Cobrado (R$) *</label>
                 <input type="text" id="student-valor-mensalidade" class="form-input" placeholder="0,00" value="${existingStudent?.valorMensalidade !== undefined ? maskMoney(existingStudent.valorMensalidade) : '280,00'}" required />
               </div>
 
@@ -1055,10 +1138,6 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                 <label class="form-label" for="student-dia-vencimento">Dia do Vencimento *</label>
                 <input type="text" id="student-dia-vencimento" class="form-input" maxlength="2" placeholder="10" value="${existingStudent?.diaVencimento ?? 10}" required />
               </div>
-            </div>
-
-            <div style="font-size: 0.74rem; color: var(--text-secondary); line-height: 1.3;">
-              ℹ️ Ao selecionar um plano pedagógico, o valor da mensalidade é preenchido automaticamente.
             </div>
           </div>
         </div>
@@ -1093,10 +1172,10 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         const instrumentoPrincipal = (document.getElementById('student-instrumento') as HTMLSelectElement).value;
         const nivelMusical = (document.getElementById('student-nivel') as HTMLSelectElement).value as MusicalLevel;
         const planoId = (document.getElementById('student-plano') as HTMLSelectElement).value;
+        const planoPagamentoId = (document.getElementById('student-plano-pagamento') as HTMLSelectElement)?.value || undefined;
+        const isSegundaMatricula = (document.getElementById('student-segunda-matricula') as HTMLInputElement)?.checked || false;
         const status = (document.getElementById('student-status') as HTMLSelectElement).value as any;
         const moduloAtual = (document.getElementById('student-modulo') as HTMLInputElement).value.trim();
-        const saldoInput = (document.getElementById('student-saldo-reposicoes') as HTMLInputElement).value;
-        const saldoReposicoes = Math.max(0, parseInt(saldoInput, 10) || 0);
 
         const valorMensalidadeInput = (document.getElementById('student-valor-mensalidade') as HTMLInputElement)?.value;
         const valorMensalidade = parseMoney(valorMensalidadeInput);
@@ -1343,9 +1422,10 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               instrumentoPrincipal,
               nivelMusical,
               planoId,
+              planoPagamentoId,
+              isSegundaMatricula,
               status,
               moduloAtual,
-              saldoReposicoes,
               valorMensalidade,
               diaVencimento,
               observacoes: obs
@@ -1368,9 +1448,10 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               instrumentoPrincipal,
               nivelMusical,
               planoId,
+              planoPagamentoId,
+              isSegundaMatricula,
               status,
               moduloAtual,
-              saldoReposicoes,
               valorMensalidade,
               diaVencimento,
               observacoes: obs
@@ -1423,18 +1504,32 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       const diaVencEl = document.getElementById('student-dia-vencimento') as HTMLInputElement;
       if (diaVencEl) applyInputMask(diaVencEl, maskDayOfMonth);
 
-      // Preenchimento automático do valor ao selecionar o plano
-      const planoSelect = document.getElementById('student-plano') as HTMLSelectElement;
-      planoSelect?.addEventListener('change', () => {
-        const selectedOpt = planoSelect.selectedOptions[0];
-        if (selectedOpt) {
-          const val = selectedOpt.getAttribute('data-valor');
-          const valorInput = document.getElementById('student-valor-mensalidade') as HTMLInputElement;
-          if (val && valorInput) {
-            valorInput.value = maskMoney(parseFloat(val) || 0);
-          }
+      // Cálculo dinâmico da mensalidade ao selecionar Plano de Pagamento ou 2ª Matrícula
+      const planoPagamentoSelect = document.getElementById('student-plano-pagamento') as HTMLSelectElement;
+      const segundaMatriculaCheckbox = document.getElementById('student-segunda-matricula') as HTMLInputElement;
+      const baseEl = document.getElementById('summary-plano-base');
+      const descEl = document.getElementById('summary-plano-desc');
+      const finalEl = document.getElementById('summary-plano-final');
+
+      const atualizarCalculoMensalidade = () => {
+        const ppId = planoPagamentoSelect?.value;
+        const is2a = segundaMatriculaCheckbox?.checked || false;
+        const calc = storageService.calcularMensalidadeAluno(ppId, is2a);
+
+        if (baseEl) baseEl.textContent = `R$ ${calc.valorBase.toFixed(2)}`;
+        if (descEl) descEl.textContent = calc.descontoPercentual > 0 ? `-R$ ${calc.valorDesconto.toFixed(2)} (${calc.descontoPercentual}%)` : 'R$ 0,00';
+        if (finalEl) finalEl.textContent = `R$ ${calc.valorFinal.toFixed(2)}`;
+
+        if (valorMensalidadeEl) {
+          valorMensalidadeEl.value = maskMoney(calc.valorFinal);
         }
-      });
+      };
+
+      planoPagamentoSelect?.addEventListener('change', atualizarCalculoMensalidade);
+      segundaMatriculaCheckbox?.addEventListener('change', atualizarCalculoMensalidade);
+      if (existingStudent?.planoPagamentoId) {
+        atualizarCalculoMensalidade();
+      }
 
       // Monitora data de nascimento para sinalizar menor de idade em tempo real
       const birthInput = document.getElementById('student-nascimento') as HTMLInputElement;

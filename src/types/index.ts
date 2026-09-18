@@ -88,7 +88,9 @@ export interface Student {
   responsavelTelefone?: string;
   responsavelCpf?: string;
   responsavelParentesco?: string;
-  planoId: string;
+  planoId: string; // Plano de Ensino Pedagógico
+  planoPagamentoId?: string; // Plano de Pagamento (Financeiro)
+  isSegundaMatricula?: boolean; // Aplica desconto de 20% automático
   moduloAtual?: string;
   saldoReposicoes?: number;
   valorMensalidade?: number;
@@ -114,14 +116,30 @@ export interface PlanModule {
   aulas: PlanLesson[];
 }
 
+// 1. Planos de Ensino: 100% pedagógicos (Plano > Módulos > Aulas)
 export interface TeachingPlan {
   id: string;
   nome: string;
   descricao: string;
-  valor?: number;
   instrumento?: string;
   nivel?: MusicalLevel;
   modulos: PlanModule[];
+  criadoEm: string;
+}
+
+// 2. Planos de Pagamento: responsáveis pela cobrança
+export type PaymentPlanModalidade = 'individual' | 'turma';
+export type PaymentPlanPeriodicidade = 'mensal' | 'trimestral' | 'semestral';
+
+export interface PaymentPlan {
+  id: string;
+  nome: string;
+  modalidade: PaymentPlanModalidade;
+  periodicidade: PaymentPlanPeriodicidade;
+  valorMensal: number;
+  descontoSegundaMatricula: number; // Ex: 20 para 20%
+  ativo: boolean;
+  descricao?: string;
   criadoEm: string;
 }
 

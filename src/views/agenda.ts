@@ -649,12 +649,17 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
             </div>
 
             <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="app-plan">Plano</label>
+              <label class="form-label" for="app-plan">Plano Pedagógico</label>
               <select id="app-plan" class="form-select">
                 <option value="">Sem plano fixo</option>
                 ${planOptions}
               </select>
             </div>
+          </div>
+
+          <div id="app-student-credits-info" style="display: none; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #93c5fd; align-items: center; justify-content: space-between;">
+            <span>Créditos de remarcação disponíveis:</span>
+            <strong id="app-student-credits-val" style="font-size: 0.95rem;">0</strong>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
@@ -796,22 +801,27 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
           showToast('Aula atualizada com sucesso!', 'success');
         } else {
           if (tipoAula === 'reposicao') {
-            storageService.agendarReposicao(
-              {
-                titulo: title,
-                alunoId: studentId,
-                planoId: planId || undefined,
-                data: date,
-                horaInicio: timeStart,
-                horaFim: timeEnd,
-                status,
-                justificativaFalta: justificativaFalta || undefined,
-                observacoes: obs
-              },
-              options?.aulaOriginalId,
-              currentUserName
-            );
-            showToast('Aula de reposição agendada (1 crédito abatido)!', 'success');
+            try {
+              storageService.agendarReposicao(
+                {
+                  titulo: title,
+                  alunoId: studentId,
+                  planoId: planId || undefined,
+                  data: date,
+                  horaInicio: timeStart,
+                  horaFim: timeEnd,
+                  status,
+                  justificativaFalta: justificativaFalta || undefined,
+                  observacoes: obs
+                },
+                options?.aulaOriginalId,
+                currentUserName
+              );
+              showToast('Aula de reposição agendada (1 crédito abatido com sucesso)!', 'success');
+            } catch (err: any) {
+              showToast(err?.message || 'Erro ao agendar reposição. Verifique o saldo do aluno.', 'error');
+              return false;
+            }
           } else {
             storageService.addAppointment(
               {
@@ -858,6 +868,41 @@ export function renderAgenda(onNavigate: (screen: string) => void): HTMLElement 
           if (panelManual) panelManual.style.display = mode === 'manual' ? 'flex' : 'none';
         });
       });
+
+      // Exibição dinâmica do saldo de créditos de reposição do aluno
+      const studentSelect = document.getElementById('app-student') as HTMLSelectElement;
+      const creditsBox = document.getElementById('app-student-credits-info');
+      const creditsVal = document.getElementById('app-student-credits-val');
+      const tipoRadios = document.querySelectorAll('input[name="app-tipo-aula"]');
+
+      const updateCreditsBadge = () => {
+        if (!studentSelect || !creditsBox || !creditsVal) return;
+        const selectedId = studentSelect.value;
+        if (!selectedId) {
+          creditsBox.style.display = 'none';
+          return;
+        }
+        const st = storageService.getStudentById(selectedId);
+        const saldo = st ? st.saldoReposicoes : 0;
+        creditsVal.textContent = `${saldo} ${saldo === 1 ? 'crédito' : 'créditos'}`;
+
+        const isRepoChecked = (document.querySelector('input[name="app-tipo-aula"]:checked') as HTMLInputElement)?.value === 'reposicao';
+        creditsBox.style.display = 'flex';
+
+        if (saldo === 0 && isRepoChecked) {
+          creditsBox.style.background = 'rgba(239, 68, 68, 0.15)';
+          creditsBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+          creditsBox.style.color = '#f87171';
+        } else {
+          creditsBox.style.background = 'rgba(59, 130, 246, 0.1)';
+          creditsBox.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+          creditsBox.style.color = '#93c5fd';
+        }
+      };
+
+      studentSelect?.addEventListener('change', updateCreditsBadge);
+      tipoRadios.forEach(r => r.addEventListener('change', updateCreditsBadge));
+      updateCreditsBadge();
 
       // Auto-seleciona plano ao escolher aluno no modo plano
       const planStudentSelect = document.getElementById('app-plan-student') as HTMLSelectElement;
