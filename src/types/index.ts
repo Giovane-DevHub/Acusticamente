@@ -2,7 +2,7 @@
 
 export type UserRole = 'admin' | 'professor' | 'atendente';
 
-export type AppFormScreen = 'home' | 'agenda' | 'alunos' | 'planos' | 'auditoria' | 'configuracoes' | 'financeiro' | 'relatorios';
+export type AppFormScreen = 'home' | 'agenda' | 'alunos' | 'planos' | 'auditoria' | 'configuracoes' | 'financeiro' | 'planos-pagamento' | 'relatorios';
 
 export interface AlunosPermissions {
   acesso: boolean;
@@ -50,10 +50,18 @@ export interface RelatoriosPermissions {
   gerar: boolean;
 }
 
+export interface PlanosPagamentoPermissions {
+  acesso: boolean;
+  cadastrar: boolean;
+  alterar: boolean;
+  excluir: boolean;
+}
+
 export interface UserPermissions {
   alunos: AlunosPermissions;
   agenda: AgendaPermissions;
   planos: PlanosPermissions;
+  planosPagamento?: PlanosPagamentoPermissions;
   home: HomePermissions;
   auditoria: AuditoriaPermissions;
   configuracoes: ConfiguracoesPermissions;
@@ -209,6 +217,7 @@ export type AppScreen =
   | 'user'
   | 'planos'
   | 'financeiro'
+  | 'planos-pagamento'
   | 'relatorios'
   | 'auditoria'
   | 'configuracoes';

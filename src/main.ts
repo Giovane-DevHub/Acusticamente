@@ -12,6 +12,7 @@ import { renderAgenda } from './views/agenda';
 import { renderAlunos } from './views/alunos';
 import { renderUser } from './views/user';
 import { renderPlanos } from './views/planos';
+import { renderPlanosPagamento } from './views/planosPagamento';
 import { renderFinanceiro } from './views/financeiro';
 import { renderRelatorios } from './views/relatorios';
 import { renderAuditoria } from './views/auditoria';
@@ -37,7 +38,7 @@ class AppRouter {
       this.currentScreen = 'login';
     } else if (authService.isAuthenticated()) {
       if (
-        ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'relatorios', 'user', 'auditoria', 'configuracoes'].includes(rawHash) &&
+        ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'planos-pagamento', 'relatorios', 'user', 'auditoria', 'configuracoes'].includes(rawHash) &&
         hasPermission(currentUser, rawHash)
       ) {
         this.currentScreen = rawHash;
@@ -85,7 +86,7 @@ class AppRouter {
 
   private getFirstAllowedScreen(user: User | null): AppScreen {
     if (!user) return 'login';
-    const screens: AppScreen[] = ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'relatorios', 'auditoria', 'configuracoes'];
+    const screens: AppScreen[] = ['home', 'agenda', 'alunos', 'planos', 'financeiro', 'planos-pagamento', 'relatorios', 'auditoria', 'configuracoes'];
     for (const s of screens) {
       if (hasPermission(user, s)) return s;
     }
@@ -224,6 +225,13 @@ class AppRouter {
             <a class="nav-item ${this.currentScreen === 'financeiro' ? 'active' : ''}" data-screen="financeiro">
               <span class="nav-item-icon">${ICONS.financeiro}</span>
               <span>Financeiro</span>
+            </a>
+          ` : ''}
+
+          ${hasPermission(currentUser, 'planos-pagamento') ? `
+            <a class="nav-item ${this.currentScreen === 'planos-pagamento' ? 'active' : ''}" data-screen="planos-pagamento">
+              <span class="nav-item-icon">${ICONS.planoPagamento}</span>
+              <span>Planos de Pagamento</span>
             </a>
           ` : ''}
 
@@ -378,6 +386,8 @@ class AppRouter {
         return renderPlanos(navCallback);
       case 'financeiro':
         return renderFinanceiro(navCallback);
+      case 'planos-pagamento':
+        return renderPlanosPagamento(navCallback);
       case 'relatorios':
         return renderRelatorios(navCallback);
       case 'auditoria':
@@ -397,6 +407,7 @@ class AppRouter {
       case 'user': return 'Usuários';
       case 'planos': return 'Planos de Ensino';
       case 'financeiro': return 'Financeiro & Mensalidades';
+      case 'planos-pagamento': return 'Planos de Pagamento';
       case 'relatorios': return 'Relatórios Gerenciais';
       case 'auditoria': return 'Auditoria';
       case 'configuracoes': return 'Configurações';
@@ -412,6 +423,7 @@ class AppRouter {
       case 'user': return 'Gerenciamento de operadores e permissões de acesso';
       case 'planos': return 'Estruturação de planos pedagógicos e seus módulos';
       case 'financeiro': return 'Controle de recebimentos, mensalidades e baixas';
+      case 'planos-pagamento': return 'Gestão de valores, modalidades (individual/turma) e ciclos de cobrança';
       case 'relatorios': return 'Emissão de relatórios e exportação para PDF corporativo';
       case 'auditoria': return 'Histórico auditado de todas as alterações do sistema';
       case 'configuracoes': return 'Dados institucionais e conexão com o MongoDB';

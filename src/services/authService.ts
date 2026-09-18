@@ -7,6 +7,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     alunos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     agenda: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     planos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
+    planosPagamento: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     home: { acesso: true },
     financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: true },
     relatorios: { acesso: true, gerar: true },
@@ -17,6 +18,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     alunos: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     planos: { acesso: true, cadastrar: false, alterar: false, excluir: false },
+    planosPagamento: { acesso: false, cadastrar: false, alterar: false, excluir: false },
     home: { acesso: true },
     financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
     relatorios: { acesso: true, gerar: true },
@@ -27,6 +29,7 @@ export const DEFAULT_PERMISSIONS_BY_ROLE: Record<UserRole, UserPermissions> = {
     alunos: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     planos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
+    planosPagamento: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     home: { acesso: true },
     financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: false },
     relatorios: { acesso: true, gerar: true },
@@ -41,6 +44,7 @@ export function getUserPermissions(user?: User | null): UserPermissions {
       alunos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       agenda: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       planos: { acesso: false, cadastrar: false, alterar: false, excluir: false },
+      planosPagamento: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       home: { acesso: false },
       financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
       relatorios: { acesso: false, gerar: false },
@@ -81,6 +85,12 @@ export function getUserPermissions(user?: User | null): UserPermissions {
       alterar: isOldBool(raw.planos) ? raw.planos : (raw.planos?.alterar ?? defaults.planos.alterar),
       excluir: isOldBool(raw.planos) ? false : (raw.planos?.excluir ?? defaults.planos.excluir)
     },
+    planosPagamento: {
+      acesso: isOldBool(raw.planosPagamento) ? raw.planosPagamento : (raw.planosPagamento?.acesso ?? defaults.planosPagamento?.acesso ?? false),
+      cadastrar: isOldBool(raw.planosPagamento) ? raw.planosPagamento : (raw.planosPagamento?.cadastrar ?? defaults.planosPagamento?.cadastrar ?? false),
+      alterar: isOldBool(raw.planosPagamento) ? raw.planosPagamento : (raw.planosPagamento?.alterar ?? defaults.planosPagamento?.alterar ?? false),
+      excluir: isOldBool(raw.planosPagamento) ? false : (raw.planosPagamento?.excluir ?? defaults.planosPagamento?.excluir ?? false)
+    },
     home: {
       acesso: isOldBool(raw.home) ? raw.home : (raw.home?.acesso ?? defaults.home.acesso)
     },
@@ -110,6 +120,11 @@ export function hasPermission(user: User | null | undefined, screen: AppScreen):
   // Apenas administradores têm acesso à aba/tela de usuários
   if (screen === 'user') return user.papel === 'admin';
   if (user.papel === 'admin' || user.isSistema) return true;
+
+  if (screen === 'planos-pagamento') {
+    const perms = getUserPermissions(user);
+    return !!perms.planosPagamento?.acesso;
+  }
 
   const perms = getUserPermissions(user);
   const screenPerm = perms[screen as keyof UserPermissions];

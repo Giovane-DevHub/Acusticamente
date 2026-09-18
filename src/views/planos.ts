@@ -1,12 +1,11 @@
 import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
-import { TeachingPlan, PlanModule, PlanLesson, PaymentPlan, PaymentPlanModalidade, PaymentPlanPeriodicidade } from '../types';
-import { ICONS, openModal, showToast, confirmAction, applyInputMask, maskMoney, parseMoney } from '../utils/ui';
+import { TeachingPlan, PlanModule, PlanLesson } from '../types';
+import { ICONS, openModal, showToast, confirmAction } from '../utils/ui';
 
 export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
   const user = authService.getCurrentUser();
-  let currentTab: 'ensino' | 'pagamento' = 'ensino';
   let searchTerm = '';
 
   const canCreate = hasActionPermission(user, 'planos', 'cadastrar');
@@ -15,7 +14,6 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
 
   function renderList(): void {
     const allPlans = storageService.getPlans();
-    const allPaymentPlans = storageService.getPaymentPlans();
 
     const filteredTeachingPlans = allPlans.filter(p => {
       const term = searchTerm.toLowerCase();
@@ -25,59 +23,29 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       );
     });
 
-    const filteredPaymentPlans = allPaymentPlans.filter(p => {
-      const term = searchTerm.toLowerCase();
-      return (
-        p.nome.toLowerCase().includes(term) ||
-        p.modalidade.toLowerCase().includes(term) ||
-        p.periodicidade.toLowerCase().includes(term) ||
-        (p.descricao && p.descricao.toLowerCase().includes(term))
-      );
-    });
-
     container.innerHTML = `
       <!-- Cabeçalho Principal -->
       <div style="margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
           <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700;">
-            ${currentTab === 'ensino' ? 'Planos de Ensino (Pedagógico)' : 'Planos de Pagamento (Financeiro)'}
+            Planos de Ensino
           </h2>
           <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-            ${
-              currentTab === 'ensino'
-                ? 'Estrutura 100% pedagógica: Plano &bull; Módulos &bull; Aulas.'
-                : 'Tabela de cobrança para matrículas: Modalidades (Individual/Turma), Periodicidades (Mensal/Trimestral/Semestral) e Regra de Desconto (20% na 2ª matrícula).'
-            }
+            Estrutura 100% pedagógica dos cursos: Plano &bull; Módulos &bull; Aulas.
           </p>
         </div>
 
         <div style="display: flex; gap: 8px;">
           ${
             canCreate
-              ? currentTab === 'ensino'
-                ? `
-                  <button class="btn btn-primary" id="btn-new-plan" style="display: flex; align-items: center; gap: 6px;">
-                    ${ICONS.plus} Novo Plano de Ensino
-                  </button>
-                `
-                : `
-                  <button class="btn btn-primary" id="btn-new-payment-plan" style="display: flex; align-items: center; gap: 6px;">
-                    ${ICONS.plus} Novo Plano de Pagamento
-                  </button>
-                `
+              ? `
+                <button class="btn btn-primary" id="btn-new-plan" style="display: flex; align-items: center; gap: 6px;">
+                  ${ICONS.plus} Novo Plano de Ensino
+                </button>
+              `
               : ''
           }
         </div>
-      </div>
-
-      <!-- Abas de Navegação (Ensino vs Pagamento) -->
-      <div style="display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px;">
-        <button type="button" class="btn ${currentTab === 'ensino' ? 'btn-primary' : 'btn-secondary'} btn-tab-plan" data-tab="ensino" style="font-size: 0.82rem; padding: 7px 16px;">
-          🎼 Planos de Ensino (${allPlans.length})
-        </button>
-        <button type="button" class="btn ${currentTab === 'pagamento' ? 'btn-primary' : 'btn-secondary'} btn-tab-plan" data-tab="pagamento" style="font-size: 0.82rem; padding: 7px 16px;">
-          💰 Planos de Pagamento (${allPaymentPlans.length})
-        </button>
       </div>
 
       <!-- Barra de Filtro / Busca -->
@@ -87,7 +55,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
             type="text" 
             id="plan-search-input" 
             class="form-input" 
-            placeholder="${currentTab === 'ensino' ? 'Buscar plano de ensino...' : 'Buscar plano de pagamento...'}" 
+            placeholder="Buscar plano de ensino..." 
             value="${searchTerm}"
             style="padding-left: 36px;"
           />
@@ -103,221 +71,101 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       </div>
 
       <!-- TABELA: PLANOS DE ENSINO -->
-      ${
-        currentTab === 'ensino'
-          ? `
-            <div class="panel-card" style="margin-bottom: 0;">
-              <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="panel-card-title">Planos Pedagógicos Cadastrados (${filteredTeachingPlans.length})</h3>
-              </div>
+      <div class="panel-card" style="margin-bottom: 0;">
+        <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="panel-card-title">Planos Pedagógicos Cadastrados (${filteredTeachingPlans.length})</h3>
+        </div>
 
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="min-width: 160px;">Plano de Ensino</th>
+                <th class="col-hide-sm" style="width: 160px; text-align: center;">Estrutura</th>
+                <th class="col-hide-md">Descrição</th>
+                <th style="width: 110px; text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${
+                filteredTeachingPlans.length === 0
+                  ? `
                     <tr>
-                      <th style="min-width: 160px;">Plano de Ensino</th>
-                      <th class="col-hide-sm" style="width: 160px; text-align: center;">Estrutura</th>
-                      <th class="col-hide-md">Descrição</th>
-                      <th style="width: 100px; text-align: right;">Ações</th>
+                      <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">
+                        ${searchTerm ? 'Nenhum plano de ensino encontrado para a busca.' : 'Nenhum plano pedagógico cadastrado ainda.'}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    ${
-                      filteredTeachingPlans.length === 0
-                        ? `
+                  `
+                  : filteredTeachingPlans
+                      .map(plan => {
+                        const totalModulos = (plan.modulos || []).length;
+                        const totalAulas = (plan.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0);
+
+                        return `
                           <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">
-                              ${searchTerm ? 'Nenhum plano de ensino encontrado.' : 'Nenhum plano de ensino cadastrado.'}
+                            <td>
+                              <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: rgba(234, 67, 53, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-coral); flex-shrink: 0;">
+                                  ${ICONS.planos}
+                                </div>
+                                <div>
+                                  <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
+                                    ${plan.nome}
+                                  </div>
+                                  ${plan.instrumento ? `<span style="font-size: 0.72rem; color: var(--text-muted);">${plan.instrumento}</span>` : ''}
+                                </div>
+                              </div>
+                            </td>
+                            <td class="col-hide-sm" style="text-align: center;">
+                              <div style="display: inline-flex; gap: 4px; align-items: center;">
+                                <span class="badge" style="background: rgba(234, 67, 53, 0.12); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
+                                  ${totalModulos} ${totalModulos === 1 ? 'módulo' : 'módulos'}
+                                </span>
+                                <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
+                                  ${totalAulas} ${totalAulas === 1 ? 'aula' : 'aulas'}
+                                </span>
+                              </div>
+                            </td>
+                            <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
+                              ${plan.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição</span>'}
+                            </td>
+                            <td style="text-align: right;">
+                              <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                ${
+                                  canEdit
+                                    ? `
+                                      <button class="btn btn-secondary btn-icon-only btn-edit-plan" data-id="${plan.id}" title="Editar Plano e Módulos">
+                                        ${ICONS.edit}
+                                      </button>
+                                    `
+                                    : ''
+                                }
+                                ${
+                                  canDelete
+                                    ? `
+                                      <button class="btn btn-danger btn-icon-only btn-delete-plan" data-id="${plan.id}" title="Excluir Plano">
+                                        ${ICONS.trash}
+                                      </button>
+                                    `
+                                    : ''
+                                }
+                                ${!canEdit && !canDelete ? `<span style="font-size: 0.72rem; color: var(--text-muted);">Visualização</span>` : ''}
+                              </div>
                             </td>
                           </tr>
-                        `
-                        : filteredTeachingPlans
-                            .map(plan => {
-                              const totalModulos = (plan.modulos || []).length;
-                              const totalAulas = (plan.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0);
-
-                              return `
-                                <tr>
-                                  <td>
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                      <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: rgba(234, 67, 53, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-coral); flex-shrink: 0;">
-                                        ${ICONS.planos}
-                                      </div>
-                                      <div>
-                                        <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
-                                          ${plan.nome}
-                                        </div>
-                                        ${plan.instrumento ? `<span style="font-size: 0.72rem; color: var(--text-muted);">${plan.instrumento}</span>` : ''}
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td class="col-hide-sm" style="text-align: center;">
-                                    <div style="display: inline-flex; gap: 4px; align-items: center;">
-                                      <span class="badge" style="background: rgba(234, 67, 53, 0.12); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
-                                        ${totalModulos} ${totalModulos === 1 ? 'módulo' : 'módulos'}
-                                      </span>
-                                      <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); font-size: 0.72rem; padding: 2px 8px; font-weight: 600;">
-                                        ${totalAulas} ${totalAulas === 1 ? 'aula' : 'aulas'}
-                                      </span>
-                                    </div>
-                                  </td>
-                                  <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
-                                    ${plan.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição</span>'}
-                                  </td>
-                                  <td style="text-align: right;">
-                                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                                      ${
-                                        canEdit
-                                          ? `
-                                            <button class="btn btn-secondary btn-icon-only btn-edit-plan" data-id="${plan.id}" title="Editar Plano e Módulos">
-                                              ${ICONS.edit}
-                                            </button>
-                                          `
-                                          : ''
-                                      }
-                                      ${
-                                        canDelete
-                                          ? `
-                                            <button class="btn btn-danger btn-icon-only btn-delete-plan" data-id="${plan.id}" title="Excluir Plano">
-                                              ${ICONS.trash}
-                                            </button>
-                                          `
-                                          : ''
-                                      }
-                                      ${!canEdit && !canDelete ? `<span style="font-size: 0.72rem; color: var(--text-muted);">Visualização</span>` : ''}
-                                    </div>
-                                  </td>
-                                </tr>
-                              `;
-                            })
-                            .join('')
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `
-          : `
-            <!-- TABELA: PLANOS DE PAGAMENTO -->
-            <div class="panel-card" style="margin-bottom: 0;">
-              <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="panel-card-title">Planos de Pagamento Cadastrados (${filteredPaymentPlans.length})</h3>
-              </div>
-
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th style="min-width: 160px;">Plano</th>
-                      <th style="width: 130px;">Modalidade</th>
-                      <th style="width: 130px;">Periodicidade</th>
-                      <th style="width: 140px;">Mensalidade</th>
-                      <th class="col-hide-sm" style="width: 180px;">2ª Matrícula (20% OFF)</th>
-                      <th class="col-hide-md">Descrição</th>
-                      <th style="width: 100px; text-align: right;">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${
-                      filteredPaymentPlans.length === 0
-                        ? `
-                          <tr>
-                            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 36px;">
-                              ${searchTerm ? 'Nenhum plano de pagamento encontrado.' : 'Nenhum plano de pagamento cadastrado.'}
-                            </td>
-                          </tr>
-                        `
-                        : filteredPaymentPlans
-                            .map(pp => {
-                              const valorComDesconto = pp.valorMensal * (1 - (pp.descontoSegundaMatricula || 20) / 100);
-
-                              return `
-                                <tr>
-                                  <td>
-                                    <div style="font-weight: 600; color: var(--text-white); font-size: 0.88rem;">
-                                      ${pp.nome}
-                                    </div>
-                                    <span class="badge ${pp.ativo ? 'badge-success' : 'badge-secondary'}" style="font-size: 0.65rem; padding: 2px 6px; margin-top: 2px;">
-                                      ${pp.ativo ? 'Ativo' : 'Inativo'}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.74rem; padding: 3px 8px;">
-                                      ${pp.modalidade === 'individual' ? '👤 Individual' : '👥 Turma'}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span class="badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 0.74rem; padding: 3px 8px; text-transform: capitalize;">
-                                      ${pp.periodicidade}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span style="font-weight: 700; color: #34d399; font-size: 0.92rem;">
-                                      R$ ${pp.valorMensal.toFixed(2)}
-                                    </span>
-                                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">/mês</span>
-                                  </td>
-                                  <td class="col-hide-sm">
-                                    <span style="font-weight: 700; color: #fbbf24; font-size: 0.86rem;">
-                                      R$ ${valorComDesconto.toFixed(2)}
-                                    </span>
-                                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">(-${pp.descontoSegundaMatricula || 20}% familiar/aluno)</span>
-                                  </td>
-                                  <td class="col-hide-md" style="color: var(--text-secondary); font-size: 0.82rem;">
-                                    ${pp.descricao || '<span style="color: var(--text-muted); font-style: italic;">Sem descrição</span>'}
-                                  </td>
-                                  <td style="text-align: right;">
-                                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                                      ${
-                                        canEdit
-                                          ? `
-                                            <button class="btn btn-secondary btn-icon-only btn-edit-payment-plan" data-id="${pp.id}" title="Editar Plano de Pagamento">
-                                              ${ICONS.edit}
-                                            </button>
-                                          `
-                                          : ''
-                                      }
-                                      ${
-                                        canDelete
-                                          ? `
-                                            <button class="btn btn-danger btn-icon-only btn-delete-payment-plan" data-id="${pp.id}" title="Excluir Plano de Pagamento">
-                                              ${ICONS.trash}
-                                            </button>
-                                          `
-                                          : ''
-                                      }
-                                    </div>
-                                  </td>
-                                </tr>
-                              `;
-                            })
-                            .join('')
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `
-      }
+                        `;
+                      })
+                      .join('')
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
     `;
-
-    // Eventos de Abas
-    container.querySelectorAll('.btn-tab-plan').forEach(btn => {
-      btn.addEventListener('click', e => {
-        currentTab = (e.currentTarget as HTMLElement).dataset.tab as any;
-        searchTerm = '';
-        renderList();
-      });
-    });
 
     // Evento: Novo Plano de Ensino
     container.querySelector('#btn-new-plan')?.addEventListener('click', () => {
       openPlanModal();
-    });
-
-    // Evento: Novo Plano de Pagamento
-    container.querySelector('#btn-new-payment-plan')?.addEventListener('click', () => {
-      openPaymentPlanModal();
     });
 
     // Filtro de Busca
@@ -359,33 +207,6 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
             onConfirm: () => {
               storageService.deletePlan(plan.id, user?.nome || 'Administrador');
               showToast(`Plano de ensino "${plan.nome}" excluído.`, 'info');
-              renderList();
-            }
-          });
-        }
-      });
-    });
-
-    // Ações de Plano de Pagamento
-    container.querySelectorAll('.btn-edit-payment-plan').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const id = (e.currentTarget as HTMLElement).dataset.id;
-        const pp = storageService.getPaymentPlans().find(p => p.id === id);
-        if (pp) openPaymentPlanModal(pp);
-      });
-    });
-
-    container.querySelectorAll('.btn-delete-payment-plan').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const id = (e.currentTarget as HTMLElement).dataset.id;
-        const pp = storageService.getPaymentPlans().find(p => p.id === id);
-        if (pp) {
-          confirmAction({
-            title: 'Excluir Plano de Pagamento',
-            message: `Deseja realmente excluir o plano de pagamento "<strong>${pp.nome}</strong>"?`,
-            onConfirm: () => {
-              storageService.deletePaymentPlan(pp.id, user?.nome || 'Administrador');
-              showToast(`Plano de pagamento "${pp.nome}" excluído.`, 'info');
               renderList();
             }
           });
@@ -820,169 +641,6 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
         });
       });
     }
-  }
-
-  // ========================================================
-  // MODAL: PLANO DE PAGAMENTO (COBRANÇA: MODALIDADES, CICLOS E DESCONTO)
-  // ========================================================
-  function openPaymentPlanModal(existingPlan?: PaymentPlan): void {
-    const isEditing = !!existingPlan;
-
-    const bodyHtml = `
-      <form id="payment-plan-modal-form" style="display: flex; flex-direction: column; gap: 14px;">
-        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px;">
-          <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #34d399; letter-spacing: 0.05em; margin-bottom: 12px;">
-            💰 Parâmetros do Plano de Pagamento
-          </div>
-
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label class="form-label" for="pp-nome">Nome do Plano *</label>
-            <input 
-              type="text" 
-              id="pp-nome" 
-              class="form-input" 
-              placeholder="Ex: Individual - Mensal" 
-              value="${existingPlan?.nome || ''}" 
-              required 
-            />
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="pp-modalidade">Modalidade *</label>
-              <select id="pp-modalidade" class="form-select">
-                <option value="individual" ${existingPlan?.modalidade === 'individual' ? 'selected' : ''}>👤 Individual</option>
-                <option value="turma" ${existingPlan?.modalidade === 'turma' ? 'selected' : ''}>👥 Turma (Grupo)</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="pp-periodicidade">Periodicidade / Ciclo *</label>
-              <select id="pp-periodicidade" class="form-select">
-                <option value="mensal" ${existingPlan?.periodicidade === 'mensal' ? 'selected' : ''}>Mensal (1 mês)</option>
-                <option value="trimestral" ${existingPlan?.periodicidade === 'trimestral' ? 'selected' : ''}>Trimestral (3 meses)</option>
-                <option value="semestral" ${existingPlan?.periodicidade === 'semestral' ? 'selected' : ''}>Semestral (6 meses)</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="pp-valor">Mensalidade Padrão (R$) *</label>
-              <input 
-                type="text" 
-                id="pp-valor" 
-                class="form-input" 
-                placeholder="0,00" 
-                value="${existingPlan?.valorMensal !== undefined ? maskMoney(existingPlan.valorMensal) : '280,00'}" 
-                required 
-              />
-            </div>
-
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="pp-desconto">Desconto 2ª Matrícula (%)</label>
-              <input 
-                type="number" 
-                id="pp-desconto" 
-                class="form-input" 
-                min="0" 
-                max="100" 
-                value="${existingPlan?.descontoSegundaMatricula ?? 20}" 
-              />
-              <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; display: block;">
-                Aplicado automaticamente para 2ª matrícula de familiar ou do aluno.
-              </span>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label class="form-label" for="pp-desc">Descrição / Benefícios</label>
-            <input 
-              type="text" 
-              id="pp-desc" 
-              class="form-input" 
-              placeholder="Ex: Aulas semanais individuais com acompanhamento personalizado." 
-              value="${existingPlan?.descricao || ''}" 
-            />
-          </div>
-
-          <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="pp-ativo">Status do Plano</label>
-            <select id="pp-ativo" class="form-select">
-              <option value="true" ${existingPlan?.ativo !== false ? 'selected' : ''}>Ativo (Disponível para matrícula)</option>
-              <option value="false" ${existingPlan?.ativo === false ? 'selected' : ''}>Inativo (Arquivado)</option>
-            </select>
-          </div>
-        </div>
-      </form>
-    `;
-
-    openModal({
-      title: isEditing ? `Editar Plano de Pagamento: ${existingPlan.nome}` : 'Novo Plano de Pagamento',
-      bodyHtml,
-      confirmText: isEditing ? 'Salvar' : 'Criar Plano',
-      onConfirm: () => {
-        const nome = (document.getElementById('pp-nome') as HTMLInputElement)?.value.trim();
-        const modalidade = (document.getElementById('pp-modalidade') as HTMLSelectElement)?.value as PaymentPlanModalidade;
-        const periodicidade = (document.getElementById('pp-periodicidade') as HTMLSelectElement)?.value as PaymentPlanPeriodicidade;
-        const valorInput = (document.getElementById('pp-valor') as HTMLInputElement)?.value;
-        const valorMensal = parseMoney(valorInput);
-        const desconto = parseInt((document.getElementById('pp-desconto') as HTMLInputElement)?.value, 10) || 20;
-        const desc = (document.getElementById('pp-desc') as HTMLInputElement)?.value.trim();
-        const ativo = (document.getElementById('pp-ativo') as HTMLSelectElement)?.value === 'true';
-
-        if (!nome) {
-          showToast('Informe o nome do plano de pagamento.', 'error');
-          return false;
-        }
-
-        if (valorMensal <= 0) {
-          showToast('Informe um valor de mensalidade válido.', 'error');
-          return false;
-        }
-
-        const currentUserName = user?.nome || 'Administrador';
-
-        if (isEditing && existingPlan) {
-          storageService.updatePaymentPlan(
-            existingPlan.id,
-            {
-              nome,
-              modalidade,
-              periodicidade,
-              valorMensal,
-              descontoSegundaMatricula: desconto,
-              descricao: desc || undefined,
-              ativo
-            },
-            currentUserName
-          );
-          showToast(`Plano de pagamento "${nome}" atualizado!`, 'success');
-        } else {
-          storageService.addPaymentPlan(
-            {
-              nome,
-              modalidade,
-              periodicidade,
-              valorMensal,
-              descontoSegundaMatricula: desconto,
-              descricao: desc || undefined,
-              ativo
-            },
-            currentUserName
-          );
-          showToast(`Plano de pagamento "${nome}" criado com sucesso!`, 'success');
-        }
-
-        renderList();
-        return true;
-      }
-    });
-
-    setTimeout(() => {
-      const valorInput = document.getElementById('pp-valor') as HTMLInputElement;
-      if (valorInput) applyInputMask(valorInput, maskMoney);
-    }, 50);
   }
 
   renderList();

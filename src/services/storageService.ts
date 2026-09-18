@@ -53,6 +53,13 @@ class StorageService {
         ...u,
         permissoes: {
           ...u.permissoes,
+          planosPagamento: u.permissoes?.planosPagamento || (
+            u.papel === 'admin'
+              ? { acesso: true, cadastrar: true, alterar: true, excluir: true }
+              : u.papel === 'atendente'
+              ? { acesso: true, cadastrar: true, alterar: true, excluir: false }
+              : { acesso: false, cadastrar: false, alterar: false, excluir: false }
+          ),
           financeiro: u.permissoes?.financeiro || (
             u.papel === 'admin'
               ? { acesso: true, cadastrar: true, alterar: true, excluir: true }
@@ -79,6 +86,7 @@ class StorageService {
             alunos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             agenda: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             planos: { acesso: true, cadastrar: true, alterar: true, excluir: true },
+            planosPagamento: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             financeiro: { acesso: true, cadastrar: true, alterar: true, excluir: true },
             relatorios: { acesso: true, gerar: true },
             home: { acesso: true },
@@ -98,6 +106,7 @@ class StorageService {
             alunos: { acesso: true, cadastrar: true, alterar: true, excluir: false },
             agenda: { acesso: true, cadastrar: true, alterar: true, excluir: false },
             planos: { acesso: true, cadastrar: false, alterar: false, excluir: false },
+            planosPagamento: { acesso: false, cadastrar: false, alterar: false, excluir: false },
             financeiro: { acesso: false, cadastrar: false, alterar: false, excluir: false },
             relatorios: { acesso: true, gerar: true },
             home: { acesso: true },

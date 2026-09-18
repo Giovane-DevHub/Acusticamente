@@ -54,6 +54,17 @@ export const PERMISSION_GROUPS: {
       ]
     },
     {
+      key: 'planosPagamento',
+      title: 'Planos de Pagamento',
+      icon: '💳',
+      items: [
+        { key: 'acesso', label: 'Acesso ao módulo de planos de pagamento' },
+        { key: 'cadastrar', label: 'Cadastrar novo plano de pagamento' },
+        { key: 'alterar', label: 'Alterar modalidades, ciclos e valores' },
+        { key: 'excluir', label: 'Excluir plano de pagamento' }
+      ]
+    },
+    {
       key: 'relatorios',
       title: 'Relatórios',
       icon: '📊',
@@ -550,6 +561,12 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
               cadastrar: (document.getElementById('perm-financeiro-cadastrar') as HTMLInputElement)?.checked ?? false,
               alterar: (document.getElementById('perm-financeiro-alterar') as HTMLInputElement)?.checked ?? false,
               excluir: (document.getElementById('perm-financeiro-excluir') as HTMLInputElement)?.checked ?? false
+            },
+            planosPagamento: {
+              acesso: (document.getElementById('perm-planosPagamento-acesso') as HTMLInputElement)?.checked ?? false,
+              cadastrar: (document.getElementById('perm-planosPagamento-cadastrar') as HTMLInputElement)?.checked ?? false,
+              alterar: (document.getElementById('perm-planosPagamento-alterar') as HTMLInputElement)?.checked ?? false,
+              excluir: (document.getElementById('perm-planosPagamento-excluir') as HTMLInputElement)?.checked ?? false
             },
             relatorios: {
               acesso: (document.getElementById('perm-relatorios-acesso') as HTMLInputElement)?.checked ?? false,
