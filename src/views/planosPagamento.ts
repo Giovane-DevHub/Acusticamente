@@ -35,6 +35,7 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
     const totalPlanos = allPaymentPlans.length;
     const totalIndiv = allPaymentPlans.filter(p => p.modalidade === 'individual').length;
     const totalTurma = allPaymentPlans.filter(p => p.modalidade === 'turma').length;
+    const totalAtivos = allPaymentPlans.filter(p => p.ativo).length;
 
     container.innerHTML = `
       <!-- Cabeçalho Principal -->
@@ -59,7 +60,7 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
         </div>
       </div>
 
-      <!-- Cards de Métricas e Regras -->
+      <!-- Cards de Métricas e Totais -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 20px;">
         <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 14px;">
           <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(74, 222, 128, 0.15); color: #4ade80; display: flex; align-items: center; justify-content: center;">
@@ -91,13 +92,13 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
           </div>
         </div>
 
-        <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 14px; border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.04);">
-          <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(245, 158, 11, 0.15); color: #fbbf24; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-            20%
+        <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 14px;">
+          <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center;">
+            ✓
           </div>
           <div>
-            <div style="font-size: 0.76rem; color: #fbbf24; text-transform: uppercase; font-weight: 600;">Segunda Matrícula</div>
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-white);">20% OFF Automático</div>
+            <div style="font-size: 0.76rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Planos Ativos</div>
+            <div style="font-size: 1.4rem; font-weight: 700; color: var(--text-white);">${totalAtivos}</div>
           </div>
         </div>
       </div>
@@ -152,7 +153,8 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
             ${filtered
               .map(p => {
-                const valorComDesconto = p.valorMensal * (1 - (p.descontoSegundaMatricula || 20) / 100);
+                const descSeg = p.descontoSegundaMatricula ?? 0;
+                const valorComDesconto = descSeg > 0 ? p.valorMensal * (1 - descSeg / 100) : p.valorMensal;
                 const isIndividual = p.modalidade === 'individual';
 
                 return `
@@ -187,10 +189,26 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
                         <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary);">/mês</span>
                       </div>
 
-                      <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.75rem; color: #fbbf24; font-weight: 600;">2ª Matrícula (${p.descontoSegundaMatricula || 20}% OFF):</span>
-                        <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-white);">R$ ${valorComDesconto.toFixed(2).replace('.', ',')}/mês</span>
-                      </div>
+                      ${
+                        descSeg > 0
+                          ? `
+                          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.74rem; color: var(--text-secondary);">
+                              2ª Matrícula / Familiar (${descSeg}% sugerido):
+                            </span>
+                            <span style="font-size: 0.84rem; font-weight: 600; color: var(--text-white);">
+                              R$ ${valorComDesconto.toFixed(2).replace('.', ',')}/mês
+                            </span>
+                          </div>
+                          `
+                          : `
+                          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.74rem; color: var(--text-muted);">
+                              Sem desconto de 2ª matrícula previsto
+                            </span>
+                          </div>
+                          `
+                      }
                     </div>
                   </div>
 
@@ -309,9 +327,9 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
           </div>
 
           <div class="form-group" style="margin: 0;">
-            <label class="form-label" for="pp-desconto-segunda">Desconto 2ª Matrícula (%)</label>
-            <input type="number" id="pp-desconto-segunda" class="form-input" min="0" max="100" value="${plan?.descontoSegundaMatricula ?? 20}" required />
-            <small style="font-size: 0.72rem; color: var(--text-secondary);">Padrão: 20% de desconto para familiares ou 2ª matrícula.</small>
+            <label class="form-label" for="pp-desconto-segunda">Desconto 2ª Matrícula / Familiar (%)</label>
+            <input type="number" id="pp-desconto-segunda" class="form-input" min="0" max="100" value="${plan?.descontoSegundaMatricula ?? 20}" />
+            <small style="font-size: 0.72rem; color: var(--text-secondary);">Opcional. Percentual sugerido de desconto (0 para nenhum).</small>
           </div>
         </div>
 
@@ -338,7 +356,9 @@ export function renderPlanosPagamento(_onNavigate?: (screen: string) => void): H
         const modalidade = (document.getElementById('pp-modalidade') as HTMLSelectElement)?.value as PaymentPlanModalidade;
         const periodicidade = (document.getElementById('pp-periodicidade') as HTMLSelectElement)?.value as PaymentPlanPeriodicidade;
         const valorRaw = (document.getElementById('pp-valor') as HTMLInputElement)?.value.trim();
-        const descontoSegunda = parseFloat((document.getElementById('pp-desconto-segunda') as HTMLInputElement)?.value) || 20;
+        const descInput = (document.getElementById('pp-desconto-segunda') as HTMLInputElement)?.value;
+        const parsedDesc = parseFloat(descInput);
+        const descontoSegunda = !isNaN(parsedDesc) && parsedDesc >= 0 ? parsedDesc : 0;
         const descricao = (document.getElementById('pp-desc') as HTMLTextAreaElement)?.value.trim();
         const ativo = (document.getElementById('pp-ativo') as HTMLInputElement)?.checked ?? true;
 

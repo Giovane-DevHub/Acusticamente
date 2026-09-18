@@ -637,8 +637,8 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
             </div>
             ${
               student.isSegundaMatricula
-                ? `<span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); font-size: 0.72rem; padding: 3px 8px;">
-                    🏷️ 2ª Matrícula (20% OFF)
+                ? `<span class="badge" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); border: 1px solid var(--border-subtle); font-size: 0.72rem; padding: 3px 8px;">
+                    🏷️ 2ª Matrícula / Familiar
                    </span>`
                 : ''
             }
@@ -901,11 +901,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       )
       .join('');
 
-    // Planos de Pagamento (Financeiro: Modalidade Individual/Turma, Ciclos e Desconto de 20%)
+    // Planos de Pagamento (Financeiro: Modalidade Individual/Turma, Ciclos e Desconto Opcional)
     const paymentPlanOptions = paymentPlans
       .filter(pp => pp.ativo)
       .map(
-        pp => `<option value="${pp.id}" ${existingStudent?.planoPagamentoId === pp.id ? 'selected' : ''} data-valor="${pp.valorMensal}" data-desconto="${pp.descontoSegundaMatricula ?? 20}">${pp.nome} (${pp.modalidade === 'individual' ? '👤 Individual' : '👥 Turma'} - ${pp.periodicidade.toUpperCase()}) - R$ ${pp.valorMensal.toFixed(2)}/mês</option>`
+        pp => `<option value="${pp.id}" ${existingStudent?.planoPagamentoId === pp.id ? 'selected' : ''} data-valor="${pp.valorMensal}" data-desconto="${pp.descontoSegundaMatricula ?? 0}">${pp.nome} (${pp.modalidade === 'individual' ? '👤 Individual' : '👥 Turma'} - ${pp.periodicidade.toUpperCase()}) - R$ ${pp.valorMensal.toFixed(2)}/mês</option>`
       )
       .join('');
 
@@ -1096,19 +1096,19 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               </select>
             </div>
 
-            <!-- Regra de Desconto: 2ª Matrícula (20% OFF) -->
-            <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <!-- Regra de Desconto: 2ª Matrícula / Familiar (Opcional) -->
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: #fbbf24;">
-                  Segunda Matrícula (Familiar ou Aluno)
+                <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-white);">
+                  2ª Matrícula / Familiar (Opcional)
                 </div>
                 <div style="font-size: 0.72rem; color: var(--text-secondary);">
-                  Aplica 20% de desconto automático na mensalidade deste plano.
+                  Aplicar desconto opcional de segunda matrícula conforme configurado no plano.
                 </div>
               </div>
               <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
-                <input type="checkbox" id="student-segunda-matricula" ${existingStudent?.isSegundaMatricula ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: #fbbf24;" />
-                <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-white);">20% OFF</span>
+                <input type="checkbox" id="student-segunda-matricula" ${existingStudent?.isSegundaMatricula ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--color-coral);" />
+                <span id="label-desc-segunda" style="font-size: 0.78rem; font-weight: 500; color: var(--text-secondary);">Aplicar</span>
               </label>
             </div>
 
@@ -1120,7 +1120,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               </div>
               <div>
                 <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Desconto</div>
-                <div id="summary-plano-desc" style="font-size: 0.85rem; font-weight: 600; color: #fbbf24; margin-top: 2px;">R$ 0,00</div>
+                <div id="summary-plano-desc" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">R$ 0,00</div>
               </div>
               <div>
                 <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Mensalidade</div>
@@ -1517,8 +1517,24 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         const calc = storageService.calcularMensalidadeAluno(ppId, is2a);
 
         if (baseEl) baseEl.textContent = `R$ ${calc.valorBase.toFixed(2)}`;
-        if (descEl) descEl.textContent = calc.descontoPercentual > 0 ? `-R$ ${calc.valorDesconto.toFixed(2)} (${calc.descontoPercentual}%)` : 'R$ 0,00';
+        if (descEl) {
+          descEl.textContent = calc.descontoPercentual > 0 ? `-R$ ${calc.valorDesconto.toFixed(2)} (${calc.descontoPercentual}%)` : 'R$ 0,00';
+          descEl.style.color = calc.descontoPercentual > 0 ? '#34d399' : 'var(--text-secondary)';
+        }
         if (finalEl) finalEl.textContent = `R$ ${calc.valorFinal.toFixed(2)}`;
+
+        const labelDesc = document.getElementById('label-desc-segunda');
+        if (labelDesc) {
+          const selectedOption = planoPagamentoSelect?.selectedOptions[0];
+          const descPerc = parseFloat(selectedOption?.getAttribute('data-desconto') || '0');
+          if (descPerc > 0) {
+            labelDesc.textContent = `${descPerc}% OFF`;
+            labelDesc.style.color = is2a ? '#34d399' : 'var(--text-secondary)';
+          } else {
+            labelDesc.textContent = 'Aplicar';
+            labelDesc.style.color = 'var(--text-secondary)';
+          }
+        }
 
         if (valorMensalidadeEl) {
           valorMensalidadeEl.value = maskMoney(calc.valorFinal);
