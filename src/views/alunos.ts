@@ -1183,6 +1183,33 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       bodyHtml,
       modalClass: 'modal-lg',
       confirmText: isEditing ? 'Salvar' : 'Cadastrar',
+      leftButton: {
+        id: 'btn-delete-student-appointments',
+        text: 'Excluir agendamentos deste aluno',
+        btnClass: 'btn-secondary',
+        disabled: !isEditing || !existingStudent,
+        title: !isEditing || !existingStudent
+          ? 'Disponível apenas para alunos já cadastrados'
+          : 'Excluir todos os agendamentos vinculados a este aluno',
+        onClick: () => {
+          if (!existingStudent) return;
+          confirmAction({
+            title: 'Excluir Agendamentos',
+            message: 'Tem certeza que deseja apagar todos os agendamentos deste aluno?',
+            confirmText: 'Sim, apagar agendamentos',
+            confirmBtnClass: 'btn-danger',
+            onConfirm: () => {
+              const currentUserName = user?.nome || 'Administrador';
+              const deletedCount = storageService.deleteStudentAppointments(existingStudent.id, currentUserName);
+              if (deletedCount > 0) {
+                showToast(`Todos os ${deletedCount} agendamento(s) do aluno "${existingStudent.nome}" foram apagados.`, 'info');
+              } else {
+                showToast(`Nenhum agendamento encontrado para o aluno "${existingStudent.nome}".`, 'info');
+              }
+            }
+          });
+        }
+      },
       onConfirm: () => {
         const nome = (document.getElementById('student-nome') as HTMLInputElement).value.trim();
         const dataNascimento = (document.getElementById('student-nascimento') as HTMLInputElement).value;

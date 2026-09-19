@@ -28,6 +28,14 @@ export function openModal(options: {
   confirmText?: string;
   confirmBtnClass?: string;
   cancelText?: string;
+  leftButton?: {
+    id?: string;
+    text: string;
+    btnClass?: string;
+    disabled?: boolean;
+    title?: string;
+    onClick: (modalElement: HTMLElement) => void;
+  };
   onConfirm?: (modalElement: HTMLElement) => boolean | void | Promise<boolean | void>;
   onCancel?: () => void;
 }): void {
@@ -45,6 +53,11 @@ export function openModal(options: {
           ${options.bodyHtml}
         </div>
         <div class="modal-footer">
+          ${
+            options.leftButton
+              ? `<button type="button" class="btn ${options.leftButton.btnClass || 'btn-secondary'}" id="${options.leftButton.id || 'modal-left-btn'}" ${options.leftButton.disabled ? 'disabled' : ''} ${options.leftButton.title ? `title="${options.leftButton.title}"` : ''} style="margin-right: auto; ${options.leftButton.disabled ? 'opacity: 0.5; cursor: not-allowed;' : ''}">${options.leftButton.text}</button>`
+              : ''
+          }
           <button type="button" class="btn btn-secondary" id="modal-cancel-btn">${options.cancelText || 'Cancelar'}</button>
           ${
             options.confirmText
@@ -70,6 +83,17 @@ export function openModal(options: {
   cancelBtn.onclick = close;
   // Bloqueado fechamento ao clicar fora do painel (evita perda acidental de dados)
 
+  if (options.leftButton && !options.leftButton.disabled) {
+    const leftBtn = document.getElementById(options.leftButton.id || 'modal-left-btn');
+    if (leftBtn) {
+      leftBtn.onclick = (e) => {
+        e.preventDefault();
+        const modalEl = document.querySelector('.modal-card') as HTMLElement;
+        options.leftButton!.onClick(modalEl);
+      };
+    }
+  }
+
   if (confirmBtn && options.onConfirm) {
     confirmBtn.onclick = async () => {
       const modalEl = document.querySelector('.modal-card') as HTMLElement;
@@ -91,31 +115,55 @@ export function confirmAction(options: {
   message: string;
   confirmText?: string;
   confirmBtnClass?: string;
+  cancelText?: string;
   onConfirm: () => void;
+  onCancel?: () => void;
 }): void {
-  openModal({
-    title: options.title || 'Confirmar Exclusão',
-    bodyHtml: `
-      <div style="display: flex; gap: 16px; align-items: flex-start; padding: 6px 0;">
-        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); color: #f87171; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid rgba(239, 68, 68, 0.3);">
-          ⚠️
-        </div>
-        <div style="flex: 1;">
-          <div style="font-size: 0.92rem; color: var(--text-white); font-weight: 500; line-height: 1.5;">
-            ${options.message}
+  // Overlay independente e empilhável para não perder o formulário aberto por baixo
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-backdrop';
+  overlay.id = 'confirm-action-backdrop';
+  overlay.style.zIndex = '10001';
+  overlay.innerHTML = `
+    <div class="modal-card" style="max-width: 480px; animation: scaleUp 0.18s ease; box-shadow: var(--shadow-lg);">
+      <div class="modal-header">
+        <h3>${options.title || 'Confirmar Exclusão'}</h3>
+        <button type="button" class="modal-close" id="confirm-action-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 16px; align-items: flex-start; padding: 6px 0;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); color: #f87171; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid rgba(239, 68, 68, 0.3);">
+            ⚠️
           </div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
-            Esta operação não poderá ser desfeita.
+          <div style="flex: 1;">
+            <div style="font-size: 0.92rem; color: var(--text-white); font-weight: 500; line-height: 1.5;">
+              ${options.message}
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
+              Esta operação não poderá ser desfeita.
+            </div>
           </div>
         </div>
       </div>
-    `,
-    confirmText: options.confirmText || 'Excluir Definitivamente',
-    confirmBtnClass: options.confirmBtnClass || 'btn-danger',
-    onConfirm: () => {
-      options.onConfirm();
-      return true;
-    }
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="confirm-action-cancel-btn">${options.cancelText || 'Cancelar'}</button>
+        <button type="button" class="btn ${options.confirmBtnClass || 'btn-danger'}" id="confirm-action-confirm-btn">${options.confirmText || 'Excluir Definitivamente'}</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    overlay.remove();
+    if (options.onCancel) options.onCancel();
+  };
+
+  overlay.querySelector('#confirm-action-close-btn')?.addEventListener('click', close);
+  overlay.querySelector('#confirm-action-cancel-btn')?.addEventListener('click', close);
+  overlay.querySelector('#confirm-action-confirm-btn')?.addEventListener('click', () => {
+    overlay.remove();
+    options.onConfirm();
   });
 }
 

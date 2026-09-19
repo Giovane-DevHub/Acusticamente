@@ -1180,6 +1180,29 @@ class StorageService {
       });
   }
 
+  // Exclusão em lote de todos os agendamentos de um aluno
+  public deleteStudentAppointments(studentId: string, currentUserName: string): number {
+    const student = this.students.find(s => s.id === studentId);
+    const studentName = student ? student.nome : 'Aluno';
+    const toDelete = this.appointments.filter(a => a.alunoId === studentId);
+    const count = toDelete.length;
+
+    this.appointments = this.appointments.filter(a => a.alunoId !== studentId);
+    this.saveAppointments();
+    this.pushToCloud('appointments', 'delete_by_student', { studentId });
+
+    auditService.log({
+      tela: 'Cadastro de Alunos',
+      acao: 'Exclusão de Agendamentos',
+      usuarioNome: currentUserName,
+      detalhes: count > 0
+        ? `Todos os ${count} agendamento(s) do aluno "${studentName}" foram excluídos do sistema.`
+        : `Tentativa de exclusão de agendamentos para o aluno "${studentName}" (nenhum agendamento ativo encontrado).`
+    });
+
+    return count;
+  }
+
   // ===================== FINANCEIRO / PAGAMENTOS =====================
   public getPayments(): Payment[] {
     const todayStr = this.getTodayDateString();

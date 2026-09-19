@@ -101,6 +101,12 @@ export default async function handler(req: any, res: any) {
         return res.status(200).json({ success: true, message: 'Removido do MongoDB.' });
       }
 
+      // Ação: Excluir todos os agendamentos de um aluno
+      if (action === 'delete_by_student' && data?.studentId) {
+        await col.deleteMany({ alunoId: data.studentId });
+        return res.status(200).json({ success: true, message: 'Agendamentos do aluno removidos do MongoDB.' });
+      }
+
       // Ação: Salvar configurações
       if (collection === 'settings' && data) {
         await col.replaceOne({ id: 'system_settings' }, { id: 'system_settings', ...data }, { upsert: true });
