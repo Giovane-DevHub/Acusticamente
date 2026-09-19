@@ -3,6 +3,7 @@ import { authService, hasActionPermission } from '../services/authService';
 import { Payment, PaymentMethod, PaymentStatus, Student } from '../types';
 import { ICONS, openModal, closeModal, showToast, confirmAction, applyInputMask, maskYearMonth, maskMoney, parseMoney } from '../utils/ui';
 import { openReceiptModal } from './alunos';
+import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -11,6 +12,7 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
   let searchTerm = '';
   let statusFilter: 'todos' | PaymentStatus = 'todos';
   let filterDate: Date | null = new Date();
+  let sortState: SortState = { column: 'vencimento', direction: 'desc' };
 
   const monthNames = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -69,6 +71,17 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
       const matchMonth = !targetMonthStr || p.mesReferencia === targetMonthStr || p.dataVencimento.startsWith(targetMonthStr);
 
       return matchSearch && matchStatus && matchMonth;
+    });
+
+    const sortedPayments = sortItems(filtered, sortState, {
+      aluno: p => {
+        const s = students.find(stud => stud.id === p.alunoId);
+        return s?.nome || '';
+      },
+      descricao: p => p.descricao,
+      vencimento: p => p.dataVencimento,
+      valor: p => p.valor,
+      status: p => p.status
     });
 
     container.innerHTML = `
@@ -276,26 +289,26 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
       <!-- Tabela Principal de Pagamentos -->
       <div class="panel-card">
         <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="panel-card-title">Lançamentos Financeiros (${filtered.length})</h3>
+          <h3 class="panel-card-title">Lançamentos Financeiros (${sortedPayments.length})</h3>
         </div>
 
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="min-width: 140px;">Aluno</th>
-                <th class="col-hide-md">Descrição / Referência</th>
-                <th class="col-hide-sm" style="width: 140px;">Vencimento</th>
-                <th style="width: 110px;">Valor</th>
-                <th class="col-hide-xs" style="width: 110px;">Status</th>
+                ${renderSortHeader('Aluno', 'aluno', sortState, { extraStyle: 'min-width: 140px;' })}
+                ${renderSortHeader('Descrição / Referência', 'descricao', sortState, { extraClass: 'col-hide-md' })}
+                ${renderSortHeader('Vencimento', 'vencimento', sortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 140px;' })}
+                ${renderSortHeader('Valor', 'valor', sortState, { extraStyle: 'width: 110px;' })}
+                ${renderSortHeader('Status', 'status', sortState, { extraClass: 'col-hide-xs', extraStyle: 'width: 110px;' })}
                 <th style="width: 120px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
               ${
-                filtered.length === 0
+                sortedPayments.length === 0
                   ? `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum lançamento financeiro encontrado para os filtros selecionados.</td></tr>`
-                  : filtered
+                  : sortedPayments
                       .map(p => {
                         const student = students.find(s => s.id === p.alunoId);
                         const isPago = p.status === 'pago';
@@ -417,6 +430,11 @@ export function renderFinanceiro(onNavigate: (screen: string) => void): HTMLElem
 
     container.querySelector('#fin-btn-all-months')?.addEventListener('click', () => {
       filterDate = null;
+      render();
+    });
+
+    attachSortEvents(container, sortState, (newSort) => {
+      sortState = newSort;
       render();
     });
 

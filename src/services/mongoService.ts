@@ -34,6 +34,7 @@ export const MONGO_SCHEMAS: Record<string, MongoCollectionMeta> = {
       telefone: 'String',
       planoId: 'ObjectId (referência para a coleção planos_ensino)',
       moduloAtual: 'String',
+      aulaAtual: 'String',
       status: 'String (enum: ativo, inativo)',
       observacoes: 'String',
       criadoEm: 'Date'

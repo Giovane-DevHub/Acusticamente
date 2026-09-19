@@ -2,11 +2,13 @@ import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { TeachingPlan, PlanModule, PlanLesson } from '../types';
 import { ICONS, openModal, showToast, confirmAction } from '../utils/ui';
+import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
   const user = authService.getCurrentUser();
   let searchTerm = '';
+  let sortState: SortState = { column: 'nome', direction: 'asc' };
 
   const canCreate = hasActionPermission(user, 'planos', 'cadastrar');
   const canEdit = hasActionPermission(user, 'planos', 'alterar');
@@ -21,6 +23,12 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
         p.nome.toLowerCase().includes(term) ||
         (p.descricao && p.descricao.toLowerCase().includes(term))
       );
+    });
+
+    const sortedTeachingPlans = sortItems(filteredTeachingPlans, sortState, {
+      nome: p => p.nome,
+      estrutura: p => (p.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0),
+      descricao: p => p.descricao || ''
     });
 
     container.innerHTML = `
@@ -73,22 +81,22 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
       <!-- TABELA: PLANOS DE ENSINO -->
       <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="panel-card-title">Planos Pedagógicos Cadastrados (${filteredTeachingPlans.length})</h3>
+          <h3 class="panel-card-title">Planos Pedagógicos Cadastrados (${sortedTeachingPlans.length})</h3>
         </div>
 
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="min-width: 160px;">Plano de Ensino</th>
-                <th class="col-hide-sm" style="width: 160px; text-align: center;">Estrutura</th>
-                <th class="col-hide-md">Descrição</th>
+                ${renderSortHeader('Plano de Ensino', 'nome', sortState, { extraStyle: 'min-width: 160px;' })}
+                ${renderSortHeader('Estrutura', 'estrutura', sortState, { align: 'center', extraClass: 'col-hide-sm', extraStyle: 'width: 160px;' })}
+                ${renderSortHeader('Descrição', 'descricao', sortState, { extraClass: 'col-hide-md' })}
                 <th style="width: 110px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
               ${
-                filteredTeachingPlans.length === 0
+                sortedTeachingPlans.length === 0
                   ? `
                     <tr>
                       <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px;">
@@ -96,7 +104,7 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
                       </td>
                     </tr>
                   `
-                  : filteredTeachingPlans
+                  : sortedTeachingPlans
                       .map(plan => {
                         const totalModulos = (plan.modulos || []).length;
                         const totalAulas = (plan.modulos || []).reduce((sum, m) => sum + (m.aulas?.length || 0), 0);
@@ -184,6 +192,11 @@ export function renderPlanos(onNavigate: (screen: string) => void): HTMLElement 
 
     container.querySelector('#btn-clear-search')?.addEventListener('click', () => {
       searchTerm = '';
+      renderList();
+    });
+
+    attachSortEvents(container, sortState, (newSort) => {
+      sortState = newSort;
       renderList();
     });
 

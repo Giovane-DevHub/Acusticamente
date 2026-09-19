@@ -553,6 +553,36 @@ html, body {
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.data-table th.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.data-table th.sortable-th:hover {
+  color: var(--text-white);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.sort-arrow-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  font-size: 0.65rem;
+  line-height: 1;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.sort-arrow-indicator.active {
+  color: var(--color-coral);
+  opacity: 1;
+  font-weight: 700;
+}
+
+.sort-arrow-indicator.inactive {
+  opacity: 0.35;
+}
+
 .data-table td {
   padding: 12px 16px;
   font-size: 0.82rem;

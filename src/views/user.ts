@@ -2,6 +2,7 @@ import { storageService } from '../services/storageService';
 import { authService, getUserPermissions, DEFAULT_PERMISSIONS_BY_ROLE } from '../services/authService';
 import { User, UserRole, UserPermissions } from '../types';
 import { ICONS, openModal, showToast, confirmAction } from '../utils/ui';
+import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 export const PERMISSION_GROUPS: {
   key: keyof UserPermissions;
@@ -140,6 +141,7 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
   }
 
   let searchTerm = '';
+  let sortState: SortState = { column: 'nome', direction: 'asc' };
 
   function renderList(): void {
     const allUsers = storageService.getUsers();
@@ -149,6 +151,13 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
       u.login.toLowerCase().includes(term) ||
       u.papel.toLowerCase().includes(term)
     );
+
+    const sortedUsers = sortItems(users, sortState, {
+      nome: u => u.nome,
+      login: u => u.login,
+      papel: u => u.papel,
+      tipo: u => (u.isSistema ? 'Sistema' : 'Operador')
+    });
 
     container.innerHTML = `
       <!-- Cabeçalho da Tela -->
@@ -200,23 +209,23 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
       <!-- Painel e Tabela de Usuários -->
       <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-card-header">
-          <h3 class="panel-card-title">Usuários Cadastrados (${users.length})</h3>
+          <h3 class="panel-card-title">Usuários Cadastrados (${sortedUsers.length})</h3>
         </div>
 
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="min-width: 140px;">Nome</th>
-                <th class="col-hide-sm">Login</th>
-                <th class="col-hide-xs">Perfil</th>
+                ${renderSortHeader('Nome', 'nome', sortState, { extraStyle: 'min-width: 140px;' })}
+                ${renderSortHeader('Login', 'login', sortState, { extraClass: 'col-hide-sm' })}
+                ${renderSortHeader('Perfil', 'papel', sortState, { extraClass: 'col-hide-xs' })}
                 <th class="col-hide-md">Permissões Detalhadas</th>
-                <th class="col-hide-sm">Tipo</th>
+                ${renderSortHeader('Tipo', 'tipo', sortState, { extraClass: 'col-hide-sm' })}
                 <th style="width: 110px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
-              ${users
+              ${sortedUsers
         .map(user => {
           const roleLabel =
             user.papel === 'admin'
@@ -307,6 +316,11 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
 
     container.querySelector('#btn-clear-search')?.addEventListener('click', () => {
       searchTerm = '';
+      renderList();
+    });
+
+    attachSortEvents(container, sortState, (newSort) => {
+      sortState = newSort;
       renderList();
     });
 

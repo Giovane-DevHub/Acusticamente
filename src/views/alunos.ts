@@ -2,6 +2,7 @@ import { storageService } from '../services/storageService';
 import { authService, hasActionPermission } from '../services/authService';
 import { Student, MusicalLevel, Payment, PaymentMethod } from '../types';
 import { ICONS, openModal, closeModal, showToast, confirmAction, maskCPF, maskPhone, isValidEmail, applyInputMask, maskMoney, parseMoney, maskDayOfMonth } from '../utils/ui';
+import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 const INSTRUMENTOS_COMUNS = [
   'Violão',
@@ -170,6 +171,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
   const container = document.createElement('div');
   const user = authService.getCurrentUser();
   let searchTerm = '';
+  let sortState: SortState = { column: 'nome', direction: 'asc' };
 
   function renderList(): void {
     const allStudents = storageService.getStudents();
@@ -186,6 +188,17 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       (s.instrumentoPrincipal && s.instrumentoPrincipal.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (s.responsavelNome && s.responsavelNome.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+    const sortedStudents = sortItems(filteredStudents, sortState, {
+      nome: s => s.nome,
+      instrumento: s => s.instrumentoPrincipal || '',
+      contato: s => s.telefone || s.email || '',
+      plano: s => {
+        const p = plans.find(plan => plan.id === s.planoId);
+        return p?.nome || '';
+      },
+      status: s => s.status
+    });
 
     container.innerHTML = `
       <!-- Cabeçalho da Tela -->
@@ -235,26 +248,26 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       <!-- Painel e Tabela de Alunos -->
       <div class="panel-card">
         <div class="panel-card-header">
-          <h3 class="panel-card-title">Alunos Matriculados (${filteredStudents.length})</h3>
+          <h3 class="panel-card-title">Alunos Matriculados (${sortedStudents.length})</h3>
         </div>
 
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="min-width: 160px;">Aluno</th>
-                <th class="col-hide-md" style="width: 180px;">Instrumento</th>
-                <th class="col-hide-sm" style="width: 160px;">Contato</th>
-                <th class="col-hide-sm" style="width: 180px;">Plano de Ensino</th>
-                <th class="col-hide-xs" style="width: 120px;">Status</th>
+                ${renderSortHeader('Aluno', 'nome', sortState, { extraStyle: 'min-width: 160px;' })}
+                ${renderSortHeader('Instrumento', 'instrumento', sortState, { extraClass: 'col-hide-md', extraStyle: 'width: 180px;' })}
+                ${renderSortHeader('Contato', 'contato', sortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 160px;' })}
+                ${renderSortHeader('Plano de Ensino', 'plano', sortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 180px;' })}
+                ${renderSortHeader('Status', 'status', sortState, { extraClass: 'col-hide-xs', extraStyle: 'width: 120px;' })}
                 <th style="width: 120px; text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
               ${
-                filteredStudents.length === 0
+                sortedStudents.length === 0
                   ? `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Nenhum aluno encontrado.</td></tr>`
-                  : filteredStudents
+                  : sortedStudents
                       .map(student => {
                         const plan = plans.find(p => p.id === student.planoId);
                         const isAtivo = student.status === 'ativo';
@@ -357,6 +370,11 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       renderList();
     });
 
+    attachSortEvents(container, sortState, (newSort) => {
+      sortState = newSort;
+      renderList();
+    });
+
     container.querySelector('#btn-new-student')?.addEventListener('click', () => {
       openStudentModal();
     });
@@ -448,6 +466,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
                 <span>${getInstrumentIcon(student.instrumentoPrincipal)} ${student.instrumentoPrincipal || 'Instrumento Geral'}</span>
                 &bull;
                 <span>${student.nivelMusical ? student.nivelMusical.toUpperCase() : 'INICIANTE'}</span>
+                ${student.moduloAtual ? `&bull; <span style="color: var(--color-coral); font-weight: 600;">📖 ${student.moduloAtual}${student.aulaAtual ? ` &bull; ${student.aulaAtual}` : ''}</span>` : ''}
                 ${ageStr ? `&bull; <span style="color: var(--text-muted);">${ageStr}</span>` : ''}
               </div>
             </div>
@@ -1054,29 +1073,36 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-group" style="margin: 0;">
               <label class="form-label" for="student-modulo">Módulo Atual</label>
-              <input type="text" id="student-modulo" class="form-input" placeholder="Ex: Módulo 1: Primeiros Acordes" value="${existingStudent?.moduloAtual || ''}" />
+              <select id="student-modulo" class="form-select">
+                <option value="">Selecione o plano primeiro...</option>
+              </select>
             </div>
 
             <div class="form-group" style="margin: 0;">
-              <label class="form-label" for="student-status">Status *</label>
-              <select id="student-status" class="form-select">
-                <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-                <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+              <label class="form-label" for="student-aula">Aula Atual (Opcional)</label>
+              <select id="student-aula" class="form-select">
+                <option value="">Selecione o módulo primeiro...</option>
               </select>
             </div>
           </div>
 
+          <div class="form-group" style="margin: 0; width: 100%;">
+            <label class="form-label" for="student-status">Status *</label>
+            <select id="student-status" class="form-select">
+              <option value="ativo" ${existingStudent?.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+              <option value="inativo" ${existingStudent?.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+            </select>
+          </div>
+
           <!-- SALDO DE REMARCAÇÃO (100% AUTOMÁTICO - SOMENTE LEITURA) -->
-          <div style="background: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.25); border-radius: var(--radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-white);">Créditos de Remarcação Disponíveis:</span>
-              <span class="badge" style="background: rgba(234, 67, 53, 0.2); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.4); font-size: 0.95rem; font-weight: 700; padding: 4px 10px;">
-                ${existingStudent?.saldoReposicoes || 0} ${ (existingStudent?.saldoReposicoes || 0) === 1 ? 'crédito' : 'créditos' }
-              </span>
+          <div style="background: rgba(234, 67, 53, 0.08); border: 1px solid rgba(234, 67, 53, 0.25); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-white);">Créditos de Remarcação Disponíveis</span>
+              <span title="Créditos gerados automaticamente por faltas justificadas e abatidos em reposições." style="display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: var(--text-secondary); font-size: 0.7rem; font-weight: 700; cursor: help; font-style: normal; line-height: 1;" aria-label="Informações sobre créditos">i</span>
             </div>
-            <div style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; margin-top: 4px;">
-              🔒 <strong>Saldo Automático:</strong> Os créditos são gerados automaticamente quando o aluno recebe falta justificada na agenda e consumidos ao agendar aulas de reposição. Não é permitida adição ou remoção manual.
-            </div>
+            <span class="badge" style="background: rgba(234, 67, 53, 0.2); color: var(--color-coral); border: 1px solid rgba(234, 67, 53, 0.4); font-size: 0.95rem; font-weight: 700; padding: 4px 10px;">
+              ${existingStudent?.saldoReposicoes || 0} ${ (existingStudent?.saldoReposicoes || 0) === 1 ? 'crédito' : 'créditos' }
+            </span>
           </div>
         </div>
 
@@ -1175,7 +1201,8 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
         const planoPagamentoId = (document.getElementById('student-plano-pagamento') as HTMLSelectElement)?.value || undefined;
         const isSegundaMatricula = (document.getElementById('student-segunda-matricula') as HTMLInputElement)?.checked || false;
         const status = (document.getElementById('student-status') as HTMLSelectElement).value as any;
-        const moduloAtual = (document.getElementById('student-modulo') as HTMLInputElement).value.trim();
+        const moduloAtual = (document.getElementById('student-modulo') as HTMLSelectElement)?.value?.trim() || undefined;
+        const aulaAtual = (document.getElementById('student-aula') as HTMLSelectElement)?.value?.trim() || undefined;
 
         const valorMensalidadeInput = (document.getElementById('student-valor-mensalidade') as HTMLInputElement)?.value;
         const valorMensalidade = parseMoney(valorMensalidadeInput);
@@ -1426,6 +1453,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               isSegundaMatricula,
               status,
               moduloAtual,
+              aulaAtual,
               valorMensalidade,
               diaVencimento,
               observacoes: obs
@@ -1452,6 +1480,7 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
               isSegundaMatricula,
               status,
               moduloAtual,
+              aulaAtual,
               valorMensalidade,
               diaVencimento,
               observacoes: obs
@@ -1572,6 +1601,92 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
       birthInput?.addEventListener('input', checkMinorStatus);
       birthInput?.addEventListener('change', checkMinorStatus);
       checkMinorStatus();
+
+      // ========================================================
+      // DINÂMICA DE MÓDULOS E AULAS DO PLANO DE ENSINO SELECIONADO
+      // ========================================================
+      const planoSelect = document.getElementById('student-plano') as HTMLSelectElement;
+      const moduloSelect = document.getElementById('student-modulo') as HTMLSelectElement;
+      const aulaSelect = document.getElementById('student-aula') as HTMLSelectElement;
+
+      const updateAulasDoModulo = (modTitulo: string, aulaPrevia?: string) => {
+        if (!aulaSelect) return;
+        const currentPlanoId = planoSelect?.value;
+        const currentPlan = plans.find(p => p.id === currentPlanoId);
+        const currentModule = currentPlan?.modulos?.find(
+          (m, idx) => (m.titulo || `Módulo ${idx + 1}`) === modTitulo
+        );
+
+        if (!currentModule || !currentModule.aulas || currentModule.aulas.length === 0) {
+          aulaSelect.innerHTML = currentModule
+            ? '<option value="">Nenhuma aula cadastrada neste módulo</option>'
+            : '<option value="">Selecione o módulo primeiro...</option>';
+          return;
+        }
+
+        let html = '<option value="">Selecione a aula atual (opcional)...</option>';
+        let achou = false;
+
+        currentModule.aulas.forEach((a, idx) => {
+          const tit = a.titulo || `Aula ${idx + 1}`;
+          const isSel = (aulaPrevia || existingStudent?.aulaAtual) === tit;
+          if (isSel) achou = true;
+          html += `<option value="${tit}" ${isSel ? 'selected' : ''}>Aula ${idx + 1}: ${tit}</option>`;
+        });
+
+        if (aulaPrevia && !achou) {
+          html += `<option value="${aulaPrevia}" selected>${aulaPrevia} (Personalizada)</option>`;
+        }
+
+        aulaSelect.innerHTML = html;
+      };
+
+      const updateModulosDoPlano = (planoId: string, modPrevio?: string, aulaPrevia?: string) => {
+        if (!moduloSelect) return;
+        const currentPlan = plans.find(p => p.id === planoId);
+
+        if (!currentPlan || !currentPlan.modulos || currentPlan.modulos.length === 0) {
+          moduloSelect.innerHTML = currentPlan
+            ? '<option value="">Este plano pedagógico não possui módulos cadastrados</option>'
+            : '<option value="">Selecione um plano de ensino primeiro...</option>';
+          if (aulaSelect) {
+            aulaSelect.innerHTML = '<option value="">Selecione o módulo primeiro...</option>';
+          }
+          return;
+        }
+
+        let html = '<option value="">Selecione o módulo do plano...</option>';
+        let achou = false;
+        const modAlvo = modPrevio !== undefined ? modPrevio : (existingStudent?.moduloAtual || '');
+
+        currentPlan.modulos.forEach((m, idx) => {
+          const tit = m.titulo || `Módulo ${idx + 1}`;
+          const isSel = modAlvo === tit;
+          if (isSel) achou = true;
+          const totalAulas = m.aulas?.length || 0;
+          html += `<option value="${tit}" ${isSel ? 'selected' : ''}>Módulo ${idx + 1}: ${tit} (${totalAulas} ${totalAulas === 1 ? 'aula' : 'aulas'})</option>`;
+        });
+
+        if (modAlvo && !achou) {
+          html += `<option value="${modAlvo}" selected>${modAlvo} (Anterior)</option>`;
+        }
+
+        moduloSelect.innerHTML = html;
+        updateAulasDoModulo(moduloSelect.value, aulaPrevia !== undefined ? aulaPrevia : existingStudent?.aulaAtual);
+      };
+
+      planoSelect?.addEventListener('change', () => {
+        updateModulosDoPlano(planoSelect.value, '', '');
+      });
+
+      moduloSelect?.addEventListener('change', () => {
+        updateAulasDoModulo(moduloSelect.value, '');
+      });
+
+      // Inicializa os seletores ao abrir o modal
+      if (planoSelect?.value) {
+        updateModulosDoPlano(planoSelect.value, existingStudent?.moduloAtual, existingStudent?.aulaAtual);
+      }
     }, 50);
   }
 

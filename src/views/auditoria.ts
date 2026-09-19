@@ -1,6 +1,7 @@
 import { auditService } from '../services/auditService';
 import { storageService } from '../services/storageService';
 import { ICONS } from '../utils/ui';
+import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 export function renderAuditoria(onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -8,6 +9,7 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
   // Por padrão, seleciona a data de hoje
   let filterDate: Date | null = new Date();
   let searchTerm = '';
+  let sortState: SortState = { column: 'dataHora', direction: 'desc' };
 
   const pad = (n: number) => n.toString().padStart(2, '0');
 
@@ -68,6 +70,14 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
       return matchDate && matchSearch;
     });
 
+    const sortedLogs = sortItems(filteredLogs, sortState, {
+      dataHora: log => log.dataHora,
+      usuario: log => log.usuarioNome,
+      tela: log => log.tela,
+      acao: log => log.acao,
+      detalhes: log => log.detalhes
+    });
+
     container.innerHTML = `
       <!-- Cabeçalho da Tela -->
       <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
@@ -84,55 +94,51 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
           <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-all-audit" disabled style="display: none; color: #ff6b6b; border-color: rgba(255,107,107,0.3); font-size: 0.78rem;" title="Zerar toda a base de dados (alunos, agenda, financeiro, planos e auditoria)">
             🗑️ Zerar Base de Dados
           </button>
-          <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px;">
-            <span>Registros de Hoje: <strong style="color: var(--color-coral);">${todayCount}</strong></span>
-          </div>
         </div>
       </div>
 
-      <!-- Barra de Controle de Data (Igual à Agenda) -->
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-        <div class="calendar-title-group">
-          <h2 class="calendar-month-title" style="min-width: 220px; font-size: 1.05rem;">
+      <!-- Barra de Controle de Período (Dia) Padronizada -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div class="calendar-title-group" style="display: flex; align-items: center; gap: 14px;">
+          <h3 class="calendar-month-title" style="min-width: 220px; font-size: 1.05rem; margin: 0; font-weight: 700;">
             ${filterDate ? formatDisplayDate(filterDate) : 'Todo o Histórico'}
-          </h2>
+          </h3>
           
-          <div class="calendar-nav-buttons">
-            <button type="button" class="btn btn-secondary btn-icon-only" id="audit-btn-prev" title="Dia anterior">
+          <div class="calendar-nav-buttons" style="display: flex; gap: 4px;">
+            <button type="button" class="btn btn-secondary btn-icon-only" id="audit-btn-prev" title="Dia anterior" style="width: 28px; height: 28px; padding: 0;">
               ◀
             </button>
             <button type="button" class="btn ${isTodaySelected ? 'btn-primary' : 'btn-secondary'}" id="audit-btn-today" style="padding: 6px 14px; font-size: 0.8rem;">
-              Hoje
+              Hoje (${todayCount})
             </button>
-            <button type="button" class="btn btn-secondary btn-icon-only" id="audit-btn-next" title="Próximo dia">
+            <button type="button" class="btn btn-secondary btn-icon-only" id="audit-btn-next" title="Próximo dia" style="width: 28px; height: 28px; padding: 0;">
               ▶
             </button>
           </div>
         </div>
 
         <div style="display: flex; align-items: center; gap: 8px;">
-          <button type="button" class="btn ${filterDate === null ? 'btn-primary' : 'btn-secondary'}" id="audit-btn-all" style="padding: 6px 14px; font-size: 0.8rem;" title="Exibir todo o histórico sem filtrar por data">
-            Ver Todos
-          </button>
           <input 
             type="date" 
             id="audit-date-picker" 
             class="form-input" 
-            style="padding: 5px 10px; font-size: 0.8rem; width: auto; color: var(--text-white); background: var(--bg-card);" 
-            value="${filterDate ? toInputDateValue(filterDate) : ''}" 
-            title="Selecionar data específica"
+            value="${filterDate ? toInputDateValue(filterDate) : ''}"
+            style="width: 140px; padding: 6px 10px; font-size: 0.8rem;"
           />
+          <button type="button" class="btn ${filterDate === null ? 'btn-primary' : 'btn-secondary'}" id="audit-btn-all" style="padding: 6px 14px; font-size: 0.8rem;" title="Ver todos os registros sem filtrar por data">
+            Ver Todos (${allLogs.length})
+          </button>
         </div>
       </div>
 
-      <!-- Filtros e Barra de Busca -->
-      <div style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
-        <div style="position: relative; flex: 1; max-width: 440px;">
+      <!-- Barra de Filtros Rápidos / Busca -->
+      <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: center;">
+        <div style="position: relative; flex: 1; max-width: 380px;">
           <input 
             type="text" 
             id="audit-search-input" 
             class="form-input" 
-            placeholder="Pesquisar por tela, ação, usuário ou detalhe..." 
+            placeholder="Buscar por tela, ação, usuário ou detalhe..." 
             value="${searchTerm}"
             style="padding-left: 36px;"
           />
@@ -142,16 +148,16 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
         </div>
         ${
           searchTerm
-            ? `<button type="button" class="btn btn-secondary btn-sm" id="btn-clear-audit-search">Limpar</button>`
+            ? `<button class="btn btn-secondary btn-sm" id="btn-clear-audit-search">Limpar</button>`
             : ''
         }
       </div>
 
-      <!-- Tabela de Auditoria -->
-      <div class="panel-card">
+      <!-- TABELA DE LOGS -->
+      <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-card-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h3 class="panel-card-title">
-            Registros de Auditoria (${filteredLogs.length})
+            Registros Encontrados (${sortedLogs.length})
             ${filterDate ? `<span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary); margin-left: 8px;">— ${selectedDateStr}</span>` : ''}
           </h3>
           ${
@@ -165,16 +171,16 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
           <table class="data-table">
             <thead>
               <tr>
-                <th style="min-width: 120px;">Data &amp; Hora</th>
-                <th class="col-hide-sm" style="width: 180px;">Usuário Responsável</th>
-                <th class="col-hide-md" style="width: 130px;">Tela / Módulo</th>
-                <th>Ação Executada</th>
-                <th class="col-hide-sm">Detalhes da Alteração</th>
+                ${renderSortHeader('Data &amp; Hora', 'dataHora', sortState, { extraStyle: 'min-width: 120px;' })}
+                ${renderSortHeader('Usuário Responsável', 'usuario', sortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 180px;' })}
+                ${renderSortHeader('Tela / Módulo', 'tela', sortState, { extraClass: 'col-hide-md', extraStyle: 'width: 130px;' })}
+                ${renderSortHeader('Ação Executada', 'acao', sortState)}
+                ${renderSortHeader('Detalhes da Alteração', 'detalhes', sortState, { extraClass: 'col-hide-sm' })}
               </tr>
             </thead>
             <tbody>
               ${
-                filteredLogs.length === 0
+                sortedLogs.length === 0
                   ? `
                     <tr>
                       <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 42px;">
@@ -190,7 +196,7 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
                       </td>
                     </tr>
                   `
-                  : filteredLogs
+                  : sortedLogs
                       .map(log => {
                         return `
                           <tr>
@@ -291,6 +297,11 @@ export function renderAuditoria(onNavigate: (screen: string) => void): HTMLEleme
 
     container.querySelector('#btn-clear-audit-search')?.addEventListener('click', () => {
       searchTerm = '';
+      renderTable();
+    });
+
+    attachSortEvents(container, sortState, (newSort) => {
+      sortState = newSort;
       renderTable();
     });
 

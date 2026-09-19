@@ -4,6 +4,7 @@ import { Student, Payment, TeachingPlan } from '../types';
 import { showToast } from '../utils/ui';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLElement {
   const container = document.createElement('div');
@@ -20,6 +21,7 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
   let alunoFiltroPlano = 'todos';
   let alunoFiltroFinanceiro = 'todos'; // 'todos' | 'em_dia' | 'atrasado'
   let alunoFiltroOrdem = 'nome_asc'; // 'nome_asc' | 'nome_desc' | 'data_asc' | 'data_desc'
+  let alunoSortState: SortState = { column: 'nome', direction: 'asc' };
 
   // Estados dos Filtros - Financeiro
   let finFiltroDataIni = '';
@@ -30,6 +32,7 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
   let finFiltroAluno = 'todos';
   let finFiltroMetodo = 'todos';
   let finFiltroOrdem = 'vencimento_asc'; // 'vencimento_asc' | 'vencimento_desc' | 'valor_desc' | 'aluno_asc'
+  let finSortState: SortState = { column: 'vencimento', direction: 'asc' };
 
   function render(): void {
     const settings = storageService.getSettings();
@@ -59,12 +62,14 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
     });
 
     // Ordenação Alunos
-    filteredStudents.sort((a, b) => {
-      if (alunoFiltroOrdem === 'nome_asc') return a.nome.localeCompare(b.nome);
-      if (alunoFiltroOrdem === 'nome_desc') return b.nome.localeCompare(a.nome);
-      if (alunoFiltroOrdem === 'data_desc') return (b.criadoEm || '').localeCompare(a.criadoEm || '');
-      if (alunoFiltroOrdem === 'data_asc') return (a.criadoEm || '').localeCompare(b.criadoEm || '');
-      return 0;
+    filteredStudents = sortItems(filteredStudents, alunoSortState, {
+      nome: s => s.nome,
+      instrumento: s => s.instrumentoPrincipal || '',
+      contato: s => s.telefone || '',
+      plano: s => plans.find(p => p.id === s.planoId)?.nome || '',
+      status: s => s.status,
+      mensalidade: s => (storageService.isStudentOverdue(s.id) ? 1 : 0),
+      criadoEm: s => s.criadoEm || ''
     });
 
     // Indicadores Alunos
@@ -97,16 +102,12 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
     const studentMap = new Map(students.map(s => [s.id, s.nome]));
 
     // Ordenação Financeiro
-    filteredPayments.sort((a, b) => {
-      if (finFiltroOrdem === 'vencimento_asc') return a.dataVencimento.localeCompare(b.dataVencimento);
-      if (finFiltroOrdem === 'vencimento_desc') return b.dataVencimento.localeCompare(a.dataVencimento);
-      if (finFiltroOrdem === 'valor_desc') return b.valor - a.valor;
-      if (finFiltroOrdem === 'aluno_asc') {
-        const nomeA = studentMap.get(a.alunoId) || '';
-        const nomeB = studentMap.get(b.alunoId) || '';
-        return nomeA.localeCompare(nomeB);
-      }
-      return 0;
+    filteredPayments = sortItems(filteredPayments, finSortState, {
+      aluno: p => studentMap.get(p.alunoId) || '',
+      descricao: p => p.descricao,
+      vencimento: p => p.dataVencimento,
+      valor: p => p.valor,
+      status: p => (p.status === 'pago' ? 'pago' : p.dataVencimento < hojeStr ? 'atrasado' : 'pendente')
     });
 
     // Indicadores Financeiro
@@ -268,12 +269,12 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
             <table class="data-table">
               <thead>
                 <tr>
-                  <th style="min-width: 140px;">Aluno</th>
-                  <th class="col-hide-md" style="width: 170px;">Instrumento</th>
-                  <th class="col-hide-sm" style="width: 130px;">Contato</th>
-                  <th class="col-hide-sm" style="width: 160px;">Plano</th>
-                  <th class="col-hide-xs" style="width: 100px;">Status</th>
-                  <th style="width: 120px;">Mensalidade</th>
+                  ${renderSortHeader('Aluno', 'nome', alunoSortState, { extraStyle: 'min-width: 140px;' })}
+                  ${renderSortHeader('Instrumento', 'instrumento', alunoSortState, { extraClass: 'col-hide-md', extraStyle: 'width: 170px;' })}
+                  ${renderSortHeader('Contato', 'contato', alunoSortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 130px;' })}
+                  ${renderSortHeader('Plano', 'plano', alunoSortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 160px;' })}
+                  ${renderSortHeader('Status', 'status', alunoSortState, { extraClass: 'col-hide-xs', extraStyle: 'width: 100px;' })}
+                  ${renderSortHeader('Mensalidade', 'mensalidade', alunoSortState, { extraStyle: 'width: 120px;' })}
                 </tr>
               </thead>
               <tbody>
@@ -423,11 +424,11 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
             <table class="data-table">
               <thead>
                 <tr>
-                  <th style="min-width: 140px;">Aluno</th>
-                  <th class="col-hide-md" style="width: 180px;">Descrição</th>
-                  <th class="col-hide-sm" style="width: 130px;">Vencimento</th>
-                  <th style="width: 110px;">Valor</th>
-                  <th class="col-hide-xs" style="width: 100px;">Status</th>
+                  ${renderSortHeader('Aluno', 'aluno', finSortState, { extraStyle: 'min-width: 140px;' })}
+                  ${renderSortHeader('Descrição', 'descricao', finSortState, { extraClass: 'col-hide-md', extraStyle: 'width: 180px;' })}
+                  ${renderSortHeader('Vencimento', 'vencimento', finSortState, { extraClass: 'col-hide-sm', extraStyle: 'width: 130px;' })}
+                  ${renderSortHeader('Valor', 'valor', finSortState, { extraStyle: 'width: 110px;' })}
+                  ${renderSortHeader('Status', 'status', finSortState, { extraClass: 'col-hide-xs', extraStyle: 'width: 100px;' })}
                 </tr>
               </thead>
               <tbody>
@@ -594,6 +595,25 @@ export function renderRelatorios(_onNavigate: (screen: string) => void): HTMLEle
         }
       }
     });
+
+    // ========================================================
+    // ATTACH SORT EVENTS PARA AS TABELAS DE PRÉVIA
+    // ========================================================
+    const alunoTable = container.querySelector('#tab-rel-alunos table');
+    if (alunoTable) {
+      attachSortEvents(alunoTable as HTMLElement, alunoSortState, newSort => {
+        alunoSortState = newSort;
+        render();
+      });
+    }
+
+    const finTable = container.querySelector('#tab-rel-financeiro table');
+    if (finTable) {
+      attachSortEvents(finTable as HTMLElement, finSortState, newSort => {
+        finSortState = newSort;
+        render();
+      });
+    }
   }
 
   // ========================================================

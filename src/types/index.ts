@@ -100,6 +100,7 @@ export interface Student {
   planoPagamentoId?: string; // Plano de Pagamento (Financeiro)
   isSegundaMatricula?: boolean; // Aplica desconto de 20% automático
   moduloAtual?: string;
+  aulaAtual?: string;
   saldoReposicoes?: number;
   valorMensalidade?: number;
   diaVencimento?: number;
