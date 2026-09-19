@@ -174,7 +174,13 @@ export function renderAlunos(onNavigate: (screen: string) => void): HTMLElement 
   let sortState: SortState = { column: 'nome', direction: 'asc' };
 
   function renderList(): void {
-    const allStudents = storageService.getStudents();
+    const rawStudents = storageService.getStudents();
+    const seenIds = new Set<string>();
+    const allStudents = rawStudents.filter(s => {
+      if (!s.id || seenIds.has(s.id)) return false;
+      seenIds.add(s.id);
+      return true;
+    });
     const plans = storageService.getPlans();
 
     const canCreate = hasActionPermission(user, 'alunos', 'cadastrar');

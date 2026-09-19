@@ -42,19 +42,31 @@ export default async function handler(req: any, res: any) {
       const payments = await db.collection('payments').find({}, { projection: { _id: 0 } }).toArray();
       const appointments = await db.collection('appointments').find({}, { projection: { _id: 0 } }).toArray();
       const plans = await db.collection('plans').find({}, { projection: { _id: 0 } }).toArray();
+      const paymentPlans = await db.collection('payment_plans').find({}, { projection: { _id: 0 } }).toArray();
       const users = await db.collection('users').find({}, { projection: { _id: 0 } }).toArray();
       const audit = await db.collection('auditorias').find({}, { projection: { _id: 0 } }).toArray();
       const settingsDoc = await db.collection('settings').findOne({ id: 'system_settings' }, { projection: { _id: 0 } });
+
+      const dedupe = (items: any[]) => {
+        const seen = new Set();
+        return items.filter(item => {
+          if (!item?.id) return true;
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+      };
 
       return res.status(200).json({
         success: true,
         source: 'mongodb',
         data: {
-          students,
-          payments,
-          appointments,
-          plans,
-          users,
+          students: dedupe(students),
+          payments: dedupe(payments),
+          appointments: dedupe(appointments),
+          plans: dedupe(plans),
+          paymentPlans: dedupe(paymentPlans),
+          users: dedupe(users),
           audit,
           settings: settingsDoc || null
         }
@@ -89,15 +101,16 @@ export default async function handler(req: any, res: any) {
 
       const col = db.collection(collection);
 
-      // Ação: Inserir ou atualizar um registro (Upsert)
+      // Ação: Inserir ou atualizar um registro (Upsert atômico por ID único)
       if (action === 'upsert' && data?.id) {
-        await col.replaceOne({ id: data.id }, data, { upsert: true });
+        await col.deleteMany({ id: data.id });
+        await col.insertOne(data);
         return res.status(200).json({ success: true, message: 'Salvo no MongoDB com sucesso.' });
       }
 
-      // Ação: Excluir um registro
+      // Ação: Excluir um registro pontual pelo ID
       if (action === 'delete' && data?.id) {
-        await col.deleteOne({ id: data.id });
+        await col.deleteMany({ id: data.id });
         return res.status(200).json({ success: true, message: 'Removido do MongoDB.' });
       }
 
@@ -113,16 +126,9 @@ export default async function handler(req: any, res: any) {
         return res.status(200).json({ success: true, message: 'Configurações salvas no MongoDB.' });
       }
 
-      // Ação: Substituir lote completo (com trava de segurança)
-      if (action === 'replace_all' && Array.isArray(data)) {
-        // SEGURANÇA MÁXIMA: Nunca permite que array vazio apague a coleção na nuvem.
-        // Apenas 'reset_clean' explícito pode zerar a base de dados.
-        if (data.length === 0) {
-          return res.status(200).json({ success: true, message: 'Lote vazio ignorado por segurança. Coleção mantida intacta.' });
-        }
-        await col.deleteMany({});
-        await col.insertMany(data);
-        return res.status(200).json({ success: true, message: 'Lote atualizado com sucesso.' });
+      // Ação: Substituir lote (desativada para segurança)
+      if (action === 'replace_all') {
+        return res.status(200).json({ success: true, message: 'replace_all desativado. Persistência atômica ativa.' });
       }
 
       return res.status(400).json({ success: false, message: 'Ação não reconhecida.' });

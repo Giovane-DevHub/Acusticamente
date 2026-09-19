@@ -95,10 +95,13 @@ export function renderHome(onNavigate: (screen: string) => void): HTMLElement {
     const schoolName = settings?.nomeEscola || 'Acusticamente - Escola de Música';
 
     const birthdays: BirthdayPerson[] = [];
+    const seenBirthdayIds = new Set<string>();
 
     students.forEach(s => {
+      if (seenBirthdayIds.has(s.id)) return;
       const parsed = parseBirthDate(s.dataNascimento);
       if (parsed && parsed.month === currentMonth) {
+        seenBirthdayIds.add(s.id);
         birthdays.push({
           id: s.id,
           nome: s.nome,
@@ -114,8 +117,10 @@ export function renderHome(onNavigate: (screen: string) => void): HTMLElement {
     });
 
     users.forEach(u => {
+      if (seenBirthdayIds.has(u.id)) return;
       const parsed = parseBirthDate(u.dataNascimento);
       if (parsed && parsed.month === currentMonth) {
+        seenBirthdayIds.add(u.id);
         birthdays.push({
           id: u.id,
           nome: u.nome,

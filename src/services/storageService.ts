@@ -48,11 +48,22 @@ class StorageService {
     this.initData();
   }
 
+  private dedupeById<T extends { id?: string }>(items: T[]): T[] {
+    if (!Array.isArray(items)) return [];
+    const map = new Map<string, T>();
+    for (const item of items) {
+      if (item && item.id) {
+        map.set(item.id, item);
+      }
+    }
+    return Array.from(map.values());
+  }
+
   private initData(): void {
     // 1. Usuários
     const savedUsers = localStorage.getItem(USERS_KEY);
     if (savedUsers) {
-      this.users = JSON.parse(savedUsers).map((u: any) => ({
+      this.users = this.dedupeById(JSON.parse(savedUsers).map((u: any) => ({
         ...u,
         permissoes: {
           ...u.permissoes,
@@ -75,7 +86,7 @@ class StorageService {
             gerar: true
           }
         }
-      }));
+      })));
     } else {
       // Usuário administrador inicial obrigatório: login 1, senha 1
       this.users = [
@@ -351,14 +362,14 @@ class StorageService {
     // 3. Alunos
     const savedStudents = localStorage.getItem(STUDENTS_KEY);
     if (savedStudents) {
-      this.students = JSON.parse(savedStudents).map((s: any) => ({
+      this.students = this.dedupeById(JSON.parse(savedStudents).map((s: any) => ({
         ...s,
         saldoReposicoes: typeof s.saldoReposicoes === 'number' ? s.saldoReposicoes : 0,
         instrumentoPrincipal: s.instrumentoPrincipal || 'Violão',
         nivelMusical: s.nivelMusical || 'iniciante',
         valorMensalidade: typeof s.valorMensalidade === 'number' ? s.valorMensalidade : 280,
         diaVencimento: typeof s.diaVencimento === 'number' ? s.diaVencimento : 10
-      }));
+      })));
     } else {
       this.students = [];
       localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
@@ -367,7 +378,7 @@ class StorageService {
     // 4. Compromissos / Agenda das Aulas
     const savedAppointments = localStorage.getItem(APPOINTMENTS_KEY);
     if (savedAppointments) {
-      this.appointments = JSON.parse(savedAppointments);
+      this.appointments = this.dedupeById(JSON.parse(savedAppointments));
     } else {
       this.appointments = [];
       localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
@@ -382,7 +393,7 @@ class StorageService {
     // 6. Pagamentos & Mensalidades (Financeiro)
     const savedPayments = localStorage.getItem(PAYMENTS_KEY);
     if (savedPayments) {
-      this.payments = JSON.parse(savedPayments);
+      this.payments = this.dedupeById(JSON.parse(savedPayments));
     } else {
       this.payments = [];
       localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
@@ -474,53 +485,32 @@ class StorageService {
       const cloud = json.data;
 
       if (Array.isArray(cloud.students)) {
-        if (cloud.students.length > 0) {
-          this.students = cloud.students;
-          localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
-        } else if (this.students.length > 0) {
-          // PROTEÇÃO: se a nuvem estiver vazia mas existirem alunos locais,
-          // não apaga os locais! Sobe os dados locais para a nuvem para restaurar.
-          for (const s of this.students) {
-            this.pushToCloud('students', 'upsert', s);
-          }
-        }
+        this.students = this.dedupeById(cloud.students);
+        localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
       }
 
       if (Array.isArray(cloud.payments)) {
-        if (cloud.payments.length > 0) {
-          this.payments = cloud.payments;
-          localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
-        } else if (this.payments.length > 0) {
-          for (const p of this.payments) {
-            this.pushToCloud('payments', 'upsert', p);
-          }
-        }
+        this.payments = this.dedupeById(cloud.payments);
+        localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
       }
 
       if (Array.isArray(cloud.appointments)) {
-        if (cloud.appointments.length > 0) {
-          this.appointments = cloud.appointments;
-          localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
-        } else if (this.appointments.length > 0) {
-          for (const a of this.appointments) {
-            this.pushToCloud('appointments', 'upsert', a);
-          }
-        }
+        this.appointments = this.dedupeById(cloud.appointments);
+        localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
       }
 
       if (Array.isArray(cloud.plans)) {
-        if (cloud.plans.length > 0) {
-          this.plans = cloud.plans;
-          localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
-        } else if (this.plans.length > 0) {
-          for (const pl of this.plans) {
-            this.pushToCloud('plans', 'upsert', pl);
-          }
-        }
+        this.plans = this.dedupeById(cloud.plans);
+        localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
+      }
+
+      if (Array.isArray(cloud.paymentPlans)) {
+        this.paymentPlans = this.dedupeById(cloud.paymentPlans);
+        localStorage.setItem(PAYMENT_PLANS_KEY, JSON.stringify(this.paymentPlans));
       }
 
       if (Array.isArray(cloud.users) && cloud.users.length > 0) {
-        this.users = cloud.users;
+        this.users = this.dedupeById(cloud.users);
         localStorage.setItem(USERS_KEY, JSON.stringify(this.users));
       }
 
@@ -569,43 +559,24 @@ class StorageService {
     }
   }
 
-  // Salvamentos internos com replicação na nuvem (protegidos contra envio vazio)
+  // Salvamentos internos no cache local (operações de persistência na nuvem são atômicas e diretas)
   private saveUsers() { 
     localStorage.setItem(USERS_KEY, JSON.stringify(this.users)); 
-    if (this.users.length > 0) {
-      this.pushToCloud('users', 'replace_all', this.users);
-    }
   }
   private saveStudents() { 
     localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students)); 
-    // SEGURANÇA MÁXIMA: NUNCA envia replace_all se a lista for vazia!
-    if (this.students.length > 0) {
-      this.pushToCloud('students', 'replace_all', this.students);
-    }
   }
   private savePlans() { 
     localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans)); 
-    if (this.plans.length > 0) {
-      this.pushToCloud('plans', 'replace_all', this.plans);
-    }
   }
   private saveAppointments() { 
     localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments)); 
-    if (this.appointments.length > 0) {
-      this.pushToCloud('appointments', 'replace_all', this.appointments);
-    }
   }
   private savePayments() { 
     localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments)); 
-    if (this.payments.length > 0) {
-      this.pushToCloud('payments', 'replace_all', this.payments);
-    }
   }
-  private savePaymentPlans() {
-    localStorage.setItem(PAYMENT_PLANS_KEY, JSON.stringify(this.paymentPlans));
-    if (this.paymentPlans.length > 0) {
-      this.pushToCloud('payment_plans', 'replace_all', this.paymentPlans);
-    }
+  private savePaymentPlans() { 
+    localStorage.setItem(PAYMENT_PLANS_KEY, JSON.stringify(this.paymentPlans)); 
   }
   private saveSettings() { 
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings)); 
@@ -614,7 +585,7 @@ class StorageService {
 
   // ===================== USUÁRIOS =====================
   public getUsers(): User[] {
-    return [...this.users];
+    return this.dedupeById(this.users);
   }
 
   public getUserById(id: string): User | undefined {
@@ -630,6 +601,7 @@ class StorageService {
     };
     this.users.push(newUser);
     this.saveUsers();
+    this.pushToCloud('users', 'upsert', newUser);
 
     auditService.log({
       tela: 'Cadastro de Usuários',
@@ -656,6 +628,7 @@ class StorageService {
       atualizadoEm: new Date().toISOString()
     };
     this.saveUsers();
+    this.pushToCloud('users', 'upsert', this.users[index]);
 
     auditService.log({
       tela: 'Cadastro de Usuários',
@@ -677,6 +650,7 @@ class StorageService {
 
     this.users = this.users.filter(u => u.id !== id);
     this.saveUsers();
+    this.pushToCloud('users', 'delete', { id });
 
     auditService.log({
       tela: 'Cadastro de Usuários',
@@ -688,7 +662,7 @@ class StorageService {
 
   // ===================== ALUNOS =====================
   public getStudents(): Student[] {
-    return [...this.students];
+    return this.dedupeById(this.students);
   }
 
   public getStudentById(id: string): Student | undefined {
@@ -751,6 +725,7 @@ class StorageService {
     this.students = this.students.filter(s => s.id !== id);
     this.saveStudents();
     this.pushToCloud('students', 'delete', { id });
+    this.pushToCloud('appointments', 'delete_by_student', { studentId: id });
 
     auditService.log({
       tela: 'Cadastro de Alunos',
@@ -762,7 +737,7 @@ class StorageService {
 
   // ===================== PLANOS DE ENSINO =====================
   public getPlans(): TeachingPlan[] {
-    return [...this.plans];
+    return this.dedupeById(this.plans);
   }
 
   public addPlan(data: Omit<TeachingPlan, 'id' | 'criadoEm'>, currentUserName: string): TeachingPlan {
@@ -773,6 +748,7 @@ class StorageService {
     };
     this.plans.push(newPlan);
     this.savePlans();
+    this.pushToCloud('plans', 'upsert', newPlan);
 
     auditService.log({
       tela: 'Plano de Ensino',
@@ -791,6 +767,7 @@ class StorageService {
     const oldPlan = this.plans[index];
     this.plans[index] = { ...oldPlan, ...updates };
     this.savePlans();
+    this.pushToCloud('plans', 'upsert', this.plans[index]);
 
     auditService.log({
       tela: 'Plano de Ensino',
@@ -808,6 +785,7 @@ class StorageService {
 
     this.plans = this.plans.filter(p => p.id !== id);
     this.savePlans();
+    this.pushToCloud('plans', 'delete', { id });
 
     auditService.log({
       tela: 'Plano de Ensino',
@@ -819,7 +797,7 @@ class StorageService {
 
   // ===================== PLANOS DE PAGAMENTO =====================
   public getPaymentPlans(): PaymentPlan[] {
-    return [...this.paymentPlans];
+    return this.dedupeById(this.paymentPlans);
   }
 
   public getPaymentPlanById(id: string): PaymentPlan | undefined {
@@ -834,6 +812,7 @@ class StorageService {
     };
     this.paymentPlans.push(newPlan);
     this.savePaymentPlans();
+    this.pushToCloud('payment_plans', 'upsert', newPlan);
 
     auditService.log({
       tela: 'Planos de Pagamento',
@@ -852,6 +831,7 @@ class StorageService {
     const oldPlan = this.paymentPlans[index];
     this.paymentPlans[index] = { ...oldPlan, ...updates };
     this.savePaymentPlans();
+    this.pushToCloud('payment_plans', 'upsert', this.paymentPlans[index]);
 
     auditService.log({
       tela: 'Planos de Pagamento',
@@ -869,6 +849,7 @@ class StorageService {
 
     this.paymentPlans = this.paymentPlans.filter(p => p.id !== id);
     this.savePaymentPlans();
+    this.pushToCloud('payment_plans', 'delete', { id });
 
     auditService.log({
       tela: 'Planos de Pagamento',
@@ -901,7 +882,7 @@ class StorageService {
 
   // ===================== AGENDA / COMPROMISSOS =====================
   public getAppointments(): Appointment[] {
-    return [...this.appointments];
+    return this.dedupeById(this.appointments);
   }
 
   public addAppointment(data: Omit<Appointment, 'id' | 'criadoEm'>, currentUserName: string): Appointment {
@@ -912,6 +893,7 @@ class StorageService {
     };
     this.appointments.push(newApp);
     this.saveAppointments();
+    this.pushToCloud('appointments', 'upsert', newApp);
 
     const student = this.students.find(s => s.id === newApp.alunoId);
     auditService.log({
@@ -934,15 +916,18 @@ class StorageService {
 
     this.appointments[index] = { ...oldApp, ...updates };
     this.saveAppointments();
+    this.pushToCloud('appointments', 'upsert', this.appointments[index]);
 
     const student = this.students.find(s => s.id === (updates.alunoId || oldApp.alunoId));
 
     // Gestão 100% AUTOMÁTICA dos créditos de remarcação através de eventos de status
     if (student) {
+      let studentUpdated = false;
       // 1. Mudança para Falta Justificada: ganha +1 crédito automático
       if (oldStatus !== 'falta_justificada' && newStatus === 'falta_justificada') {
         student.saldoReposicoes = (student.saldoReposicoes || 0) + 1;
         this.saveStudents();
+        studentUpdated = true;
         auditService.log({
           tela: 'Agenda',
           acao: 'Crédito de Remarcação Automático (+1)',
@@ -954,6 +939,7 @@ class StorageService {
       else if (oldStatus === 'falta_justificada' && newStatus !== 'falta_justificada') {
         student.saldoReposicoes = Math.max(0, (student.saldoReposicoes || 0) - 1);
         this.saveStudents();
+        studentUpdated = true;
         auditService.log({
           tela: 'Agenda',
           acao: 'Estorno de Crédito de Remarcação (-1)',
@@ -968,6 +954,7 @@ class StorageService {
         if (oldStatus !== 'cancelado' && newStatus === 'cancelado') {
           student.saldoReposicoes = (student.saldoReposicoes || 0) + 1;
           this.saveStudents();
+          studentUpdated = true;
           auditService.log({
             tela: 'Agenda',
             acao: 'Estorno por Cancelamento de Reposição (+1)',
@@ -977,6 +964,7 @@ class StorageService {
         } else if (oldStatus === 'cancelado' && newStatus === 'agendado') {
           student.saldoReposicoes = Math.max(0, (student.saldoReposicoes || 0) - 1);
           this.saveStudents();
+          studentUpdated = true;
           auditService.log({
             tela: 'Agenda',
             acao: 'Consumo por Reativação de Reposição (-1)',
@@ -984,6 +972,10 @@ class StorageService {
             detalhes: `Reposição reativada para "${student.nome}". 1 crédito consumido. Saldo atual: ${student.saldoReposicoes}.`
           });
         }
+      }
+
+      if (studentUpdated) {
+        this.pushToCloud('students', 'upsert', student);
       }
     }
 
@@ -1007,6 +999,7 @@ class StorageService {
       if (student) {
         student.saldoReposicoes = (student.saldoReposicoes || 0) + 1;
         this.saveStudents();
+        this.pushToCloud('students', 'upsert', student);
         auditService.log({
           tela: 'Agenda',
           acao: 'Estorno Automático de Crédito (+1)',
@@ -1018,6 +1011,7 @@ class StorageService {
 
     this.appointments = this.appointments.filter(a => a.id !== id);
     this.saveAppointments();
+    this.pushToCloud('appointments', 'delete', { id });
 
     auditService.log({
       tela: 'Agenda',
@@ -1162,6 +1156,9 @@ class StorageService {
     });
 
     this.saveAppointments();
+    for (const app of created) {
+      this.pushToCloud('appointments', 'upsert', app);
+    }
 
     auditService.log({
       tela: 'Agenda',
@@ -1227,7 +1224,7 @@ class StorageService {
       this.savePayments();
     }
 
-    return [...this.payments].sort((a, b) => b.dataVencimento.localeCompare(a.dataVencimento));
+    return this.dedupeById(this.payments).sort((a, b) => b.dataVencimento.localeCompare(a.dataVencimento));
   }
 
   public getStudentPayments(studentId: string): Payment[] {
@@ -1259,6 +1256,7 @@ class StorageService {
 
     this.payments.push(newPayment);
     this.savePayments();
+    this.pushToCloud('payments', 'upsert', newPayment);
 
     const student = this.students.find(s => s.id === newPayment.alunoId);
     auditService.log({
@@ -1291,6 +1289,7 @@ class StorageService {
     }
 
     this.savePayments();
+    this.pushToCloud('payments', 'upsert', payment);
 
     const student = this.students.find(s => s.id === payment.alunoId);
     auditService.log({
@@ -1323,6 +1322,7 @@ class StorageService {
     };
 
     this.savePayments();
+    this.pushToCloud('payments', 'upsert', this.payments[index]);
 
     const p = this.payments[index];
     const student = this.students.find(s => s.id === p.alunoId);
@@ -1342,6 +1342,7 @@ class StorageService {
 
     this.payments = this.payments.filter(item => item.id !== id);
     this.savePayments();
+    this.pushToCloud('payments', 'delete', { id });
 
     const student = this.students.find(s => s.id === p.alunoId);
     auditService.log({
