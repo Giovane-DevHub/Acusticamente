@@ -74,6 +74,7 @@ export interface User {
   nome: string;
   login: string;
   senha?: string;
+  dataNascimento?: string;
   papel: UserRole;
   permissoes?: UserPermissions;
   isSistema: boolean; // Usuário 1: não pode ser apagado, mas pode ter login e senha alterados
@@ -246,4 +247,7 @@ export interface SystemSettings {
   mongoDatabase: string;
   mongoStatus: 'conectado' | 'desconectado' | 'simulado';
   notificacoesAtivas: boolean;
+  msgAniversarioAluno?: string;
+  msgAniversarioProfessor?: string;
+  msgAniversarioAdmin?: string;
 }

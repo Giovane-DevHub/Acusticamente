@@ -237,6 +237,22 @@ export function maskCEP(value: string): string {
   return v;
 }
 
+export function maskDate(value: string): string {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+    const [y, m, d] = value.split('-');
+    return `${d.slice(0, 2)}/${m}/${y}`;
+  }
+  const clean = value.replace(/\D/g, '').slice(0, 8);
+  if (clean.length > 4) {
+    return `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4)}`;
+  }
+  if (clean.length > 2) {
+    return `${clean.slice(0, 2)}/${clean.slice(2)}`;
+  }
+  return clean;
+}
+
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

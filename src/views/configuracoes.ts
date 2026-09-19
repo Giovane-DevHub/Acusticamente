@@ -316,6 +316,62 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
             <div id="logo-feedback-msg" style="font-size: 0.74rem; margin-top: 8px; display: none;"></div>
           </div>
 
+          <!-- Divisor -->
+          <div style="border-top: 1px solid var(--border-subtle); margin: 18px 0;"></div>
+
+          <!-- Mensagens Padrão de Aniversário (WhatsApp) -->
+          <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 12px;">
+              <label class="form-label" style="font-size: 0.85rem; font-weight: 700; color: var(--text-white); margin-bottom: 2px; display: block;">
+                🎂 Mensagens Padrão de Aniversário (WhatsApp)
+              </label>
+              <span style="font-size: 0.74rem; color: var(--text-secondary);">
+                Configure o texto padrão de felicitação sugerido ao abrir o WhatsApp na tela inicial. A tag <code>{nome}</code> será substituída pelo primeiro nome do aniversariante.
+              </span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="cfg-msg-aluno" style="font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                  <span class="badge badge-info" style="font-size: 0.65rem;">Aluno</span> Mensagem para Alunos
+                </label>
+                <textarea 
+                  id="cfg-msg-aluno" 
+                  class="form-textarea" 
+                  rows="3" 
+                  placeholder="Mensagem de parabéns para alunos..."
+                  style="resize: vertical; font-size: 0.82rem; line-height: 1.4;"
+                >${settings.msgAniversarioAluno || ''}</textarea>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="cfg-msg-professor" style="font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                  <span class="badge badge-warning" style="font-size: 0.65rem;">Professor</span> Mensagem para Professores
+                </label>
+                <textarea 
+                  id="cfg-msg-professor" 
+                  class="form-textarea" 
+                  rows="3" 
+                  placeholder="Mensagem de parabéns para professores..."
+                  style="resize: vertical; font-size: 0.82rem; line-height: 1.4;"
+                >${settings.msgAniversarioProfessor || ''}</textarea>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="cfg-msg-admin" style="font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                  <span class="badge badge-coral" style="font-size: 0.65rem;">ADM</span> Mensagem para Administradores / Gestão
+                </label>
+                <textarea 
+                  id="cfg-msg-admin" 
+                  class="form-textarea" 
+                  rows="3" 
+                  placeholder="Mensagem de parabéns para administradores..."
+                  style="resize: vertical; font-size: 0.82rem; line-height: 1.4;"
+                >${settings.msgAniversarioAdmin || ''}</textarea>
+              </div>
+            </div>
+          </div>
+
           <!-- Ação Salvar Configurações Gerais -->
           <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px; display: flex; justify-content: flex-start;">
             ${
@@ -485,11 +541,17 @@ export function renderConfiguracoes(onNavigate: (screen: string) => void): HTMLE
   formGerais?.addEventListener('submit', (e) => {
     e.preventDefault();
     const nomeMenu = inputMenuName.value.trim() || 'Acusticamente';
+    const msgAniversarioAluno = (container.querySelector('#cfg-msg-aluno') as HTMLTextAreaElement)?.value.trim() || '';
+    const msgAniversarioProfessor = (container.querySelector('#cfg-msg-professor') as HTMLTextAreaElement)?.value.trim() || '';
+    const msgAniversarioAdmin = (container.querySelector('#cfg-msg-admin') as HTMLTextAreaElement)?.value.trim() || '';
 
     storageService.updateSettings(
       {
         nomeMenu,
-        logotipoCustomizado: tempCustomLogo
+        logotipoCustomizado: tempCustomLogo,
+        msgAniversarioAluno,
+        msgAniversarioProfessor,
+        msgAniversarioAdmin
       },
       user?.nome || 'Administrador'
     );

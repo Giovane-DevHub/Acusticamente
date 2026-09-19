@@ -1,7 +1,7 @@
 import { storageService } from '../services/storageService';
 import { authService, getUserPermissions, DEFAULT_PERMISSIONS_BY_ROLE } from '../services/authService';
 import { User, UserRole, UserPermissions } from '../types';
-import { ICONS, openModal, showToast, confirmAction } from '../utils/ui';
+import { ICONS, openModal, showToast, confirmAction, applyInputMask, maskDate } from '../utils/ui';
 import { renderSortHeader, attachSortEvents, sortItems, SortState } from '../utils/tableSort';
 
 export const PERMISSION_GROUPS: {
@@ -244,9 +244,12 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
                           <div style="width: 28px; height: 28px; border-radius: 50%; background: ${user.isSistema ? 'var(--color-coral)' : '#282b3a'}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; color: #ffffff; flex-shrink: 0;">
                             ${user.nome[0] || 'U'}
                           </div>
-                          <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${user.nome}
-                          </span>
+                          <div style="display: flex; flex-direction: column; overflow: hidden;">
+                            <span style="font-weight: 600; color: var(--text-white); font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                              ${user.nome}
+                            </span>
+                            ${user.dataNascimento ? `<span style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.2;">Nascimento: ${maskDate(user.dataNascimento)}</span>` : ''}
+                          </div>
                         </div>
                       </td>
                       <td class="col-hide-sm">
@@ -368,7 +371,7 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
           <input type="text" id="user-nome" class="form-input" placeholder="Ex: Maria Fernandes" value="${existingUser?.nome || ''}" required />
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-row-responsive">
           <div class="form-group">
             <label class="form-label" for="user-login">Login de Acesso</label>
             <input type="text" id="user-login" class="form-input" placeholder="Ex: maria ou 1" value="${existingUser?.login || ''}" required />
@@ -380,13 +383,27 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="user-papel">Perfil / Papel no Sistema</label>
-          <select id="user-papel" class="form-select" ${existingUser?.isSistema ? 'disabled title="O administrador raiz deve manter o perfil admin"' : ''}>
-            <option value="admin" ${initialRole === 'admin' ? 'selected' : ''}>Administrador (Acesso Total)</option>
-            <option value="professor" ${initialRole === 'professor' ? 'selected' : ''}>Professor</option>
-            <option value="atendente" ${initialRole === 'atendente' ? 'selected' : ''}>Atendente</option>
-          </select>
+        <div class="form-row-responsive">
+          <div class="form-group">
+            <label class="form-label" for="user-nascimento">Data de Nascimento</label>
+            <input 
+              type="text" 
+              id="user-nascimento" 
+              class="form-input" 
+              placeholder="DD/MM/AAAA" 
+              maxlength="10" 
+              value="${existingUser?.dataNascimento ? maskDate(existingUser.dataNascimento) : ''}" 
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="user-papel">Perfil / Papel no Sistema</label>
+            <select id="user-papel" class="form-select" ${existingUser?.isSistema ? 'disabled title="O administrador raiz deve manter o perfil admin"' : ''}>
+              <option value="admin" ${initialRole === 'admin' ? 'selected' : ''}>Administrador (Acesso Total)</option>
+              <option value="professor" ${initialRole === 'professor' ? 'selected' : ''}>Professor</option>
+              <option value="atendente" ${initialRole === 'atendente' ? 'selected' : ''}>Atendente</option>
+            </select>
+          </div>
         </div>
 
         ${existingUser?.isSistema
@@ -531,12 +548,29 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
         const nome = (document.getElementById('user-nome') as HTMLInputElement).value.trim();
         const login = (document.getElementById('user-login') as HTMLInputElement).value.trim();
         const senha = (document.getElementById('user-senha') as HTMLInputElement).value.trim();
+        const dataNascimento = (document.getElementById('user-nascimento') as HTMLInputElement)?.value.trim() || '';
         const papelEl = document.getElementById('user-papel') as HTMLSelectElement;
         const papel = (papelEl ? papelEl.value : 'professor') as UserRole;
 
         if (!nome || !login || !senha) {
           showToast('Preencha Nome, Login e Senha.', 'error');
           return false;
+        }
+
+        if (dataNascimento) {
+          if (dataNascimento.length !== 10) {
+            showToast('Informe a data de nascimento completa no formato DD/MM/AAAA.', 'error');
+            return false;
+          }
+          const parts = dataNascimento.split('/');
+          const dia = parseInt(parts[0], 10);
+          const mes = parseInt(parts[1], 10);
+          const ano = parseInt(parts[2], 10);
+          const currentYear = new Date().getFullYear();
+          if (isNaN(dia) || isNaN(mes) || isNaN(ano) || dia < 1 || dia > 31 || mes < 1 || mes > 12 || ano < 1900 || ano > currentYear) {
+            showToast('Data de nascimento inválida.', 'error');
+            return false;
+          }
         }
 
         // Validação de login duplicado
@@ -608,6 +642,7 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
               nome,
               login,
               senha,
+              dataNascimento,
               papel: existingUser.isSistema ? 'admin' : papel,
               permissoes: existingUser.isSistema ? DEFAULT_PERMISSIONS_BY_ROLE.admin : permissoes
             },
@@ -620,6 +655,7 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
               nome,
               login,
               senha,
+              dataNascimento,
               papel,
               permissoes
             },
@@ -636,6 +672,11 @@ export function renderUser(onNavigate: (screen: string) => void): HTMLElement {
     // Conectar eventos dinâmicos dentro do modal aberto
     const papelSelect = document.getElementById('user-papel') as HTMLSelectElement;
     const permSection = document.getElementById('user-permissions-section') as HTMLElement;
+    const birthInput = document.getElementById('user-nascimento') as HTMLInputElement;
+
+    if (birthInput) {
+      applyInputMask(birthInput, maskDate);
+    }
 
     const updateItemVisual = (groupKey: string, actionKey: string, checked: boolean) => {
       const row = document.getElementById(`row-perm-${groupKey}-${actionKey}`);

@@ -38,7 +38,10 @@ class StorageService {
     mongoStatus: 'simulado',
     notificacoesAtivas: true,
     nomeMenu: 'Acusticamente',
-    logotipoCustomizado: ''
+    logotipoCustomizado: '',
+    msgAniversarioAluno: 'Olá, {nome}! 🎂🎉 A equipe da Acusticamente passa para te desejar um Feliz Aniversário! Que seu novo ciclo seja repleto de realizações, saúde, alegria e muita música! Parabéns pelo seu dia! 🎶✨',
+    msgAniversarioProfessor: 'Olá, Prof. {nome}! 🎂🎉 Toda a equipe da Acusticamente te deseja um Feliz Aniversário! Muito obrigado por sua dedicação musical e talento. Que você tenha um ano repleto de sucesso e realizações! 🎶✨',
+    msgAniversarioAdmin: 'Olá, {nome}! 🎂🎉 A equipe da Acusticamente passa para te desejar um Feliz Aniversário! Muito sucesso, liderança, saúde e grandes conquistas neste novo ciclo! Parabéns! 🎶✨'
   };
 
   constructor() {
@@ -114,6 +117,7 @@ class StorageService {
             configuracoes: { acesso: false, alterar: false }
           },
           isSistema: false,
+          dataNascimento: '1992-09-24',
           criadoEm: new Date().toISOString()
         }
       ];
@@ -372,7 +376,7 @@ class StorageService {
     // 5. Configurações
     const savedSettings = localStorage.getItem(SETTINGS_KEY);
     if (savedSettings) {
-      this.settings = JSON.parse(savedSettings);
+      this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
     }
 
     // 6. Pagamentos & Mensalidades (Financeiro)

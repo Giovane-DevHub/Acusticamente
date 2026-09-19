@@ -415,6 +415,12 @@ html, body {
   margin-bottom: 14px;
 }
 
+.form-row-responsive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .form-label {
   font-size: 0.78rem;
   font-weight: 500;
@@ -885,6 +891,7 @@ html, body {
 .modal-body {
   padding: 20px;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: calc(90vh - 130px);
 }
 
@@ -1369,6 +1376,15 @@ html, body {
     max-height: 94vh;
     max-height: 94dvh;
     padding-bottom: max(16px, env(safe-area-inset-bottom, 12px));
+  }
+
+  .modal-body {
+    padding: 16px 12px;
+  }
+
+  .form-row-responsive {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
 
   .data-table th, 
