@@ -117,7 +117,7 @@ class StorageService {
           criadoEm: new Date().toISOString()
         }
       ];
-      this.saveUsers();
+      localStorage.setItem(USERS_KEY, JSON.stringify(this.users));
     }
 
     // 2. Planos de Ensino de Música com módulos e aulas aninhadas
@@ -260,7 +260,7 @@ class StorageService {
           ]
         }
       ];
-      this.savePlans();
+      localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
     }
 
     // 2.1. Planos de Pagamento (Cobranças, Modalidades, Ciclos e Desconto 20%)
@@ -341,7 +341,7 @@ class StorageService {
           criadoEm: new Date().toISOString()
         }
       ];
-      this.savePaymentPlans();
+      localStorage.setItem(PAYMENT_PLANS_KEY, JSON.stringify(this.paymentPlans));
     }
 
     // 3. Alunos
@@ -357,7 +357,7 @@ class StorageService {
       }));
     } else {
       this.students = [];
-      this.saveStudents();
+      localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
     }
 
     // 4. Compromissos / Agenda das Aulas
@@ -366,7 +366,7 @@ class StorageService {
       this.appointments = JSON.parse(savedAppointments);
     } else {
       this.appointments = [];
-      this.saveAppointments();
+      localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
     }
 
     // 5. Configurações
@@ -381,18 +381,18 @@ class StorageService {
       this.payments = JSON.parse(savedPayments);
     } else {
       this.payments = [];
-      this.savePayments();
+      localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
     }
 
     // Auto-sanitização para assegurar 100% de foco em Escola de Música
     if (this.settings.nomeClinica && this.settings.nomeClinica.includes('Terapêutico')) {
       this.settings.nomeEscola = 'Acusticamente - Escola de Música';
       this.settings.nomeClinica = 'Acusticamente - Escola de Música';
-      this.saveSettings();
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings));
     }
     if (!this.settings.nomeEscola) {
       this.settings.nomeEscola = this.settings.nomeClinica || 'Acusticamente - Escola de Música';
-      this.saveSettings();
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings));
     }
     this.plans.forEach(p => {
       if (p.nome.includes('Reabilitação')) {
@@ -405,21 +405,21 @@ class StorageService {
         ];
       }
     });
-    this.savePlans();
+    localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
     this.students.forEach(s => {
       if (s.observacoes?.includes('implante')) {
         s.moduloAtual = 'Módulo 1: Primeiros Acordes e Levadas';
         s.observacoes = 'Iniciando estudos no violão popular.';
       }
     });
-    this.saveStudents();
+    localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
     this.appointments.forEach(a => {
       if (a.titulo?.includes('Auditivo')) {
         a.titulo = 'Aula Prática de Violão';
         a.observacoes = 'Praticar transição entre acordes maiores.';
       }
     });
-    this.saveAppointments();
+    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
   }
 
   public getTodayDateString(): string {
@@ -470,23 +470,49 @@ class StorageService {
       const cloud = json.data;
 
       if (Array.isArray(cloud.students)) {
-        this.students = cloud.students;
-        localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
+        if (cloud.students.length > 0) {
+          this.students = cloud.students;
+          localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students));
+        } else if (this.students.length > 0) {
+          // PROTEÇÃO: se a nuvem estiver vazia mas existirem alunos locais,
+          // não apaga os locais! Sobe os dados locais para a nuvem para restaurar.
+          for (const s of this.students) {
+            this.pushToCloud('students', 'upsert', s);
+          }
+        }
       }
 
       if (Array.isArray(cloud.payments)) {
-        this.payments = cloud.payments;
-        localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
+        if (cloud.payments.length > 0) {
+          this.payments = cloud.payments;
+          localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments));
+        } else if (this.payments.length > 0) {
+          for (const p of this.payments) {
+            this.pushToCloud('payments', 'upsert', p);
+          }
+        }
       }
 
       if (Array.isArray(cloud.appointments)) {
-        this.appointments = cloud.appointments;
-        localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
+        if (cloud.appointments.length > 0) {
+          this.appointments = cloud.appointments;
+          localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments));
+        } else if (this.appointments.length > 0) {
+          for (const a of this.appointments) {
+            this.pushToCloud('appointments', 'upsert', a);
+          }
+        }
       }
 
       if (Array.isArray(cloud.plans)) {
-        this.plans = cloud.plans;
-        localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
+        if (cloud.plans.length > 0) {
+          this.plans = cloud.plans;
+          localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans));
+        } else if (this.plans.length > 0) {
+          for (const pl of this.plans) {
+            this.pushToCloud('plans', 'upsert', pl);
+          }
+        }
       }
 
       if (Array.isArray(cloud.users) && cloud.users.length > 0) {
@@ -539,30 +565,43 @@ class StorageService {
     }
   }
 
-  // Salvamentos internos com replicação na nuvem
+  // Salvamentos internos com replicação na nuvem (protegidos contra envio vazio)
   private saveUsers() { 
     localStorage.setItem(USERS_KEY, JSON.stringify(this.users)); 
-    this.pushToCloud('users', 'replace_all', this.users);
+    if (this.users.length > 0) {
+      this.pushToCloud('users', 'replace_all', this.users);
+    }
   }
   private saveStudents() { 
     localStorage.setItem(STUDENTS_KEY, JSON.stringify(this.students)); 
-    this.pushToCloud('students', 'replace_all', this.students);
+    // SEGURANÇA MÁXIMA: NUNCA envia replace_all se a lista for vazia!
+    if (this.students.length > 0) {
+      this.pushToCloud('students', 'replace_all', this.students);
+    }
   }
   private savePlans() { 
     localStorage.setItem(PLANS_KEY, JSON.stringify(this.plans)); 
-    this.pushToCloud('plans', 'replace_all', this.plans);
+    if (this.plans.length > 0) {
+      this.pushToCloud('plans', 'replace_all', this.plans);
+    }
   }
   private saveAppointments() { 
     localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(this.appointments)); 
-    this.pushToCloud('appointments', 'replace_all', this.appointments);
+    if (this.appointments.length > 0) {
+      this.pushToCloud('appointments', 'replace_all', this.appointments);
+    }
   }
   private savePayments() { 
     localStorage.setItem(PAYMENTS_KEY, JSON.stringify(this.payments)); 
-    this.pushToCloud('payments', 'replace_all', this.payments);
+    if (this.payments.length > 0) {
+      this.pushToCloud('payments', 'replace_all', this.payments);
+    }
   }
   private savePaymentPlans() {
     localStorage.setItem(PAYMENT_PLANS_KEY, JSON.stringify(this.paymentPlans));
-    this.pushToCloud('payment_plans', 'replace_all', this.paymentPlans);
+    if (this.paymentPlans.length > 0) {
+      this.pushToCloud('payment_plans', 'replace_all', this.paymentPlans);
+    }
   }
   private saveSettings() { 
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings)); 
@@ -662,6 +701,7 @@ class StorageService {
     };
     this.students.push(newStudent);
     this.saveStudents();
+    this.pushToCloud('students', 'upsert', newStudent);
 
     auditService.log({
       tela: 'Cadastro de Alunos',
@@ -688,6 +728,7 @@ class StorageService {
       saldoReposicoes: oldStudent.saldoReposicoes ?? 0
     };
     this.saveStudents();
+    this.pushToCloud('students', 'upsert', this.students[index]);
 
     auditService.log({
       tela: 'Cadastro de Alunos',
@@ -705,6 +746,7 @@ class StorageService {
 
     this.students = this.students.filter(s => s.id !== id);
     this.saveStudents();
+    this.pushToCloud('students', 'delete', { id });
 
     auditService.log({
       tela: 'Cadastro de Alunos',

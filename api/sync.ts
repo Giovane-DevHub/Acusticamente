@@ -107,12 +107,15 @@ export default async function handler(req: any, res: any) {
         return res.status(200).json({ success: true, message: 'Configurações salvas no MongoDB.' });
       }
 
-      // Ação: Substituir lote completo
+      // Ação: Substituir lote completo (com trava de segurança)
       if (action === 'replace_all' && Array.isArray(data)) {
-        await col.deleteMany({});
-        if (data.length > 0) {
-          await col.insertMany(data);
+        // SEGURANÇA MÁXIMA: Nunca permite que array vazio apague a coleção na nuvem.
+        // Apenas 'reset_clean' explícito pode zerar a base de dados.
+        if (data.length === 0) {
+          return res.status(200).json({ success: true, message: 'Lote vazio ignorado por segurança. Coleção mantida intacta.' });
         }
+        await col.deleteMany({});
+        await col.insertMany(data);
         return res.status(200).json({ success: true, message: 'Lote atualizado com sucesso.' });
       }
 
